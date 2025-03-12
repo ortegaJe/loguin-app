@@ -29,6 +29,7 @@ class LoguinTicketStoreController extends Controller
                 'especialidad' => 'nullable|string|max:255',
                 'observaciones' => 'nullable|string',
                 'cargo_id' => 'integer',
+                'sedes_adicionales' => 'nullable|string',
             ]);
     
             // Datos enviados desde el frontend
@@ -44,6 +45,7 @@ class LoguinTicketStoreController extends Controller
             $nombre_especialidad = $validatedData['especialidad'] ?? null;
             $observaciones = $validatedData['observaciones'];
             $cargo_id = $validatedData['cargo_id'];
+            $sedes_adicionales = $validatedData['sedes_adicionales'] ?? '';
     
             // Crear usuario en la tabla loguin_usuarios
             $appUserId = $this->createUser($tipo_identificacion_id, $identificacion, $nombre, $apellido, $email);
@@ -51,7 +53,7 @@ class LoguinTicketStoreController extends Controller
 
             // Lógica para decidir y crear los tickets
             $cargo = $this->getCargoName($cargo_id);
-            $tickets = $this->processTickets($aplicaciones, $infraestructura, $identificacion, $appUserId, $nombre_especialidad, $zonal_id, $sede_id, $observaciones, $cargo);
+            $tickets = $this->processTickets($aplicaciones, $infraestructura, $identificacion, $appUserId, $nombre_especialidad, $zonal_id, $sede_id, $sedes_adicionales, $observaciones, $cargo);
     
             // Confirmar la transacción si todo salió bien
             DB::commit();
@@ -166,6 +168,7 @@ class LoguinTicketStoreController extends Controller
         $nombre_especialidad,
         $zonal_id, 
         $sede_id,
+        $sedesAdicionales,
         $observaciones,
         $cargo,
     ) {
@@ -184,7 +187,7 @@ class LoguinTicketStoreController extends Controller
         // Crea tickets basados en las solicitudes recibidas
         if ($createLoguinTicket) {
             // Registrar solicitudes asociados al usuario SOLO si hay aplicaciones
-            $solicitudId = $this->registerUserRequest($appUserId, $cargo->id, $zonal_id, $sede_id, $observacionesStr);
+            $solicitudId = $this->registerUserRequest($appUserId, $cargo->id, $zonal_id, $sede_id, $sedesAdicionales, $observacionesStr);
             
             // Registrar aplicaciones y perfiles asociados al usuario
             $this->registerUserApplications($aplicaciones, $solicitudId);
@@ -215,13 +218,14 @@ class LoguinTicketStoreController extends Controller
     }
     
     // Función para registrar solicitudes asociados al usuario
-    private function registerUserRequest($appUserId, $cargoId, $zonal_id, $sede_id, $observacionesStr)
-    {
+    private function registerUserRequest($appUserId, $cargoId, $zonal_id, $sede_id, $sedesAdicionales, $observacionesStr)
+    {   
         $solicitudId = DB::table('loguin_solicitud')->insertGetId([
             'usuario_id' => $appUserId,
             'cargo_id' => $cargoId,
             'zonal_id' => $zonal_id,
             'sede_id' => $sede_id,
+            'sedes_adicionales' => $sedesAdicionales,
             'observaciones' => $observacionesStr,
         ]);
 

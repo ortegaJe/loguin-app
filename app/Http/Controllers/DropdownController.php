@@ -79,6 +79,8 @@ class DropdownController extends Controller
         $cargo_id = $request->input('cargo_id');
         $sede_id = $request->input('sede_id');
 
+        $data = [];
+
         $perfiles = DB::table('loguin_rel_cargo_sede as a')
         ->join('loguin_cargo as b', 'b.id', 'a.cargo_id')
         ->join('glpi_locations as c', 'c.id', 'a.sede_id')
@@ -102,7 +104,7 @@ class DropdownController extends Controller
         ->join('loguin_aplicaciones as e', 'e.id', 'd.aplicacion_id')
         ->where('a.cargo_id', $cargo_id)
         ->where('a.sede_id',  $sede_id)
-        ->distinct('cargo_id')
+        ->distinct('a.cargo_id')
         ->get([
             'b.sw_correo',
             'b.sw_dominio',
@@ -116,9 +118,70 @@ class DropdownController extends Controller
         $data = [
             'perfiles' => $perfiles,
             'solicitud_infra' => $solicitud_infra,
+            'perfil_esp_everest_id' => $this->isEspecialistaEverestWithPerfil($perfiles),
+            'perfil_esp_pana_id' => $this->isEspecialistaPanaWithPerfil($perfiles),
         ];
 
         return response()->json($data, 200);
+    }
+
+    private function isEspecialistaEverestWithPerfil($perfiles)
+    {
+        $perfilesData = [];
+        $perfiles->each(function ($perfil) use (&$perfilesData) {
+            if ($perfil->perfil_id == OpcionesConstantes::ESP_PERFIL_EVEREST_ID) {
+                $perfilesData['perfil_esp_everest_id'] = true;
+            }
+        });
+
+        //error_log(__LINE__ . __METHOD__ . ' perfil_esp_everest_id --->' . ($perfilesData['perfil_esp_everest_id'] ?? 'null'));
+        return $perfilesData['perfil_esp_everest_id'] ?? false;
+    }
+
+    private function isEspecialistaPanaWithPerfil($perfiles)
+    {
+        $perfilesData = [];
+        $perfiles->each(function ($perfil) use (&$perfilesData) {
+            if ($perfil->perfil_id == OpcionesConstantes::ESP_PERFIL_PANA_ID) {
+                $perfilesData['perfil_esp_pana_id'] = true;
+            }
+        });
+
+        //error_log(__LINE__ . __METHOD__ . ' perfil_esp_everest_id --->' . ($perfilesData['perfil_esp_everest_id'] ?? 'null'));
+        return $perfilesData['perfil_esp_pana_id'] ?? false;
+    }
+
+    public function fetchSedesAdicionales(Request $request)
+    {
+        $zonal_id = $request->input('zonal_id');
+        $sede_id = $request->input('sede_id');
+        $cargo_id = $request->input('cargo_id');
+
+        $data['sedes_multiples'] = DB::table('loguin_rel_cargo_sede as b')
+                ->join('loguin_perfil as c', 'c.id', 'b.perfil_id')
+                ->join('glpi_locations as d', 'd.id', 'b.sede_id')
+                ->join('loguin_aplicaciones as f', 'f.id', 'c.aplicacion_id')
+                ->join('glpi_locations as d2', 'd2.id', 'b.sede_id')
+                ->select([
+                    'd2.id',
+                    'd2.name',
+                    //DB::raw('GROUP_CONCAT(DISTINCT f.name ORDER BY f.name) as aplicaciones'),
+                    //DB::raw('GROUP_CONCAT(DISTINCT c.name ORDER BY c.name) as perfiles'),
+                ])
+                ->where('d.locations_id', $zonal_id)
+                ->where('b.cargo_id', $cargo_id)
+                ->whereIn('c.aplicacion_id', [2])
+                ->whereIn('b.perfil_id', function ($query) use ($sede_id) {
+                    $query->select('b2.perfil_id')
+                        ->from('loguin_rel_cargo_sede as b2')
+                        ->where('b2.sede_id', $sede_id); // Sede seleccionada
+                })
+                ->where('d2.id', '<>', $sede_id)
+                ->groupBy('d2.id','d2.name')
+                ->orderBy('d2.name')
+                ->get();
+
+        return response()->json($data);
     }
 
     public function fetchEspecialidades(Request $request)

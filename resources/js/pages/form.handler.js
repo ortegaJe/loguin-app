@@ -1,5 +1,8 @@
+import MultiSelect from './MultiSelect.js'; // Adjust the path as needed
+
 class ApplicationFormManager {
     static perfilesEspecialistaId = ["5","6"] // ID desde la base de datos especilidades everest y pana
+    static PERFIL_ESPECIALISTA_EVEREST = 5;
 
     static initFormElements() {
         this.mainForm = document.getElementById('main-form');
@@ -10,6 +13,10 @@ class ApplicationFormManager {
         this.blockElement  = document.querySelector('.block.block-rounded.block-transparent');
         this.blockSolicitud = document.getElementById('block-solicitud');
         this.rowEspecialidad = document.getElementById('row-especialidad');
+        this.radioAdicionSedeMultiple = document.getElementById('radio-adicion-sedes-multiples');
+        this.radioAdicionSedeMultipleContainer = document.getElementById('radio-adicion-sedes-multiples-container');
+        this.rowSedeMultiple = document.getElementById('row-sedes-multiple');
+        this.sedeMultiple = document.getElementById('sedes-multiple');
         this.searchEspecialidad = document.getElementById('search-especialidad');
         this.checkboxRow = document.getElementById('checkbox-row');
         this.checkboxDescLabel = document.getElementById('checkbox-label');
@@ -18,13 +25,6 @@ class ApplicationFormManager {
         this.cheboxInfraLabel = document.getElementById('checkbox-infra-label');
         this.checkboxInfraContainer = document.getElementById('checkbox-infra-container');
         this.observaciones = document.getElementById('observaciones');
-        this.modalContainer = document.getElementById('modal-container');
-
-        this.appDropdown = document.getElementById('app-dropdown');
-        this.perfilDropdown = document.getElementById('perfil-dropdown');
-        this.applicationsList = document.getElementById('applications-list');
-        this.btnAdd = document.getElementById('btn-add');
-
         this.btnRefreshBlock = document.getElementById('btn-refresh');
         this.btnReset = document.getElementById('btn-reset');
         this.toast = Swal.mixin({
@@ -209,6 +209,8 @@ class ApplicationFormManager {
         this.resetCheckboxesButtons();
         this.rowEspecialidad.hidden = true;
         this.searchEspecialidad.value = '';
+        this.radioAdicionSedeMultiple.hidden = true;
+        this.rowSedeMultiple.hidden = true;
         this.observaciones.value = '';
     }
 
@@ -331,6 +333,7 @@ class ApplicationFormManager {
     {
         const idTipoCargo = this.tipoCargoDropdown.value;
         const idSede = this.sedeDropdown.value;
+
         if (!idTipoCargo) {
             this.resetAll();
             return;
@@ -361,6 +364,8 @@ class ApplicationFormManager {
     {
         const idSede = this.sedeDropdown.value;
         const idCargo = this.cargoSedeDropdown.value;
+        this.radioAdicionSedeMultiple.hidden = true;
+        this.rowSedeMultiple.hidden = true;
     
         if (!idCargo) {
             this.resetAll();
@@ -391,11 +396,15 @@ class ApplicationFormManager {
             //console.log(data);
             const renderPerfilesCheckboxes = data.perfiles;
             const renderInfraCheckboxes = data.solicitud_infra;
+            const espEverestPerfilId = data.perfil_esp_everest_id;
+            const espPanaPerfilId = data.perfil_esp_pana_id;
 
-            //console.log(this.perfilesEspecialistaId);
+            // Valida si el cargo seleccionado es especialista EVEREST
+            if (espEverestPerfilId != false) this.sedesAdicionalesChangeHandler(espEverestPerfilId);
     
             // oculta y setea el contenedor del input especialidaddes antes de agregar nuevos elementos
-            this.rowEspecialidad.hidden = this.perfilesEspecialistaId.includes(idCargo) ? false : true;
+            //this.rowEspecialidad.hidden = this.perfilesEspecialistaId.includes(idCargo) ? false : true;
+            this.rowEspecialidad.hidden = (espPanaPerfilId !== false || espEverestPerfilId !== false) ? false : true;
             this.searchEspecialidad.value = '';
             
             // Limpiar los contenedores de checkboxes después de la animación
@@ -515,156 +524,95 @@ class ApplicationFormManager {
             this.showToast('Oops...', `${error.message}`, 'warning');
             this.cargoSedeDropdown.value = '';
             this.blockSolicitud.hidden = true;
+            this.radioAdicionSedeMultiple.hidden = true;
+            this.rowSedeMultiple.hidden = true;
             this.resetPerfilDropdown();
         }
     }
 
-    static mostrarModal({ titulo, descripcion }) {
-        const modalHtml = `
-            <div class="modal fade" id="ayudaModal" tabindex="-1" aria-labelledby="ayudaModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="ayudaModalLabel">${titulo}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            ${descripcion}
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        </div>
-                    </div>
+    static async sedesAdicionalesChangeHandler(perfilId) {
+    
+        if (perfilId) {
+            this.radioAdicionSedeMultiple.hidden = false;
+            const radioAdicionSedeMultipleHTML = `
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="sedeMultipleDecision" 
+                        id="sedeMultipleSi" value="si">
+                    <label class="form-check-label" for="sedeMultipleSi">Si</label>
                 </div>
-            </div>`;
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="sedeMultipleDecision" 
+                        id="sedeMultipleNo" value="no" checked>
+                    <label class="form-check-label" for="sedeMultipleNo">No</label>
+                </div>`;
+            this.radioAdicionSedeMultipleContainer.innerHTML = radioAdicionSedeMultipleHTML;
     
-        this.modalContainer.innerHTML = modalHtml;
-    
-        // Inicializar y mostrar el modal usando Bootstrap
-        const ayudaModal = new bootstrap.Modal(document.getElementById('ayudaModal'));
-        ayudaModal.show();
-    }
-    
-    static async appChangeHandler() {
-        const idApp = this.appDropdown.value;
-        const selectedAppText = this.appDropdown.options[this.appDropdown.selectedIndex].text;
+                // Add radio button event listeners
+                const radioButtons = document.querySelectorAll('input[name="sedeMultipleDecision"]');
+                radioButtons.forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        const showMultiSelect = e.target.value === 'si';
+                        this.rowSedeMultiple.hidden = !showMultiSelect;
+                        
+                        if (showMultiSelect) {
+                            // Initialize MultiSelect only when "Si" is selected
+                                this.fetchSedesAdicionales();
+                        }
+                    });
+                });
 
-        if (!idApp) {
-            this.resetPerfilDropdown();
-            return;
+                // Initially hide MultiSelect since "No" is checked by default
+                this.rowSedeMultiple.hidden = true;
+        } else {
+            this.radioAdicionSedeMultiple.hidden = true;
+            this.rowSedeMultiple.hidden = true;
         }
+    }
+
+    static async fetchSedesAdicionales() {
+        const idZonal = this.zonalDropdown.value;
+        const idSede = this.sedeDropdown.value;
+        const idCargo = this.cargoSedeDropdown.value;
 
         try {
-            const response = await fetch("fetchAppsPerfiles", {
+            const response = await fetch("/fetchSedesAdicionales", {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                 },
-                body: JSON.stringify({ app_id: idApp })
+                body: JSON.stringify({ cargo_id: idCargo, zonal_id: idZonal, sede_id: idSede })
             });
 
-            const data = await this.handleFetchResponse(response);
-            this.updateDropdown('perfil-dropdown', data.perfiles, 'Seleccione Perfil..');
-
-            if (this.panaAppNames.includes(selectedAppText)) {
-                this.perfilDropdown.size = "10";
-                this.perfilDropdown.multiple = true;
-            } else {
-                this.perfilDropdown.multiple = false;
-                this.btnAdd.disabled = data.perfiles.length > 0 ? false : true;
+            if (!response.ok) {
+                const errorData = await response.json();  // Extraer el mensaje desde el backend
+                throw new Error(errorData.message || 'Something went wrong..')
             }
-            this.btnAdd.disabled = false;
-            this.disableSelectedPerfiles();
+
+            const data = await response.json();
+            this.MultiSelectSedes(data.sedes_multiples);
+
         } catch (error) {
             console.error('Fetch error:', error);
+            this.showToast('Error...', `${error.message}`, 'error');
         }
     }
 
-    static addApplicationHandler() {
-        const selectedAppId = this.appDropdown.value;
-        const selectedAppText = this.appDropdown.options[this.appDropdown.selectedIndex].text;
-        const selectedPerfilOptions = [...this.perfilDropdown.selectedOptions];
-    
-        if (!selectedAppId || selectedPerfilOptions.length === 0) return;
-    
-        selectedPerfilOptions.forEach(option => {
-            const selectedPerfilId = option.value;
-            const selectedPerfilText = option.text;
-    
-            const appHtml = `<div class="form-group mb-2">
-                <div class="row">
-                    <div class="col-5">
-                        <input type="text" class="form-control" value="${selectedAppText}" data-app-id="${selectedAppId}" readonly>
-                    </div>
-                    <div class="col-5">
-                        <input type="text" class="form-control" value="${selectedPerfilText}" data-perfil-id="${selectedPerfilId}" readonly>
-                    </div>
-                    <div class="col-2">
-                        <button type="button" class="btn btn-alt-danger btn-remove"><i class="fa fa-trash-can"></i></button>
-                    </div>
-                </div>
-            </div>`;
-    
-            this.applicationsList.insertAdjacentHTML('beforeend', appHtml);
-    
-            // Añadir el perfil seleccionado a la lista de perfiles seleccionados
-            this.selectedPerfiles.push(selectedPerfilId);
-    
-            // Deshabilitar el perfil seleccionado
-            this.perfilDropdown.querySelectorAll('option').forEach(option => {
-                if (option.value === selectedPerfilId) {
-                    option.disabled = true; // Deshabilitar el perfil en el dropdown
-                }
-            });
-    
-            if (!this.panaAppNames.includes(selectedAppText)) {
-                this.appDropdown.querySelectorAll('option').forEach(appOption => {
-                    if (appOption.text === selectedAppText) {
-                        appOption.disabled = true; // Deshabilitar la aplicación si no es PANA
-                    }
-                });
+    static async MultiSelectSedes(sedesAdicionales) {
+        const selectElement = document.querySelector('#sedes-multiple');
+        selectElement.multiSelect = new MultiSelect(selectElement, {
+            data: sedesAdicionales.map(sede => ({
+                value: sede.id,
+                text: sede.name,
+                selected: false
+            })),
+            onSelect: function (value, text) {
+                //console.log('Selected:', value, text);
             }
         });
-    
-        this.appDropdown.value = '';
-        this.resetPerfilDropdown();
-        this.btnAdd.disabled = true;
     }
 
-    static removeApplicationHandler(event) {
-        if (event.target.classList.contains('btn-remove')) {
-            const row = event.target.closest('.form-group');
-            const perfilId = row.querySelector('input[data-perfil-id]').getAttribute('data-perfil-id');
-            const appId = row.querySelector('input[data-app-id]').getAttribute('data-app-id');
-            const appText = this.appDropdown.querySelector(`option[value="${appId}"]`).text;
-    
-            // Remover el perfil de la lista de perfiles seleccionados
-            this.selectedPerfiles = this.selectedPerfiles.filter(id => id !== perfilId);
-    
-            // Rehabilitar el perfil en el dropdown de perfiles
-            this.perfilDropdown.querySelectorAll('option').forEach(option => {
-                if (option.value === perfilId) {
-                    option.disabled = false; // Rehabilitar el perfil en el dropdown
-                }
-            });
-    
-            // Si no es una aplicación PANA, también habilitamos la aplicación en el dropdown
-            if (!this.panaAppNames.includes(appText)) {
-                this.appDropdown.querySelectorAll('option').forEach(appOption => {
-                    if (appOption.value === appId) {
-                        appOption.disabled = false; // Rehabilitar la aplicación en el dropdown
-                    }
-                });
-            }
-    
-            // Eliminar la fila correspondiente en la lista de aplicaciones
-            row.remove();
-        }
-    }
-
-    static clearForm() 
-    {
+    static clearForm() {
         document.getElementById('type_identity_number').value = '',
         document.getElementById('identity_number').value = '';
         document.getElementById('first_name').value = '';
@@ -678,141 +626,7 @@ class ApplicationFormManager {
         this.resetAll();
     }
 
-    static async handleSubmit(event) 
-    {
-        event.preventDefault();
-
-        if (!jQuery('#main-form').valid()) {
-            // Si la validación falla, detén el proceso y no envíes el formulario
-            console.log('El formulario contiene campos que deben ser validados, no se enviará.');
-            return;
-        }
-
-        const appData = [];
-        const appDivs = this.checkboxContainer.querySelectorAll('.form-check');
-
-        appDivs.forEach(div => {
-            const appInput = div.querySelector('input[data-app-id]:checked');
-            const perfilInput = div.querySelector('input[data-perfil-id]:checked');
-
-            if (appInput && perfilInput) {
-                const appId = appInput.getAttribute('data-app-id');
-                const perfilId = perfilInput.getAttribute('data-perfil-id');
-                appData.push({app_id: appId, perfil_id: perfilId});
-            }
-        });
-
-        //console.log(appData);
-
-        const radioData = [];
-        const radioContainers = this.checkboxInfraContainer.querySelectorAll('.form-check'); // Seleccionamos todos los contenedores de checkbox
-        
-        radioContainers.forEach(container => {
-            const checkedRadio = container.querySelector('input[type="checkbox"]:checked'); // Buscamos el checkbox seleccionado dentro del contenedor
-                 
-            if (checkedRadio) {
-                    const radioSolicitud = container.querySelector('.form-check-label').textContent.trim();
-                    const radioValue = checkedRadio.value;
-                    radioData.push({radio_solicitud: radioSolicitud,radio_valor: radioValue});
-            }
-        });
-
-        //console.log(radioData);
-
-        const formData = {
-            tipo_identificacion: document.getElementById('type_identity_number').value,
-            identificacion: document.getElementById('identity_number').value,
-            nombre: document.getElementById('first_name').value,
-            apellido: document.getElementById('last_name').value,
-            email: document.getElementById('email').value,
-            zonal_id: this.zonalDropdown.value,
-            sede_id: this.sedeDropdown.value,
-            cargo_id: this.cargoSedeDropdown.value,
-            aplicaciones: appData,
-            infraestructura: radioData,
-            especialidad: this.searchEspecialidad.value,
-            observaciones: this.observaciones.value,
-        };
-
-        console.log('Request del Formulario');
-        console.group();
-        console.log('loguin usuario', formData);
-        //this.showToast('Oops...', `Formulario loguin enviado correctamente`, 'success');
-
-        this.toast.fire({
-        title: 'Esta seguro?',
-        text: 'Se enviaran los datos del formulario para la creacion del loguin!',
-        icon: 'warning',
-        showCancelButton: true,
-        customClass: {
-            confirmButton: 'btn btn-success m-1',
-            cancelButton: 'btn btn-secondary m-1'
-        },
-        confirmButtonText: 'Si, enviar!',
-        cancelButtonText: 'Cancelar',
-        html: false,
-        preConfirm: e => {
-            return new Promise(resolve => {
-            setTimeout(() => {
-                resolve();
-            }, 50);
-            });
-        }
-        }).then(async result => {
-            if (result.value) {                
-            try {
-                const response = await fetch('/storeLoguinTicket', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                if (!response.ok) {
-                    this.showToast('Error...', `Error al enviar Formulario Loguin ${response.statusText}`, 'error');
-                    throw new Error(`Error en la respuesta del servidor: ${response.statusText} - ${response.status}`);
-                }
-
-                const result = await response.json();
-
-                const ticketLoguinNumber = result.ticketLoguin !== null ? result.ticketLoguin : null;
-                const ticketInfraNumber = result.ticketInfraestructura !== null ? result.ticketInfraestructura : null;
-
-                if (ticketLoguinNumber) {
-                    const URLTicketLoguin = `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${ticketLoguinNumber}" target="_blank">#${ticketLoguinNumber}</a>`;
-                    console.log('ID de ticketLoguin:', ticketLoguinNumber);
-                    this.showToast('Formulario Loguin Enviado!', `TICKET Loguin ${URLTicketLoguin}`, 'success');
-                }
-                
-                if (ticketInfraNumber) {
-                    const URLticketInfraNumber = `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${ticketInfraNumber}" target="_blank">#${ticketInfraNumber}</a>`;
-                    console.log('ID de ticketInfraestructura:', ticketInfraNumber);
-                    this.showToast('Formulario Loguin Enviado!', `TICKET Infraestructura ${URLticketInfraNumber}`, 'success');
-                }
-
-                if (ticketLoguinNumber && ticketInfraNumber) {
-                    const URLTicketLoguin = `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${ticketLoguinNumber}" target="_blank">#${ticketLoguinNumber}</a>`;
-                    const URLticketInfraNumber = `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${ticketInfraNumber}" target="_blank">#${ticketInfraNumber}</a>`;
-                    console.log('ID de ticketInfraestructura:', ticketInfraNumber);
-                    console.log('ID de ticketLoguin:', ticketLoguinNumber);
-                    this.showToast('Formulario Loguin Enviado!', `TICKET Loguin ${URLTicketLoguin} <br> TICKET Infraestructura ${URLticketInfraNumber}`, 'success');
-                }
-
-                this.clearForm();
-            } catch (error) {
-                console.error('Error al enviar el formulario:', error);
-                this.showToast('Error...', `Error al enviar formulario loguin ${error}`, 'error');
-            }
-        } else if (result.dismiss === 'cancel') {
-            //toast.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
-        }
-        });
-    }
-
-    static init() 
-    {
+    static init() {
         this.initFormElements();
         this.AutocompleteDataLoguin();
         this.zonalDropdown.addEventListener('change', () => this.zonalChangeHandler());

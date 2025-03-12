@@ -20,6 +20,7 @@ Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN|CONTRATACION'])->group(func
     Route::post('fetchTipoCargoSede', [DropdownController::class, 'fetchTipoCargoSede']);
     Route::post('fetchCargoSede', [DropdownController::class, 'fetchCargoSede']);
     Route::post('fetchCargoAppPerfil', [DropdownController::class, 'fetchCargoAppPerfil']);
+    Route::post('fetchSedesAdicionales', [DropdownController::class, 'fetchSedesAdicionales']);
     Route::get('fetchEspecialidades', [DropdownController::class, 'fetchEspecialidades']);
     Route::get('fetchDataIdentificacionLoguin', [DropdownController::class, 'fetchDataIdentificacionLoguin']);
     Route::get('fetchDataAutoCompleteLoguin', [DropdownController::class, 'fetchDataAutoCompleteLoguin']);

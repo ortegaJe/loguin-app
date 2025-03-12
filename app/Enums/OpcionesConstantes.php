@@ -4,6 +4,9 @@ namespace App\Enums;
 
 class OpcionesConstantes
 {
+    const ESP_PERFIL_EVEREST_ID = 5;
+    const ESP_PERFIL_PANA_ID = 6;
+
     const OPCIONES = [
         'solicitar_correo' => [
             'label' => 'Requiere Correo Institucional',
