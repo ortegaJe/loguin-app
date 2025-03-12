@@ -626,6 +626,165 @@ class ApplicationFormManager {
         this.resetAll();
     }
 
+    static async handleSubmit(event) {
+        event.preventDefault();
+
+        if (!jQuery('#main-form').valid()) {
+            // Si la validación falla, detén el proceso y no envíes el formulario
+            console.log('El formulario contiene campos que deben ser validados, no se enviará.');
+            return;
+        }
+
+        // Obtener los valores seleccionados de los checkboxes de Aplicaciones y Perfiles
+        const appData = [];
+        const appDivs = this.checkboxContainer.querySelectorAll('.form-check');
+
+        appDivs.forEach(div => {
+            const appInput = div.querySelector('input[data-app-id]:checked');
+            const perfilInput = div.querySelector('input[data-perfil-id]:checked');
+
+            if (appInput && perfilInput) {
+                const appId = appInput.getAttribute('data-app-id');
+                const perfilId = perfilInput.getAttribute('data-perfil-id');
+                appData.push({app_id: appId, perfil_id: perfilId});
+            }
+        });
+
+        //console.log(appData);
+
+        // Obtener los valores seleccionados de los checkboxes de Infraestructura
+        const radioData = [];
+        const radioContainers = this.checkboxInfraContainer.querySelectorAll('.form-check'); // Seleccionamos todos los contenedores de checkbox
+        
+        radioContainers.forEach(container => {
+            const checkedRadio = container.querySelector('input[type="checkbox"]:checked'); // Buscamos el checkbox seleccionado dentro del contenedor
+                 
+            if (checkedRadio) {
+                    const radioSolicitud = container.querySelector('.form-check-label').textContent.trim();
+                    const radioValue = checkedRadio.value;
+                    radioData.push({radio_solicitud: radioSolicitud,radio_valor: radioValue});
+            }
+        });
+
+        //console.log(radioData);
+
+        // Obtener los valores seleccionados del MultiSelect
+        const selectedData = [];
+        const selectElements = document.querySelectorAll('.multi-select-option.multi-select-selected');
+
+        let sedesIdsString = '';
+        
+        if (selectElements.length > 0) {
+            const sedesIds = [];
+            selectElements.forEach(element => {
+                const getText = element.querySelector('.multi-select-option-text').textContent;
+
+                const selectedValue = element.getAttribute('data-value');
+                const selectedText = getText;
+
+                if (selectedValue !== null && selectedValue !== '0') {
+                    sedesIds.push({id: selectedValue, name: selectedText});
+                }
+            });
+
+            sedesIdsString = JSON.stringify(sedesIds);
+        }
+
+        //console.log(selectedData);
+
+        const formData = {
+            tipo_identificacion: document.getElementById('type_identity_number').value,
+            identificacion: document.getElementById('identity_number').value,
+            nombre: document.getElementById('first_name').value,
+            apellido: document.getElementById('last_name').value,
+            email: document.getElementById('email').value,
+            zonal_id: this.zonalDropdown.value,
+            sede_id: this.sedeDropdown.value,
+            cargo_id: this.cargoSedeDropdown.value,
+            aplicaciones: appData,
+            infraestructura: radioData,
+            especialidad: this.searchEspecialidad.value,
+            observaciones: this.observaciones.value,
+            sedes_adicionales: sedesIdsString,
+        };
+
+        //console.log('Request del Formulario');
+        //console.group();
+        console.log('loguin usuario', formData);
+        //this.showToast('Oops...', `Formulario loguin enviado correctamente`, 'success');
+
+        this.toast.fire({
+        title: 'Esta seguro?',
+        text: 'Se enviaran los datos del formulario para la creacion del loguin!',
+        icon: 'warning',
+        showCancelButton: true,
+        customClass: {
+            confirmButton: 'btn btn-success m-1',
+            cancelButton: 'btn btn-secondary m-1'
+        },
+        confirmButtonText: 'Si, enviar!',
+        cancelButtonText: 'Cancelar',
+        html: false,
+        preConfirm: e => {
+            return new Promise(resolve => {
+            setTimeout(() => {
+                resolve();
+            }, 50);
+            });
+        }
+        }).then(async result => {
+            if (result.value) {                
+            try {
+                const response = await fetch('/storeLoguinTicket', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    this.showToast('Error...', `Error al enviar Formulario Loguin ${response.statusText}`, 'error');
+                    throw new Error(`Error en la respuesta del servidor: ${response.statusText} - ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                const ticketLoguinNumber = result.ticketLoguin !== null ? result.ticketLoguin : null;
+                const ticketInfraNumber = result.ticketInfraestructura !== null ? result.ticketInfraestructura : null;
+
+                if (ticketLoguinNumber) {
+                    const URLTicketLoguin = `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${ticketLoguinNumber}" target="_blank">#${ticketLoguinNumber}</a>`;
+                    console.log('ID de ticketLoguin:', ticketLoguinNumber);
+                    this.showToast('Formulario Loguin Enviado!', `TICKET Loguin ${URLTicketLoguin}`, 'success');
+                }
+                
+                if (ticketInfraNumber) {
+                    const URLticketInfraNumber = `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${ticketInfraNumber}" target="_blank">#${ticketInfraNumber}</a>`;
+                    console.log('ID de ticketInfraestructura:', ticketInfraNumber);
+                    this.showToast('Formulario Loguin Enviado!', `TICKET Infraestructura ${URLticketInfraNumber}`, 'success');
+                }
+
+                if (ticketLoguinNumber && ticketInfraNumber) {
+                    const URLTicketLoguin = `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${ticketLoguinNumber}" target="_blank">#${ticketLoguinNumber}</a>`;
+                    const URLticketInfraNumber = `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${ticketInfraNumber}" target="_blank">#${ticketInfraNumber}</a>`;
+                    console.log('ID de ticketInfraestructura:', ticketInfraNumber);
+                    console.log('ID de ticketLoguin:', ticketLoguinNumber);
+                    this.showToast('Formulario Loguin Enviado!', `TICKET Loguin ${URLTicketLoguin} <br> TICKET Infraestructura ${URLticketInfraNumber}`, 'success');
+                }
+
+                this.clearForm();
+            } catch (error) {
+                console.error('Error al enviar el formulario:', error);
+                this.showToast('Error...', `Error al enviar formulario loguin ${error}`, 'error');
+            }
+        } else if (result.dismiss === 'cancel') {
+            //toast.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
+        }
+        });
+    }
+
     static init() {
         this.initFormElements();
         this.AutocompleteDataLoguin();
