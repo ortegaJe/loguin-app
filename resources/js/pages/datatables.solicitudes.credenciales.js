@@ -21,16 +21,12 @@ class pageTablesDatatables {
         if (solicitudTipo === 'loguin') {
           this.fetchSolicitudLoguinData(solicitudId, usuarioId);
         }
-  
-        if (solicitudTipo === 'infra') {
-          this.fetchSolicitudInfraData(solicitudId, usuarioId);
-        }
       }
 
       if (btnRegisterLoguin) {
         const loguinSolicitudId = btnRegisterLoguin.getAttribute('data-solicitud-id');
         const url = `/loguin/aplicaciones/solicitud/registrar/${loguinSolicitudId}`;
-        window.location.href = url;
+        window.open(url, '_blank');
       }
 
     });

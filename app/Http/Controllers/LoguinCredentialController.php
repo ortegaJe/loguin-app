@@ -30,6 +30,7 @@ class LoguinCredentialController extends Controller
         $loguinSolicitud = $this->getLoguinSolicitud($solicitudId);
         $especialidadUsuario = $this->getEspecialidadUsuario($solicitudId);
         $hasLoguin = $this->hasLoguins($solicitudId);
+        $sedesAdicionales = $this->getSedesAdicionales($solicitudId);
 
         if ($usuario->isEmpty() && $loguinSolicitud->isEmpty() && $especialidadUsuario->isEmpty()) {
             return response()->json(['message' => 'No se encontró información'], 404);
@@ -39,7 +40,8 @@ class LoguinCredentialController extends Controller
             'usuario' => $usuario,
             'loguin_solicitud' => $loguinSolicitud,
             'especialidad_usuario' => $especialidadUsuario ?? null,
-            'has_loguin' => $hasLoguin ?? null
+            'sedes_adicionales' => $sedesAdicionales ?? null,
+            'has_loguin' => $hasLoguin ?? null,
         ], 200);
     }
 
@@ -118,6 +120,24 @@ class LoguinCredentialController extends Controller
             ->where('a.solicitud_id', $solicitudId)
             ->select('b.name as especialidad')
             ->get();
+    }
+
+    private function getSedesAdicionales($solicitudId)
+    {
+        $sedesAdicionales = DB::table('loguin_solicitud')
+            ->where('id', $solicitudId)
+            ->first('sedes_adicionales');
+
+            if (!$sedesAdicionales || $sedesAdicionales == '') {
+                return null;
+            }
+
+            $sedesJson = $sedesAdicionales->sedes_adicionales;
+
+            $sedes = json_decode($sedesJson, JSON_PRETTY_PRINT);
+            //error_log(__LINE__ . __METHOD__ . ' json --->' .var_export($sedesJson, true));
+
+            return $sedes;
     }
 
     public function storeLoguin(Request $request)

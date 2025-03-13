@@ -23,7 +23,7 @@ class pageTablesDatatables {
       if (btnRegisterLoguin) {
         const loguinSolicitudId = btnRegisterLoguin.getAttribute('data-solicitud-id');
         const url = `/loguin/infraestructura/solicitud/registrar/${loguinSolicitudId}`;
-        window.location.href = url;
+        window.open(url, '_blank');
       }
     });
   }

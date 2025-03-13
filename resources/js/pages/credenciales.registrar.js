@@ -150,13 +150,19 @@ class RenderDataSolicitudLoguin {
         !data.loguin_solicitud ||
         !data.especialidad_usuario === null ||
         !data.especialidad_usuario ||
+        //!data.sedes_adicionales ||
+        !data.sedes_adicionales === null ||
         !data.has_loguin === null ||
         !data.has_loguin
       ) {
         throw new Error("Datos incompletos recibidos del servidor");
       }
 
-      this.showDataUserBlock(data.usuario[0], data.especialidad_usuario);
+      this.showDataUserBlock(
+        data.usuario[0],
+        data.especialidad_usuario,
+        data.sedes_adicionales
+      );
       this.renderApplicationBlocks(data.loguin_solicitud);
       this.hasLoguin(data.has_loguin);
     } catch (error) {
@@ -166,39 +172,78 @@ class RenderDataSolicitudLoguin {
     }
   }
 
-  static async showDataUserBlock(usuario, especialidadUsuario) {
-    //console.log(usuario);
+  static async showDataUserBlock(
+    usuario,
+    especialidadUsuario,
+    sedesAdicionales
+  ) {
+    //console.log(sedesAdicionales);
     //console.log(especialidadUsuario);
-    const blockIDUser = document.getElementById("data-identificacion");
-    const blockDataUser = document.getElementById("data-usuario");
-    const BlockObservation = document.getElementById("loguin-observacion");
-    blockIDUser.querySelector("#loguin-tipo-identificacion").innerHTML =
-      `<i class="fa fa-address-card me-1"></i>${usuario.tipo_identificacion}` ||
+    const blockDatosPersonales = document.getElementById(
+      "block-datos-personales"
+    );
+    const containerDatosPersonal = document.getElementById(
+      "container-datos-personal"
+    );
+    const blockDatosSolicitud = document.getElementById(
+      "block-datos-solicitud"
+    );
+    const containerDatosSolicitud = document.getElementById(
+      "container-datos-solicitud"
+    );
+    const blockSedesAdicionales = document.getElementById(
+      "block-sedes-adicionales"
+    );
+    const containerSedesAdicionales = document.getElementById(
+      "container-sedes-adicionales"
+    );
+    const BlockDatosObservacion = document.getElementById(
+      "block-observaciones"
+    );
+    const containerObservacion = document.getElementById(
+      "container-observacion"
+    );
+
+    containerDatosPersonal.querySelector(
+      "#loguin-tipo-identificacion"
+    ).innerHTML =
+      `<i class="fa fa-address-card me-2"></i>${usuario.tipo_identificacion}` ||
       "N/A";
-    blockIDUser.querySelector("#loguin-identificacion").innerHTML =
-    `${usuario.identificacion}` ||
-    "N/A";
-    blockDataUser.querySelector("#loguin-nombre").innerHTML =
-      `<i class="fa fa-user me-1"></i>${usuario.nombreCompleto}` || "N/A";
-    blockDataUser.querySelector("#loguin-email").innerHTML =
-      `<i class="fa fa-envelope me-1"></i>${usuario.email}` || "N/A";
-    blockDataUser.querySelector("#loguin-sede").innerHTML =
-      `<i class="fa fa-building me-1"></i>${usuario.sede}` || "N/A";
-    blockDataUser.querySelector("#loguin-cargo").innerHTML =
-      `<i class="fa fa-briefcase me-1"></i>${usuario.cargo}` || "N/A";
-    blockDataUser.querySelector("#loguin-ticket").href =
+
+    containerDatosPersonal.querySelector("#loguin-identificacion").innerHTML =
+      `${usuario.identificacion}` || "N/A";
+
+    containerDatosPersonal.querySelector("#loguin-nombre").innerHTML =
+      `<i class="fa fa-user me-2"></i>${usuario.nombreCompleto}` || "N/A";
+
+    containerDatosPersonal.querySelector("#loguin-email").innerHTML =
+      `<i class="fa fa-envelope me-2"></i>${usuario.email}` || "N/A";
+
+    containerDatosSolicitud.querySelector("#loguin-sede").classList.add("mb-4");
+    containerDatosSolicitud.querySelector("#loguin-sede").innerHTML =
+      `<i class="fa fa-building me-2"></i> ${usuario.sede}` || "N/A";
+
+    containerDatosSolicitud
+      .querySelector("#loguin-cargo")
+      .classList.add("mb-4");
+    containerDatosSolicitud.querySelector("#loguin-cargo").innerHTML =
+      `<i class="fa fa-briefcase me-1"></i> ${usuario.cargo}` || "N/A";
+
+    containerDatosSolicitud.querySelector("#loguin-ticket").href =
       `http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${usuario.ticket_id}` ||
       "N/A";
-    blockDataUser
+    containerDatosSolicitud
       .querySelector("#loguin-ticket")
       .setAttribute("target", "_blank");
-    blockDataUser.querySelector("#modal-ticket-numero").innerHTML =
+    containerDatosSolicitud.querySelector("#modal-ticket-numero").innerHTML =
       `<span class="badge bg-${usuario.status_color}"></i><i class="${usuario.status_icon} me-1"></i>${usuario.ticket_id}</span>` ||
       "N/A";
-    BlockObservation.querySelector("#observacion-loguin").innerHTML =
-      `<i class="fa fa-circle-info me-1"></i>${
+
+    containerObservacion.querySelector("#observacion-loguin").innerHTML =
+      `<i class="fa fa-circle-info me-2"></i>
+      ${
         usuario.observaciones === ""
-          ? "Sin observaciones"
+          ? BlockDatosObservacion.remove()
           : usuario.observaciones
       }` || "N/A";
 
@@ -206,13 +251,55 @@ class RenderDataSolicitudLoguin {
       especialidadUsuario && especialidadUsuario.length > 0;
     //console.log(hasEspecialidad);
     if (hasEspecialidad) {
-      blockDataUser.querySelector("#loguin-especialidad").hidden = false;
-      blockDataUser.querySelector("#loguin-especialidad").innerHTML =
-        `<i class="fa fa-book-medical me-1"></i>${especialidadUsuario[0].especialidad}` ||
+      containerDatosSolicitud.querySelector(
+        "#loguin-especialidad"
+      ).hidden = false;
+      containerDatosSolicitud
+        .querySelector("#loguin-especialidad")
+        .classList.add("mb-4");
+      containerDatosSolicitud.querySelector("#loguin-especialidad").innerHTML =
+        `<i class="fa fa-book-medical me-2"></i> ${especialidadUsuario[0].especialidad}` ||
         "N/A";
     } else {
-      blockDataUser.querySelector("#loguin-especialidad").hidden = true;
+      containerDatosSolicitud.querySelector(
+        "#loguin-especialidad"
+      ).hidden = true;
     }
+
+    if (sedesAdicionales !== null) {
+      //blockSedesAdicionales.hidden = false;
+      blockDatosPersonales.classList.replace("col-sm-6", "col-sm-4");
+      blockDatosSolicitud.classList.replace("col-sm-6", "col-sm-4");
+
+      sedesAdicionales.map((sede) => {
+        const randomColors = [
+          "primary",
+          "secondary",
+          "success",
+          "danger",
+          "warning",
+          "info",
+          "primary-light",
+          "dark",
+          "primary-darker",
+          "primary-dark",
+          "muted",
+        ];
+        const randomColor =
+          randomColors[Math.floor(Math.random() * randomColors.length)];
+
+        const span = document.createElement("span");
+        span.classList.add("badge", `bg-${randomColor}`, "me-1");
+        span.textContent = sede.name;
+        const icon = document.createElement("i");
+        icon.classList.add("fa", "fa-building", "me-1");
+        span.prepend(icon);
+        containerSedesAdicionales.appendChild(span);
+      });
+    } else {
+      blockSedesAdicionales.remove();
+    }
+
     this.copyInfoCardLoguin(); // Función para copiar la información del usuario loguin
   }
 
@@ -962,41 +1049,39 @@ class RenderDataSolicitudLoguin {
 
   // Función para copiar texto al portapapeles de card de información loguin
   static copyInfoCardLoguin() {
-    const copyButton = document.querySelectorAll(
-      ".copy-btn"
-    );
+    const copyButton = document.querySelectorAll(".copy-btn");
 
     copyButton.forEach((button) => {
-        button.addEventListener("click", () => {
-          const targetIds = button.getAttribute("data-copy-target").split(" ");
-            let contentToCopy = targetIds
-                .map(id => document.getElementById(id)?.textContent.trim())
-                .filter(text => text)
-                .join(" ");
+      button.addEventListener("click", () => {
+        const targetIds = button.getAttribute("data-copy-target").split(" ");
+        let contentToCopy = targetIds
+          .map((id) => document.getElementById(id)?.textContent.trim())
+          .filter((text) => text)
+          .join(" ");
 
-            if (contentToCopy) {
-                this.copyToClipboard(contentToCopy);
-            }
-        });
+        if (contentToCopy) {
+          this.copyToClipboard(contentToCopy);
+        }
+      });
     });
   }
 
   // Función para copiar texto al portapapeles con `navigator.clipboard` desde copyInfoCardLoguin
   static async copyToClipboard(text) {
     try {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            await navigator.clipboard.writeText(text);
-            Codebase.helpers("jq-notify", {
-                type: "success",
-                icon: "far fa-paste",
-                message: "Texto copiado al portapapeles",
-            });
-        } else {
-            this.copyToClipboardFallback(text);
-        }
-    } catch (err) {
-        console.error("Error al copiar usando Clipboard API:", err);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        Codebase.helpers("jq-notify", {
+          type: "success",
+          icon: "far fa-paste",
+          message: "Texto copiado al portapapeles",
+        });
+      } else {
         this.copyToClipboardFallback(text);
+      }
+    } catch (err) {
+      console.error("Error al copiar usando Clipboard API:", err);
+      this.copyToClipboardFallback(text);
     }
   }
 
