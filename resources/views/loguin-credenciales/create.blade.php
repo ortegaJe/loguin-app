@@ -128,64 +128,79 @@
             <span class="breadcrumb-item active">Ticket #LOG.{{ $solicitud->ticket_id }}</span>
         </nav>
         <div class="row">
-            <!-- Billing Address -->
-            <div class="col-md-12">
-                <div class="block block-themed block-rounded">
+            <div class="col-sm-6 d-flex flex-column" id="block-datos-personales">
+                <div class="block block-themed block-rounded flex-grow-1">
                     <div class="block-header block-header-default">
-                        <h3 class="block-title">Información Loguin</i></h3>
+                        <h3 class="block-title">Datos Personales</i></h3>
                     </div>
-                    <div class="block-content" id="data-identificacion">
-                        <div class="d-flex align-items-center fw-bold">
-                            <div id="loguin-tipo-identificacion" class="me-2"></div>
-                            <div id="loguin-identificacion"></div>
-                            <button type="button" class="btn-block-option ms-2 copy-btn" data-bs-toggle="tooltip"
-                                data-bs-placement="right" title="Copiar" data-copy-target="loguin-identificacion">
-                                <i class="far fa-fw fa-copy text-muted"></i>
-                            </button>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <address id="data-usuario">
-                                    <div class="d-flex align-items-center">
-                                        <span id="loguin-nombre"></span>
-                                        <button type="button" class="btn-block-option ms-2 copy-btn"
-                                            data-bs-toggle="tooltip" data-bs-placement="right" title="Copiar"
-                                            data-copy-target="loguin-nombre">
-                                            <i class="far fa-fw fa-copy text-muted"></i>
-                                        </button>
-                                    </div>
-                                    <div class="d-flex align-items-center">
-                                        <span id="loguin-email"></span>
-                                        <button type="button" class="btn-block-option ms-2 copy-btn"
-                                            data-bs-toggle="tooltip" data-bs-placement="right" title="Copiar"
-                                            data-copy-target="loguin-email">
-                                            <i class="far fa-fw fa-copy text-muted"></i>
-                                        </button>
-                                    </div>
-                                    <div class="d-flex align-items-center">
-                                        <span id="loguin-sede"></span>
-                                    </div>
-                                    <div class="d-flex align-items-center">
-                                        <span id="loguin-cargo"></span>
-                                    </div>
-                                    <div class="d-flex align-items-center">
-                                        <span id="loguin-especialidad" hidden></span>
-                                    </div>
-                                    <a type="button" class="fw-bold mb-2" id="loguin-ticket" href="javascript:void(0)"
-                                        data-bs-toggle="tooltip" data-bs-placement="right" title="Ticket Mesa de Servicio">
-                                        <span id="modal-ticket-numero"></span></a>
-                                </address>
+                    <div class="block-content">
+                        <address id="container-datos-personal">
+                            <div class="d-flex align-items-center fw-bold">
+                                <span class="me-2" id="loguin-tipo-identificacion"></span>
+                                <span id="loguin-identificacion"></span>
+                                <button type="button" class="btn-block-option ms-2 copy-btn" data-bs-toggle="tooltip"
+                                    data-bs-placement="right" title="Copiar" data-copy-target="loguin-identificacion">
+                                    <i class="far fa-fw fa-copy text-muted"></i>
+                                </button>
                             </div>
-                            <div class="col-sm-6">
-                                <address id="loguin-observacion">
-                                    <span id="observacion-loguin"></span>
-                                </address>
+                            <div class="d-flex align-items-center">
+                                <span id="loguin-nombre"></span>
+                                <button type="button" class="btn-block-option ms-2 copy-btn" data-bs-toggle="tooltip"
+                                    data-bs-placement="right" title="Copiar" data-copy-target="loguin-nombre">
+                                    <i class="far fa-fw fa-copy text-muted"></i>
+                                </button>
                             </div>
-                        </div>
+                            <div class="d-flex align-items-center">
+                                <span id="loguin-email"></span>
+                                <button type="button" class="btn-block-option ms-2 copy-btn" data-bs-toggle="tooltip"
+                                    data-bs-placement="right" title="Copiar" data-copy-target="loguin-email">
+                                    <i class="far fa-fw fa-copy text-muted"></i>
+                                </button>
+                            </div>
+                        </address>
                     </div>
                 </div>
             </div>
-            <!-- END Billing Address -->
+            <div class="col-sm-6 d-flex flex-column" id="block-datos-solicitud">
+                <div class="block block-themed block-rounded flex-grow-1">
+                    <div class="block-header block-header-default">
+                        <h3 class="block-title">Solicitud</h3>
+                    </div>
+                    <div class="block-content">
+                        <address id="container-datos-solicitud">
+                            <span id="loguin-sede"></span><br>
+                            <span id="loguin-cargo"></span><br>
+                            <span id="loguin-especialidad" hidden></span><br>
+                            <a type="button" class="fw-bold mb-2" id="loguin-ticket" href="javascript:void(0)"
+                                data-bs-toggle="tooltip" data-bs-placement="right" title="Ticket Mesa de Servicio">
+                                <span id="modal-ticket-numero"></span>
+                            </a>
+                        </address>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 d-flex flex-column" id="block-sedes-adicionales">
+                <div class="block block-themed block-rounded flex-grow-1">
+                    <div class="block-header block-header-default">
+                        <h3 class="block-title">Sedes Adicionales</h3>
+                    </div>
+                    <div class="block-content">
+                        <address id="container-sedes-adicionales"></address>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 d-flex flex-column" id="block-observaciones">
+                <div class="block block-themed block-rounded flex-grow-1">
+                    <div class="block-header block-header-default">
+                        <h3 class="block-title">Observaciones</h3>
+                    </div>
+                    <div class="block-content">
+                        <address id="container-observacion">
+                            <p id="observacion-loguin"></p>
+                        </address>
+                    </div>
+                </div>
+            </div>
         </div>
         <form id="form-loguin">
             <div class="add-btn-container">
@@ -211,9 +226,8 @@
                 <div class="block-content block-content-full loguin-content"></div>
             </div>
         </div>
-    </div>
-    <div class="mb-4"></div>
-    <div class="mb-4"></div>
-    <div class="mb-4"></div>
-    <div class="mb-4"></div>
-@endsection
+        <div class="mb-4"></div>
+        <div class="mb-4"></div>
+        <div class="mb-4"></div>
+        <div class="mb-4"></div>
+    @endsection
