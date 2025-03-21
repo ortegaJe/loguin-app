@@ -459,10 +459,6 @@ class RenderDataSolicitudLoguin {
       userInput.type = "text";
       userInput.classList.add("form-control", "usuario-loguin");
       userInput.placeholder = "Usuario";
-      userInput.setAttribute(
-        "onkeypress",
-        "return /[0-9a-zA-Z]/i.test(event.key);"
-      );
       userColDiv.appendChild(userInput);
 
       const passColDiv = document.createElement("div");
@@ -471,10 +467,6 @@ class RenderDataSolicitudLoguin {
       passInput.type = "text";
       passInput.classList.add("form-control", "password-loguin");
       passInput.placeholder = "Contraseña";
-      passInput.setAttribute(
-        "onkeypress",
-        "return /[0-9a-zA-Z]/i.test(event.key);"
-      );
       passColDiv.appendChild(passInput);
 
       formRowDiv.appendChild(userColDiv);
