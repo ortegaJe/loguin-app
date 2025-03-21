@@ -4,6 +4,7 @@ class ApplicationFormManager {
 
     static initFormElements() {
         this.mainForm = document.getElementById('main-form');
+        this.fechaNacimiento = document.getElementById('fecha_nacimiento');
         this.zonalDropdown = document.getElementById('zonal-dropdown');
         this.sedeDropdown = document.getElementById('sede-dropdown');
         this.tipoCargoDropdown = document.getElementById('tipo-cargo-dropdown');
@@ -263,6 +264,7 @@ class ApplicationFormManager {
                     jQuery('#first_name').val(data.nombres);
                     jQuery('#last_name').val(data.apellidos);
                     jQuery('#email').val(data.email);
+                    jQuery('#fecha_nacimiento').val(data.fecha_nacimiento);
                 })
                 .catch(error => console.error('Error al obtener los datos del usuario:', error));
 
@@ -616,6 +618,7 @@ class ApplicationFormManager {
         document.getElementById('first_name').value = '';
         document.getElementById('last_name').value = '';
         document.getElementById('email').value = '';
+        this.fechaNacimiento.value = '';
         this.zonalDropdown.value = '';
         this.sedeDropdown.value = '';
         this.tipoCargoDropdown.value = '';
@@ -696,6 +699,7 @@ class ApplicationFormManager {
             nombre: document.getElementById('first_name').value,
             apellido: document.getElementById('last_name').value,
             email: document.getElementById('email').value,
+            fecha_nacimiento: this.fechaNacimiento.value,
             zonal_id: this.zonalDropdown.value,
             sede_id: this.sedeDropdown.value,
             cargo_id: this.cargoSedeDropdown.value,

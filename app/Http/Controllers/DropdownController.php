@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\OpcionesConstantes;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -233,12 +234,15 @@ class DropdownController extends Controller
                 'a.identificacion',
                 'a.nombres',
                 'a.apellidos',
-                'a.email'
+                'a.email',
+                'fecha_nacimiento'
             ])->first();
 
         if (!$user) {
             return response()->json(['message' => 'Usuario no encontrado'], 404);
         }
+
+        $fechaNacimientoFormat = Carbon::createFromFormat('Y-m-d', $user->fecha_nacimiento)->format('d-m-Y');
 
         return response()->json([
             'tipo_doc_id' => $user->tipo_doc_id,
@@ -246,6 +250,7 @@ class DropdownController extends Controller
             'nombres' => $user->nombres,
             'apellidos' => $user->apellidos,
             'email' => $user->email,
+            'fecha_nacimiento' => $fechaNacimientoFormat,
         ]);
     }
 }

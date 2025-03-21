@@ -234,10 +234,11 @@
     <script src="{{ asset('/js/plugins/jquery-validation/additional-methods.js') }}"></script>
     <script src="{{ asset('/js/plugins/bootstrap3-typeahead.min.js') }}"></script>
     <script src="{{ asset('/js/plugins/bootstrap-notify/bootstrap-notify.min.js') }}"></script>
+    <script src="{{ asset('/js/plugins/masked-inputs/jquery.maskedinput.min.js') }}"></script>
     <script src="https://unpkg.com/@popperjs/core@2"></script>
     <script src="https://unpkg.com/tippy.js@6"></script>
     <script type="module">
-        Codebase.helpersOnLoad(['jq-select2', 'jq-notify', 'jq-validation']);
+        Codebase.helpersOnLoad(['jq-select2', 'jq-notify', 'jq-validation', 'jq-masked-inputs']);
     </script>
 
     <script type="module">
@@ -326,11 +327,22 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-12 mb-4">
-                                        <div class="form-floating">
-                                            <input type="email" class="form-control" id="email" name="email"
-                                                for="email" placeholder="email">
-                                            <label class="form-label" for="email">Correo</label>
+                                    <div class="row mb-4">
+                                        <div class="col-6">
+                                            <div class="form-floating">
+                                                <input type="email" class="form-control" id="email" name="email"
+                                                    for="email" placeholder="email">
+                                                <label class="form-label" for="email">Correo</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="form-floating">
+                                                <input type="text"
+                                                    class="js-masked-date-dash form-control form-control-lg"
+                                                    id="fecha_nacimiento" name="fecha_nacimiento"
+                                                    placeholder="dd-mm-yyyy">
+                                                <label class="form-label" for="fecha_nacimiento">Fecha de Nacimiento</label>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row mb-4">

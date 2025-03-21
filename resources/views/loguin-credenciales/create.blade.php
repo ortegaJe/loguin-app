@@ -157,6 +157,13 @@
                                     <i class="far fa-fw fa-copy text-muted"></i>
                                 </button>
                             </div>
+                            <div class="d-flex align-items-center">
+                                <span id="loguin-fecha-nacimiento"></span>
+                                <button type="button" class="btn-block-option ms-2 copy-btn" data-bs-toggle="tooltip"
+                                    data-bs-placement="right" title="Copiar" data-copy-target="loguin-fecha-nacimiento">
+                                    <i class="far fa-fw fa-copy text-muted"></i>
+                                </button>
+                            </div>
                         </address>
                     </div>
                 </div>

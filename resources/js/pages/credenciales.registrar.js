@@ -219,6 +219,9 @@ class RenderDataSolicitudLoguin {
     containerDatosPersonal.querySelector("#loguin-email").innerHTML =
       `<i class="fa fa-envelope me-2"></i>${usuario.email}` || "N/A";
 
+      containerDatosPersonal.querySelector("#loguin-fecha-nacimiento").innerHTML =
+      `<i class="fa fa-cake-candles me-2"></i>${usuario.fechaNacimiento}` || "N/A";
+
     containerDatosSolicitud.querySelector("#loguin-sede").classList.add("mb-4");
     containerDatosSolicitud.querySelector("#loguin-sede").innerHTML =
       `<i class="fa fa-building me-2"></i> ${usuario.sede}` || "N/A";

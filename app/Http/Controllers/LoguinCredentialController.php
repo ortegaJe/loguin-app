@@ -60,6 +60,7 @@ class LoguinCredentialController extends Controller
                 DB::raw("CONCAT(b.identificacion) as identificacion"),
                 DB::raw("UPPER(CONCAT(b.nombres, ' ', b.apellidos)) as nombreCompleto"), 
                 'b.email',
+                DB::raw("DATE_FORMAT(b.fecha_nacimiento, '%m-%d-%Y') as fechaNacimiento"),
                 'c.name as sede',
                 DB::raw("UPPER(e.name) as cargo"),
                 'a.ticket_id',
