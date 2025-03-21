@@ -63,6 +63,9 @@ class ApplicationFormManager {
             required: true,
             emailWithDot: true
             },
+            'fecha_nacimiento': {
+            required: true,
+            },
             'zonal-dropdown': {
             required: true,
             },
@@ -102,6 +105,9 @@ class ApplicationFormManager {
             'email': {
                 required: "Este campo es obligatorio",
                 emailWithDot: "Debe ser un correo válido"
+            },
+            'fecha_nacimiento': {
+                required: "Este campo es obligatorio",
             },
             'zonal-dropdown': {
                 required: "Este campo es obligatorio",
