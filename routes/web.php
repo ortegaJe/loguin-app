@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\CargoController;
 use App\Http\Controllers\DropdownController;
 use App\Http\Controllers\GlpiAuthController;
 use App\Http\Controllers\InfraCredentialController;
 use App\Http\Controllers\LoguinCredentialController;
 use App\Http\Controllers\LoguinTicketStoreController;
+use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SolicitudController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -42,8 +44,13 @@ Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN|ANALISTA_APP'])->group(func
     Route::get('fetchDataLoguin/{id}', [LoguinCredentialController::class, 'fetchDataLoguin']);
     Route::post('storeLoguin', [LoguinCredentialController::class, 'storeLoguin']);
     Route::get('getLoguins/aplicaciones/{id}', [LoguinCredentialController::class, 'getLoguins']);
-
-});
+    Route::get('loguin/crear-cargos', [CargoController::class, 'index']);
+    Route::post('storeCargo', [CargoController::class, 'storeCargo']);
+    Route::get('loguin/crear-perfiles', [PerfilController::class, 'index']);
+    Route::post('storePerfil', [PerfilController::class, 'storePerfil']);
+    Route::get('getSedes', [CargoController::class, 'getSedes']);
+    Route::get('getAplicaciones', [PerfilController::class, 'getAplicaciones']);
+});    
 
 Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN||INFRAESTRUCTURA'])->group(function () {
     Route::get('loguin/infraestructura/solicitudes', [SolicitudController::class, 'getRequestLoguinInfra'])->name('loguin.infra');
@@ -51,7 +58,6 @@ Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN||INFRAESTRUCTURA'])->group(
     Route::get('fetchDataLoguinInfra/{id}', [InfraCredentialController::class, 'fetchDataLoguinInfra']);
     Route::post('storeLoguinInfra', [InfraCredentialController::class, 'storeLoguinInfra']);
     Route::get('getLoguins/infraestructura/{id}', [InfraCredentialController::class, 'getLoguinInfra']);
-
 });
 
 Route::match(['get', 'post'], '/login',  [GlpiAuthController::class, 'login'])->name('login');

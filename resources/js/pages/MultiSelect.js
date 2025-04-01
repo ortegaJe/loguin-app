@@ -9,7 +9,7 @@ export class MultiSelect {
 
   constructor(element, options = {}) {
       let defaults = {
-          placeholder: 'Seleccionar sede(s)',
+          placeholder: '',
           max: null,
           search: true,
           selectAll: true,
