@@ -129,7 +129,6 @@ class pageTablesDatatables {
     const modalInstance = new bootstrap.Modal(modal);
     modalInstance.show();
   }
-
   /*
    * Init DataTables functionality
    */
@@ -158,10 +157,173 @@ class pageTablesDatatables {
       dom: { button: { className: 'btn btn-sm btn-primary' } }
     });
 
-    jQuery('.js-dataTable-full').DataTable({
+    // Recuperar valor guardado del localStorage (o usar 10 como valor por defecto)
+    const savedPageLength = localStorage.getItem('datatable_length');
+
+    const table = jQuery('.js-dataTable-full').DataTable({
+      ajax: {
+        url: '/fetchSolicitudesLoguin',
+        type: 'GET',
+        dataSrc: 'data.aplicaciones'
+      },
+      //serverSide: true,
+      //processing: true,
+      responsive: true,
       pagingType: "simple_numbers",
-      pageLength: 10,
+      pageLength: savedPageLength ? parseInt(savedPageLength) : 10,
       autoWidth: false,
+      order: [[3, 'desc']],
+      columns: [
+        { data: 'solicitud_id' },
+        { data: 'ticket' },
+        { data: 'status_title' },
+        { data: 'fecha_creacion' },
+        { data: 'identificacion'},
+        { data: 'nombreCompleto' },
+        {
+          data: null,
+          orderable: false,
+          searchable: false,
+          className: 'text-center',
+          render: function (data, type, row) {
+            return `
+              <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-secondary btn-show"
+                  data-toggle="click-ripple" data-bs-toggle="tooltip" title="Ver detalle"
+                  data-solicitud-id="${row.solicitud_id}"
+                  data-solicitud-tipo="${row.tipo}">
+                  <i class="fa fa-eye"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-secondary btn-register-loguin"
+                  data-toggle="click-ripple" data-bs-toggle="tooltip" title="Registrar credenciales"
+                  data-solicitud-id="${row.solicitud_id}"
+                  data-solicitud-tipo="${row.tipo}">
+                  <i class="fa fa-user-pen"></i>
+                </button>
+              </div>
+            `;
+          }
+        }
+      ],
+      columnDefs: [
+        {
+          targets: 2, // Asumimos que "ESTADO" es la columna 2 (ajusta si es otra)
+          render: function (data, type, row) {
+          const div = document.createElement('div');
+          div.innerHTML = data;
+          const estado = div.textContent || div.innerText || "";
+          //console.log(estado.trim());
+
+          // Asignar clase según el estado
+          let badgeClass = "badge bg-info w-100"; // Clase por defecto
+          let icon = ""; // Icono por defecto
+          if (estado.trim() === "Cerrado") {
+            badgeClass = "badge bg-info w-100";
+            icon = "fa fa-check";
+          } else if (estado.trim() === "En curso") {
+            badgeClass = "badge bg-success w-100";
+            icon = "far fa-circle";
+          } else if (estado.trim() === "Respuesta") {
+            badgeClass = "badge bg-secondary w-100";
+            icon = "far fa-comment";
+          }
+
+          return `<span class="${badgeClass}"><i class="${icon} me-1"></i>${estado.trim()}</span>`;
+          }
+        }
+      ]
+    });
+
+    table.on('length.dt', function (e, settings, len) {
+      localStorage.setItem('datatable_length', len);
+    });
+
+    // Insertar filtro de estado
+    const estadoFilterHTML = `
+      <div class="col-md-auto me-auto">
+        <select id="filter-estado" class="form-select form-select">
+          <option value="">Todos</option>
+          <option value="En curso">En curso</option>
+          <option value="Cerrado">Cerrado</option>
+          <option value="Respuesta">Respuesta</option>
+        </select>
+      </div>
+    `;
+
+    // Insertar el filtro después del page length
+    const filtroRow = document.querySelector('#solicitudesTable_wrapper .row.mt-2.justify-content-between');
+    if (filtroRow) {
+      const temp = document.createElement('div');
+      temp.innerHTML = estadoFilterHTML;
+      const filtroEstadoDiv = temp.firstElementChild;
+
+      const children = filtroRow.children;
+      if (children.length >= 1) {
+        // Insertar como segundo hijo
+        filtroRow.insertBefore(filtroEstadoDiv, children[1]);
+      } else {
+        // Si no hay hijos, insertar simplemente
+        filtroRow.appendChild(filtroEstadoDiv);
+      }
+    }
+
+    // Filtro de estado
+    const estadoSelect = document.getElementById('filter-estado');
+    if (estadoSelect) {
+      estadoSelect.addEventListener('change', function () {
+        const value = this.value;
+        table.column(2).search(value).draw(); // columna "ESTADO"
+      });
+    }
+
+    const refreshButtonHTML = `
+      <div class="col-md-auto me-auto d-flex align-items-end">
+        <button type="button" id="refresh-datatable" class="btn btn-sm btn-success" title="Actualizar">
+          <i class="fa fa-sync-alt"></i>
+        </button>
+      </div>
+    `;
+
+    // Insertar el botón después del filtro de estado
+    const refreshTemp = document.createElement('div');
+    refreshTemp.innerHTML = refreshButtonHTML;
+    const refreshBtnDiv = refreshTemp.firstElementChild;
+
+    const filtroRowRefresh = document.querySelector('#solicitudesTable_wrapper .row.mt-2.justify-content-between');
+    if (filtroRowRefresh) {
+      const children = filtroRowRefresh.children;
+      if (children.length >= 2) {
+        // Insertar como tercer hijo (después del filtro de estado)
+        filtroRowRefresh.insertBefore(refreshBtnDiv, children[2]);
+      } else {
+        filtroRowRefresh.appendChild(refreshBtnDiv);
+      }
+    }
+
+      document.getElementById('refresh-datatable').addEventListener('click', function () {
+        const block = document.querySelector('#datatable-wrapper');
+        console.log(block);
+      
+        // Mostrar efecto loading
+        block.classList.add('block-mode-loading-refresh', 'block-mode-loading');
+      
+        // Recargar la tabla
+        const table = jQuery('.js-dataTable-full').DataTable();
+        table.ajax.reload(null, false); // false evita que se reinicie la paginación
+      
+        // Ocultar el efecto luego de completar la carga
+        table.on('xhr', function () {
+          block.classList.remove('block-mode-loading-refresh', 'block-mode-loading');
+        });
+    });
+    
+
+    // Activar tooltips después del renderizado
+    table.on('draw', function () {
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
     });
 
     jQuery('.js-dataTable-buttons').DataTable({
@@ -177,6 +339,16 @@ class pageTablesDatatables {
   static init() {
     this.initDataTables();
     this.SolicitudDetalleViewer();
+     // Eliminar el valor de localStorage solo si se va a otra página
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'hidden') {
+        const navType = performance.getEntriesByType("navigation")[0].type;
+
+        if (navType !== 'reload') {
+          localStorage.removeItem('datatable_length');
+        }
+      }
+    });
   }
 }
 

@@ -38,6 +38,7 @@ Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN|CONTRATACION|ANALISTA_APP|I
 
 Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN|ANALISTA_APP'])->group(function () {
     Route::get('loguin/aplicaciones/solicitudes', [SolicitudController::class, 'getRequestLoguin'])->name('loguin.app');
+    Route::get('fetchSolicitudesLoguin', [SolicitudController::class, 'getLoguin']);
     Route::get('loguin/aplicaciones/solicitud/registrar/{id}', [LoguinCredentialController::class, 'registerCredential'])->name('register.loguin.app');
     Route::get('fetchDataLoguin/{id}', [LoguinCredentialController::class, 'fetchDataLoguin']);
     Route::post('storeLoguin', [LoguinCredentialController::class, 'storeLoguin']);

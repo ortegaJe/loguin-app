@@ -21,8 +21,16 @@ class SolicitudController extends Controller
 
     public function getRequestLoguin()
     {
-        $data = $this->getUsuariosConSolicitudes()->where('tipo', 'loguin');
-        return view('loguin-credenciales.index', compact('data'));
+        return view('loguin-credenciales.index');
+    }
+
+    public function getLoguin()
+    {
+        $data['aplicaciones'] = $this->getUsuariosConSolicitudes()->where('tipo', 'loguin');
+
+        return response()->json([
+            'data' => $data,
+        ]);
     }
 
     public function getRequestLoguinInfra()

@@ -34,9 +34,10 @@
             </span>
         </div>
         <!-- Partial Table -->
-        <div class="block block-rounded">
+        <div class="block block-rounded" id="datatable-wrapper">
             <div class="block-content block-content-full">
-                <table class="table table-borderless table-hover table-striped table-vcenter js-dataTable-full" id="solicitudesTable">
+                <table class="table table-borderless table-hover table-striped table-vcenter js-dataTable-full"
+                    id="solicitudesTable">
                     <thead class="text-end border-bottom">
                         <tr>
                             <th class="d-none d-md-table-cell">#</th>
@@ -46,45 +47,10 @@
                             <th>Documento</th>
                             <th class="d-none d-md-table-cell" style="width: 30%;">Nombre Completo</th>
                             {{-- <th class="d-none d-md-table-cell"th>Cargo</th> --}}
-                            <th class="text-center" style="width: 100px;">Opciones</th>
+                            <th class="text-center" style="width: 100px;">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @php $contador = 1; @endphp
-                        @foreach ($data as $loguin)
-                            <tr data-usuario-id="{{ $loguin->usuario_id }}">
-                                <td class="text-center d-none d-md-table-cell">{{ $contador++ }}</td>
-                                <td class="text-center"><a class="fw-semibold"
-                                        href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id={{ $loguin->ticket_id }}"
-                                        target="_blank">{{ $loguin->ticket }}</a></td>
-                                <td class="d-none d-sm-table-cell">
-                                    <span class="badge bg-{{ $loguin->status_color }} w-100">
-                                        <i class="{{ $loguin->status_icon }} me-1"></i>
-                                        {{ $loguin->status_title }}</span>
-                                </td>
-                                <td class="text-muted d-none d-md-table-cell">
-                                    {{ Carbon\Carbon::parse($loguin->fecha_creacion)->format('d/m/Y') }}
-                                </td>
-                                <td class="fw-semibold">{{ $loguin->identificacion }}</td>
-                                <td class="fw-semibold d-none d-md-table-cell">{{ $loguin->nombreCompleto }}</td>
-                                <td class="text-center">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-secondary btn-show"
-                                            data-toggle="click-ripple" data-bs-toggle="tooltip" title="Ver detalle"
-                                            data-solicitud-id="{{ $loguin->solicitud_id }}" data-solicitud-tipo="{{ $loguin->tipo }}">
-                                            <i class="fa fa-eye"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-secondary btn-register-loguin"
-                                            data-toggle="click-ripple" data-bs-toggle="tooltip"
-                                            title="Registrar credenciales"
-                                            data-solicitud-id="{{ $loguin->solicitud_id }}" data-solicitud-tipo="{{ $loguin->tipo }}">
-                                            <i class="fa fa-user-pen"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
