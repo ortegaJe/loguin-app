@@ -16,7 +16,7 @@ class pageTablesDatatables {
       if (button) {
         const solicitudId = button.getAttribute('data-solicitud-id');
         const solicitudTipo = button.getAttribute('data-solicitud-tipo');
-        const usuarioId = button.closest('tr').getAttribute('data-usuario-id');
+        const usuarioId = button.getAttribute('data-usuario-id');
 
         if (solicitudTipo === 'loguin') {
           this.fetchSolicitudLoguinData(solicitudId, usuarioId);
@@ -167,8 +167,8 @@ class pageTablesDatatables {
         dataSrc: 'data.aplicaciones'
       },
       //serverSide: true,
-      //processing: true,
-      responsive: true,
+      processing: true,
+      //responsive: true,
       pagingType: "simple_numbers",
       pageLength: savedPageLength ? parseInt(savedPageLength) : 10,
       autoWidth: false,
@@ -177,7 +177,7 @@ class pageTablesDatatables {
         { data: 'solicitud_id' },
         { data: 'ticket' },
         { data: 'status_title' },
-        { data: 'fecha_creacion' },
+        { data: 'fecha_creacion'},
         { data: 'identificacion'},
         { data: 'nombreCompleto' },
         {
@@ -191,7 +191,8 @@ class pageTablesDatatables {
                 <button type="button" class="btn btn-sm btn-secondary btn-show"
                   data-toggle="click-ripple" data-bs-toggle="tooltip" title="Ver detalle"
                   data-solicitud-id="${row.solicitud_id}"
-                  data-solicitud-tipo="${row.tipo}">
+                  data-solicitud-tipo="${row.tipo}"
+                  data-usuario-id="${row.usuario_id}">
                   <i class="fa fa-eye"></i>
                 </button>
                 <button type="button" class="btn btn-sm btn-secondary btn-register-loguin"
@@ -202,33 +203,82 @@ class pageTablesDatatables {
                 </button>
               </div>
             `;
+            }
           }
-        }
-      ],
-      columnDefs: [
+          ],
+          columnDefs: [
+          {
+            targets: 1,
+            render: function (data, type, row) {
+            if (type === 'display') {
+              return `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${row.ticket_id}" target="_blank">LOG.${row.ticket_id}</a>`;
+            }
+            return data;
+            }
+          },
+          {
+            targets: 2,
+            render: function (data, type, row) {
+              if (type === 'display') {
+              const div = document.createElement('div');
+              div.innerHTML = data;
+              const estado = div.textContent || div.innerText || "";
+              //console.log(estado.trim());
+
+              // Asignar clase según el estado
+              let badgeClass = "badge bg-info w-100"; // Clase por defecto
+              let icon = ""; // Icono por defecto
+              if (estado.trim() === "Cerrado") {
+                badgeClass = "badge bg-info w-100";
+                icon = "fa fa-check";
+              } else if (estado.trim() === "En curso") {
+                badgeClass = "badge bg-success w-100";
+                icon = "far fa-circle";
+              } else if (estado.trim() === "Respuesta") {
+                badgeClass = "badge bg-secondary w-100";
+                icon = "far fa-comment";
+              }
+
+              return `<span class="${badgeClass}"><i class="${icon} me-1"></i>${estado.trim()}</span>`;
+            }
+            return data;
+          }
+        },
         {
-          targets: 2, // Asumimos que "ESTADO" es la columna 2 (ajusta si es otra)
+          targets: 3,
           render: function (data, type, row) {
-          const div = document.createElement('div');
-          div.innerHTML = data;
-          const estado = div.textContent || div.innerText || "";
-          //console.log(estado.trim());
-
-          // Asignar clase según el estado
-          let badgeClass = "badge bg-info w-100"; // Clase por defecto
-          let icon = ""; // Icono por defecto
-          if (estado.trim() === "Cerrado") {
-            badgeClass = "badge bg-info w-100";
-            icon = "fa fa-check";
-          } else if (estado.trim() === "En curso") {
-            badgeClass = "badge bg-success w-100";
-            icon = "far fa-circle";
-          } else if (estado.trim() === "Respuesta") {
-            badgeClass = "badge bg-secondary w-100";
-            icon = "far fa-comment";
+            const rawDate = new Date(data);
+            if (type === 'display') {
+              const formatted = new Intl.DateTimeFormat('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                //hour: '2-digit',
+                //minute: '2-digit',
+                //second: '2-digit',
+                //hour12: false
+              }).format(rawDate);
+              return `<span class="text-muted d-none d-md-table-cell">${formatted}</span>`;
+            }
+            return rawDate.getTime(); // timestamp para ordenamiento y búsqueda
           }
-
-          return `<span class="${badgeClass}"><i class="${icon} me-1"></i>${estado.trim()}</span>`;
+        },
+        {
+          targets: 4,
+          render: function (data, type, row) {
+            if (type === 'display') {
+              return `<span class="fw-semibold dt-type-numeric">${data}</span>`;
+            }
+            return data;
+          }
+        },
+        {
+          targets: 5,
+          render: function (data, type, row) {
+            if (type === 'display') {
+              return `<span class="fw-semibold d-none d-md-table-cell">${data}</span>`;
+            }
+            return data;
           }
         }
       ]
@@ -277,9 +327,10 @@ class pageTablesDatatables {
     }
 
     const refreshButtonHTML = `
-      <div class="col-md-auto me-auto d-flex align-items-end">
-        <button type="button" id="refresh-datatable" class="btn btn-sm btn-success" title="Actualizar">
-          <i class="fa fa-sync-alt"></i>
+      <div class="col-md-auto">
+        <button type="button" id="refresh-datatable" class="btn btn-md btn-alt-success me-1 mb-1"
+          data-bs-toggle="tooltip" data-bs-placement="top" title="Actualizar lista">
+          <i class="fa fa-sync opacity-50"></i>
         </button>
       </div>
     `;
@@ -294,27 +345,26 @@ class pageTablesDatatables {
       const children = filtroRowRefresh.children;
       if (children.length >= 2) {
         // Insertar como tercer hijo (después del filtro de estado)
-        filtroRowRefresh.insertBefore(refreshBtnDiv, children[2]);
+        filtroRowRefresh.insertBefore(refreshBtnDiv, children[3]);
       } else {
         filtroRowRefresh.appendChild(refreshBtnDiv);
       }
     }
 
       document.getElementById('refresh-datatable').addEventListener('click', function () {
-        const block = document.querySelector('#datatable-wrapper');
-        console.log(block);
+        //const block = document.querySelector('#datatable-wrapper');
       
         // Mostrar efecto loading
-        block.classList.add('block-mode-loading-refresh', 'block-mode-loading');
+        //block.classList.add('block-mode-loading-refresh', 'block-mode-loading');
       
         // Recargar la tabla
         const table = jQuery('.js-dataTable-full').DataTable();
         table.ajax.reload(null, false); // false evita que se reinicie la paginación
       
         // Ocultar el efecto luego de completar la carga
-        table.on('xhr', function () {
-          block.classList.remove('block-mode-loading-refresh', 'block-mode-loading');
-        });
+        //table.on('xhr', function () {
+          //block.classList.remove('block-mode-loading-refresh', 'block-mode-loading');
+        //});
     });
     
 
