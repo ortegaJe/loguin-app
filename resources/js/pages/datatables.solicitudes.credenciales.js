@@ -174,7 +174,12 @@ class pageTablesDatatables {
       autoWidth: false,
       order: [[3, 'desc']],
       columns: [
-        { data: 'solicitud_id' },
+        { 
+          data: null,
+          orderable: false,
+          searchable: false,
+          defaultContent: ''
+        },
         { data: 'ticket' },
         { data: 'status_title' },
         { data: 'fecha_creacion'},
@@ -206,14 +211,22 @@ class pageTablesDatatables {
             }
           }
           ],
+          drawCallback: function(settings) {
+            const api = this.api();
+            api.column(0, { search: 'applied', order: 'applied' })
+              .nodes()
+              .each(function(cell, i) {
+                cell.innerHTML = i + 1;
+              });
+          },
           columnDefs: [
           {
             targets: 1,
             render: function (data, type, row) {
-            if (type === 'display') {
-              return `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${row.ticket_id}" target="_blank">LOG.${row.ticket_id}</a>`;
-            }
-            return data;
+              if (type === 'display') {
+                return `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${row.ticket_id}" target="_blank">LOG.${row.ticket_id}</a>`;
+              }
+              return data;
             }
           },
           {
