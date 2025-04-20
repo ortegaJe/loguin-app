@@ -7,6 +7,13 @@
 // DataTables, for more examples you can check out https://www.datatables.net/
 class pageTablesDatatables {
 
+  static initElements() {
+    this.cardRow = document.getElementById('countTicketCard');
+    this.enCursoCount = document.getElementById('enCursoCount');
+    this.respuestaCount = document.getElementById('respuestaCount');
+    this.cerradoCount = document.getElementById('cerradoCount');
+  }
+
   static SolicitudDetalleViewer() {
     const table = document.getElementById('solicitudesTable');
   
@@ -129,6 +136,95 @@ class pageTablesDatatables {
     const modalInstance = new bootstrap.Modal(modal);
     modalInstance.show();
   }
+
+  static async getCountTickets() {
+    try {
+      const response = await fetch("/getCountTickets", {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+        }
+      });
+      
+      if (!response.ok) throw new Error('Error al obtener los datos de la solicitud');
+      
+      const data = await response.json();
+      //console.log(data);
+      if (!data) {
+        throw new Error('Datos incompletos recibidos del servidor');
+      }
+      
+      this.renderTodosLosTickets(data.countByStatus, data.countByTicketCloseUser);
+
+    } catch (error) {
+      this.showToast('Error', `${error}`, 'error');
+      console.error('Fetch error:', error);
+    }
+  }
+
+  static renderTodosLosTickets(statusTickets, ticketsPorUsuario) {
+    const { en_curso, respuesta, cerrados } = statusTickets;
+  
+    const tarjetasFijas = `
+      <div class="col-6 col-md-4 col-xl-2 animated fadeIn">
+        <a class="block block-rounded block-link-shadow" href="javascript:void(0)">
+          <div class="block-content block-content-full">
+            <div class="py-3 text-center">
+              <div class="mb-3"><i class="far fa-circle fa-4x text-success"></i></div>
+              <div class="fs-3 fw-semibold">${en_curso}</div>
+              <div class="fs-sm fw-semibold text-uppercase text-muted">En Curso</div>
+            </div>
+          </div>
+        </a>
+      </div>
+  
+      <div class="col-6 col-md-4 col-xl-2 animated fadeIn">
+        <a class="block block-rounded block-link-shadow" href="javascript:void(0)">
+          <div class="block-content block-content-full">
+            <div class="py-3 text-center">
+              <div class="mb-3"><i class="far fa-comment fa-4x text-secondary"></i></div>
+              <div class="fs-3 fw-semibold">${respuesta}</div>
+              <div class="fs-sm fw-semibold text-uppercase text-muted">Con Respuesta</div>
+            </div>
+          </div>
+        </a>
+      </div>
+  
+      <div class="col-6 col-md-4 col-xl-2 animated fadeIn">
+        <a class="block block-rounded block-link-shadow" href="javascript:void(0)">
+          <div class="block-content block-content-full">
+            <div class="py-3 text-center">
+              <div class="mb-3"><i class="fa fa-check fa-4x text-info"></i></div>
+              <div class="fs-3 fw-semibold">${cerrados}</div>
+              <div class="fs-sm fw-semibold text-uppercase text-muted">Cerrados</div>
+            </div>
+          </div>
+        </a>
+      </div>
+    `;
+  
+    const tarjetasUsuarios = ticketsPorUsuario.map(tickets => `
+      <div class="col-6 col-md-4 col-xl-2 animated fadeIn">
+        <a class="block block-rounded block-link-shadow" href="javascript:void(0)">
+          <div class="block-content block-content-full">
+            <div class="py-3 text-center">
+              <div class="mb-3"><i class="far fa-user fa-4x text-primary"></i></div>
+              <div class="fs-3 fw-semibold">${tickets.cerrados}</div>
+              <div class="fs-sm fw-semibold text-uppercase text-muted">
+                ${tickets.analista_app == null ? 'No Registra' : tickets.analista_app}
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    `).join('');
+  
+    // Render todo en una sola fila
+    this.UsuarioCount = this.cardRow;
+    this.UsuarioCount.innerHTML = tarjetasFijas + tarjetasUsuarios;
+  }  
+
   /*
    * Init DataTables functionality
    */
@@ -364,20 +460,13 @@ class pageTablesDatatables {
       }
     }
 
-      document.getElementById('refresh-datatable').addEventListener('click', function () {
-        //const block = document.querySelector('#datatable-wrapper');
-      
-        // Mostrar efecto loading
-        //block.classList.add('block-mode-loading-refresh', 'block-mode-loading');
-      
-        // Recargar la tabla
-        const table = jQuery('.js-dataTable-full').DataTable();
-        table.ajax.reload(null, false); // false evita que se reinicie la paginación
-      
-        // Ocultar el efecto luego de completar la carga
-        //table.on('xhr', function () {
-          //block.classList.remove('block-mode-loading-refresh', 'block-mode-loading');
-        //});
+    document.getElementById('refresh-datatable').addEventListener('click', async function () {
+      // Recargar la tabla
+      const table = jQuery('.js-dataTable-full').DataTable();
+      table.ajax.reload(null, false); // false evita que se reinicie la paginación
+
+      // Actualizar todas las cards
+      await pageTablesDatatables.getCountTickets();
     });
     
 
@@ -400,8 +489,10 @@ class pageTablesDatatables {
    * Init functionality
    */
   static init() {
+    this.initElements();
     this.initDataTables();
     this.SolicitudDetalleViewer();
+    this.getCountTickets();
      // Eliminar el valor de localStorage solo si se va a otra página
     document.addEventListener('visibilitychange', function () {
       if (document.visibilityState === 'hidden') {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -231,5 +232,55 @@ class LoguinCredentialController extends Controller
             'b.mipres',
             'b.ruaf'
         ])->get();
+    }
+
+    public function getCountTickets()
+    {
+        $countByStatus = DB::table('loguin_solicitud as b')
+        ->leftJoin('glpi_tickets as c', 'c.id', 'b.ticket_id')
+        ->leftJoin('glpi_itilfollowups as d', 'd.items_id', 'c.id')
+        ->selectRaw("
+            SUM(CASE 
+                WHEN c.status = 2 AND d.items_id IS NULL THEN 1
+                ELSE 0
+            END) as en_curso,
+            SUM(CASE 
+                WHEN c.status = 2 AND c.id = d.items_id THEN 1
+                ELSE 0
+            END) as respuesta,
+            COUNT(DISTINCT CASE 
+                    WHEN c.status >= 5 THEN b.ticket_id
+                    ELSE NULL
+            END) as cerrados
+        ")
+        ->first();
+
+        $carbon = CarbonImmutable::now()->locale('es');
+        $primerDiaSemana = $carbon->startOfWeek()->format('Y-m-d H:i:s');
+        $ultimoDiaSemana = $carbon->endOfWeek()->format('Y-m-d H:i:s');
+    
+        $countByTicketCloseUser = DB::table('loguin_solicitud as a')
+        ->leftJoin('loguin_solicitud_detalle as b', 'b.solicitud_id', 'a.id')
+        ->leftJoin('glpi_tickets as c', 'c.id', 'a.ticket_id')
+        ->leftJoin('glpi_users as d', 'd.id', 'b.users_id_recipient')
+        ->whereBetween('c.solvedate', [$primerDiaSemana, $ultimoDiaSemana])
+        ->select(
+            'd.name as analista_app',
+            DB::raw("
+                COUNT(DISTINCT CASE
+                    WHEN c.status >= 5 THEN a.ticket_id
+                    ELSE NULL
+                END) as cerrados
+            ")
+        )
+        ->groupBy('d.name')
+        ->get();
+    
+        return response()->json([
+            'message' => 'Contador de tickets',
+            'status' => 200,
+            'countByStatus' => $countByStatus,
+            'countByTicketCloseUser' => $countByTicketCloseUser,
+        ]);
     }
 }

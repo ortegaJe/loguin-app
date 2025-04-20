@@ -6,6 +6,8 @@ use App\Http\Controllers\InfraCredentialController;
 use App\Http\Controllers\LoguinCredentialController;
 use App\Http\Controllers\LoguinTicketStoreController;
 use App\Http\Controllers\SolicitudController;
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +45,7 @@ Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN|ANALISTA_APP'])->group(func
     Route::get('fetchDataLoguin/{id}', [LoguinCredentialController::class, 'fetchDataLoguin']);
     Route::post('storeLoguin', [LoguinCredentialController::class, 'storeLoguin']);
     Route::get('getLoguins/aplicaciones/{id}', [LoguinCredentialController::class, 'getLoguins']);
+    Route::get('getCountTickets', [LoguinCredentialController::class, 'getCountTickets']);
 
 });
 

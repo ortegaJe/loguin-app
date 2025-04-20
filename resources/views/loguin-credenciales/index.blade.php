@@ -33,6 +33,43 @@
 
 @section('content')
     <div class="content">
+        <div class="row g-sm" id="countTicketCard">
+            <div class="col-6 col-md-4 col-xl-2">
+                <a class="block block-rounded block-link-shadow block-mode-loading-refresh block-mode-loading" href="javascript:void(0)">
+                    <div class="block-content block-content-full">
+                        <div class="py-3 text-center">
+                            <div class="mb-3"><i class="far fa-circle fa-4x text-success"></i></div>
+                            <div class="fs-3 fw-semibold">0</div>
+                            <div class="fs-sm fw-semibold text-uppercase text-muted">En Curso</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-2 animated fadeIn">
+                <a class="block block-rounded block-link-shadow  block-mode-loading-refresh block-mode-loading" href="javascript:void(0)">
+                    <div class="block-content block-content-full">
+                        <div class="py-3 text-center">
+                            <div class="mb-3"><i class="far fa-comment fa-4x text-secondary"></i></div>
+                            <div class="fs-3 fw-semibold">0</div>
+                            <div class="fs-sm fw-semibold text-uppercase text-muted">Con Respuesta</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-2 animated fadeIn">
+                <a class="block block-rounded block-link-shadow  block-mode-loading-refresh block-mode-loading" href="javascript:void(0)">
+                    <div class="block-content block-content-full">
+                        <div class="py-3 text-center">
+                            <div class="mb-3"><i class="fa fa-check fa-4x text-info"></i></div>
+                            <div class="fs-3 fw-semibold">0</div>
+                            <div class="fs-sm fw-semibold text-uppercase text-muted">Cerrados</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
         <div class="content-heading d-flex justify-content-between align-items-center">
             <span>
                 Solicitudes <small class="d-none d-sm-inline">Aplicaciones</small>
