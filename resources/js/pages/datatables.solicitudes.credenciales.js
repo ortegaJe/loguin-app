@@ -20,14 +20,12 @@ class pageTablesDatatables {
     table.addEventListener('click', event => {
       const button = event.target.closest('.btn-show');
       const btnRegisterLoguin = event.target.closest('.btn-register-loguin');
+
       if (button) {
         const solicitudId = button.getAttribute('data-solicitud-id');
-        const solicitudTipo = button.getAttribute('data-solicitud-tipo');
         const usuarioId = button.getAttribute('data-usuario-id');
 
-        if (solicitudTipo === 'loguin') {
-          this.fetchSolicitudLoguinData(solicitudId, usuarioId);
-        }
+        this.fetchSolicitudLoguinData(solicitudId, usuarioId);
       }
 
       if (btnRegisterLoguin) {
@@ -212,7 +210,7 @@ class pageTablesDatatables {
               <div class="mb-3"><i class="far fa-user fa-4x text-primary"></i></div>
               <div class="fs-3 fw-semibold">${tickets.cerrados}</div>
               <div class="fs-sm fw-semibold text-uppercase text-muted">
-                ${tickets.analista_app == null ? 'No Registra' : tickets.analista_app}
+                ${tickets.analista_app == null ? null : tickets.analista_app}
               </div>
             </div>
           </div>
@@ -292,14 +290,12 @@ class pageTablesDatatables {
                 <button type="button" class="btn btn-sm btn-secondary btn-show"
                   data-toggle="click-ripple" data-bs-toggle="tooltip" title="Ver detalle"
                   data-solicitud-id="${row.solicitud_id}"
-                  data-solicitud-tipo="${row.tipo}"
                   data-usuario-id="${row.usuario_id}">
                   <i class="fa fa-eye"></i>
                 </button>
                 <button type="button" class="btn btn-sm btn-secondary btn-register-loguin"
                   data-toggle="click-ripple" data-bs-toggle="tooltip" title="Registrar credenciales"
-                  data-solicitud-id="${row.solicitud_id}"
-                  data-solicitud-tipo="${row.tipo}">
+                  data-solicitud-id="${row.solicitud_id}">
                   <i class="fa fa-user-pen"></i>
                 </button>
               </div>
@@ -320,7 +316,7 @@ class pageTablesDatatables {
             targets: 1,
             render: function (data, type, row) {
               if (type === 'display') {
-                return `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${row.ticket_id}" target="_blank">${row.ticket_id}</a>`;
+                return `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${row.ticket_id}" target="_blank">LOG.${row.ticket_id}</a>`;
               }
               return data;
             }

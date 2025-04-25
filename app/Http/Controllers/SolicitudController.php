@@ -26,11 +26,38 @@ class SolicitudController extends Controller
 
     public function getLoguin()
     {
-        $data['aplicaciones'] = $this->getUsuariosConSolicitudes()->where('tipo', 'loguin');
+        $data = DB::table('loguin_usuarios as a')
+        ->join('loguin_solicitud as b', 'b.usuario_id', 'a.id')
+        ->select(
+            'b.id as solicitud_id',
+            'b.ticket_id',
+            DB::raw("(
+                SELECT 
+                    CASE 
+                        WHEN c.status = 2 AND d.items_id IS NULL THEN 'En curso'
+                        WHEN c.status = 2 AND c.id = d.items_id THEN 'Respuesta'
+                        WHEN c.status >= 5 THEN 'Cerrado'
+                        ELSE 0
+                    END
+                FROM glpi_tickets c
+                LEFT JOIN glpi_itilfollowups d ON d.items_id = c.id
+                WHERE c.id = b.ticket_id
+                LIMIT 1
+            ) AS status_title"),
+            'b.fecha_creacion',
+            'a.id as usuario_id',
+            'a.identificacion',
+            DB::raw("CONCAT(a.nombres,' ', a.apellidos) as nombreCompleto"), 
+            'a.email',
+        )
+        ->orderBy('b.fecha_creacion', 'desc')
+        ->get();
 
         return response()->json([
-            'data' => $data,
-        ]);
+            'loguinAplicaciones' => $data,
+            'message' => 'ok',
+            'status' => 200,
+        ], 200);
     }
 
     public function getRequestLoguinInfra()
