@@ -179,6 +179,13 @@ class RenderDataSolicitudLoguin {
   ) {
     //console.log(sedesAdicionales);
     //console.log(especialidadUsuario);
+    const rawDate = new Date(usuario.fechaNacimiento);
+    const fechaNacimiento = `${rawDate.getDate().toString().padStart(2, "0")}-${(
+      rawDate.getMonth() + 1
+    )
+      .toString()
+      .padStart(2, "0")}-${rawDate.getFullYear()}`;
+
     const blockDatosPersonales = document.getElementById(
       "block-datos-personales"
     );
@@ -220,7 +227,7 @@ class RenderDataSolicitudLoguin {
       `<i class="fa fa-envelope me-2"></i>${usuario.email}` || "N/A";
 
       containerDatosPersonal.querySelector("#loguin-fecha-nacimiento").innerHTML =
-      `<i class="fa fa-cake-candles me-2"></i>${usuario.fechaNacimiento}` || "N/A";
+      `<i class="fa fa-cake-candles me-2"></i>${fechaNacimiento}` || "N/A";
 
     containerDatosSolicitud.querySelector("#loguin-sede").classList.add("mb-4");
     containerDatosSolicitud.querySelector("#loguin-sede").innerHTML =
