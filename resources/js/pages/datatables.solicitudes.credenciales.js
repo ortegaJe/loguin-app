@@ -6,46 +6,45 @@
 
 // DataTables, for more examples you can check out https://www.datatables.net/
 class pageTablesDatatables {
-
   static initElements() {
-    this.cardRow = document.getElementById('countTicketCard');
-    this.enCursoCount = document.getElementById('enCursoCount');
-    this.respuestaCount = document.getElementById('respuestaCount');
-    this.cerradoCount = document.getElementById('cerradoCount');
+    this.cardRow = document.getElementById("countTicketCard");
+    this.enCursoCount = document.getElementById("enCursoCount");
+    this.respuestaCount = document.getElementById("respuestaCount");
+    this.cerradoCount = document.getElementById("cerradoCount");
   }
 
   static SolicitudDetalleViewer() {
-    const table = document.getElementById('solicitudesTable');
-  
-    table.addEventListener('click', event => {
-      const button = event.target.closest('.btn-show');
-      const btnRegisterLoguin = event.target.closest('.btn-register-loguin');
+    const table = document.getElementById("solicitudesTable");
+
+    table.addEventListener("click", (event) => {
+      const button = event.target.closest(".btn-show");
+      const btnRegisterLoguin = event.target.closest(".btn-register-loguin");
 
       if (button) {
-        const solicitudId = button.getAttribute('data-solicitud-id');
-        const usuarioId = button.getAttribute('data-usuario-id');
+        const solicitudId = button.getAttribute("data-solicitud-id");
+        const usuarioId = button.getAttribute("data-usuario-id");
 
         this.fetchSolicitudLoguinData(solicitudId, usuarioId);
       }
 
       if (btnRegisterLoguin) {
-        const loguinSolicitudId = btnRegisterLoguin.getAttribute('data-solicitud-id');
+        const loguinSolicitudId =
+          btnRegisterLoguin.getAttribute("data-solicitud-id");
         const url = `/loguin/aplicaciones/solicitud/registrar/${loguinSolicitudId}`;
-        window.open(url, '_blank');
+        window.open(url, "_blank");
       }
-
     });
   }
 
   static async showToast(title, message, type) {
     let toast = Swal.mixin({
       buttonsStyling: false,
-      target: '#page-container',
+      target: "#page-container",
       customClass: {
-        confirmButton: 'btn btn-primary m-1',
-        cancelButton: 'btn btn-danger m-1',
-        input: 'form-control'
-      }
+        confirmButton: "btn btn-primary m-1",
+        cancelButton: "btn btn-danger m-1",
+        input: "form-control",
+      },
     });
 
     toast.fire(title, message, type);
@@ -53,7 +52,11 @@ class pageTablesDatatables {
 
   static async fetchSolicitudLoguinData(solicitudId, usuarioId) {
     if (!solicitudId) {
-      this.showToast('Error', 'No se pudo cargar los datos de la solicitud', 'error');
+      this.showToast(
+        "Error",
+        "No se pudo cargar los datos de la solicitud",
+        "error"
+      );
       return;
     }
 
@@ -61,74 +64,108 @@ class pageTablesDatatables {
       const response = await fetch("/fetchSolicitudLoguin", {
         method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
         },
-        body: JSON.stringify({ solicitud_id: solicitudId, usuario_id: usuarioId })
+        body: JSON.stringify({
+          solicitud_id: solicitudId,
+          usuario_id: usuarioId,
+        }),
       });
 
-      if (!response.ok) throw new Error('Error al obtener los datos de la solicitud');
+      if (!response.ok)
+        throw new Error("Error al obtener los datos de la solicitud");
 
       const data = await response.json();
       //console.log(data);
-      if (!data.usuario || !data.usuario[0] || !data.loguin_solicitud || !data.especialidad_usuario) {
-        throw new Error('Datos incompletos recibidos del servidor');
+      if (
+        !data.usuario ||
+        !data.usuario[0] ||
+        !data.loguin_solicitud ||
+        !data.especialidad_usuario
+      ) {
+        throw new Error("Datos incompletos recibidos del servidor");
       }
 
-      this.showSolicitudModal(data.usuario[0], data.loguin_solicitud, data.especialidad_usuario);
-
+      this.showSolicitudModal(
+        data.usuario[0],
+        data.loguin_solicitud,
+        data.especialidad_usuario
+      );
     } catch (error) {
-      this.showToast('Error', `${error}`, 'error');
-      console.error('Fetch error:', error);
+      this.showToast("Error", `${error}`, "error");
+      console.error("Fetch error:", error);
     }
   }
 
-  static async showSolicitudModal(usuario, loguinSolicitud, especialidadUsuario) {
+  static async showSolicitudModal(
+    usuario,
+    loguinSolicitud,
+    especialidadUsuario
+  ) {
     //console.log(loguinSolicitud);
-    const modal = document.getElementById('solicitudModal');
-    modal.querySelector('#modal-documento').textContent = usuario.identificacion || 'N/A';
-    modal.querySelector('#modal-nombre').textContent = usuario.nombreCompleto || 'N/A';
-    modal.querySelector('#modal-email').textContent = usuario.email || 'N/A';
-    modal.querySelector('#modal-zonal').textContent = usuario.zonal || 'N/A';
-    modal.querySelector('#modal-sede').textContent = usuario.sede || 'N/A';
-    modal.querySelector('#modal-ticket').href = `http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${usuario.ticket_id}` || 'N/A';
-    modal.querySelector('#modal-ticket').setAttribute('target', '_blank');
-    modal.querySelector('#modal-ticket-numero').textContent = `#${usuario.ticket_id}` || 'N/A';
-    modal.querySelector('#modal-fecha').textContent = usuario.fecha_creacion || 'N/A';
-    modal.querySelector('#modal-observacion').textContent = usuario.observaciones;
+    const rawDate = new Date(usuario.fecha_creacion);
+    const fechaFormateada = `${rawDate.getDate().toString().padStart(2, "0")}-${(
+      rawDate.getMonth() + 1
+    )
+      .toString()
+      .padStart(2, "0")}-${rawDate.getFullYear()}`;
 
-    const aplicacionesPerfilesContainer = modal.querySelector('#modal-aplicaciones-perfiles');
-    aplicacionesPerfilesContainer.innerHTML = '';
+    const modal = document.getElementById("solicitudModal");
+    modal.querySelector("#modal-documento").textContent = usuario.identificacion || "N/A";
+    modal.querySelector("#modal-nombre").textContent = usuario.nombreCompleto || "N/A";
+    modal.querySelector("#modal-email").textContent = usuario.email || "N/A";
+    modal.querySelector("#modal-zonal").textContent = usuario.zonal || "N/A";
+    modal.querySelector("#modal-sede").textContent = usuario.sede || "N/A";
+    modal.querySelector("#modal-ticket").href =
+      `http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${usuario.ticket_id}` ||
+      "N/A";
+    modal.querySelector("#modal-ticket").setAttribute("target", "_blank");
+    modal.querySelector("#modal-ticket-numero").textContent = `#${usuario.ticket_id}` || "N/A";
+    modal.querySelector("#modal-fecha").textContent = fechaFormateada || "N/A";
+    modal.querySelector("#modal-observacion").textContent = usuario.observaciones;
+
+    const aplicacionesPerfilesContainer = modal.querySelector(
+      "#modal-aplicaciones-perfiles"
+    );
+    aplicacionesPerfilesContainer.innerHTML = "";
 
     loguinSolicitud.map((item) => {
-      const listItem = document.createElement('li');
-      listItem.classList.add('list-group-item');
+      const listItem = document.createElement("li");
+      listItem.classList.add("list-group-item");
       listItem.textContent = `${item.aplicacion} ${item.perfil.toUpperCase()}`;
       aplicacionesPerfilesContainer.appendChild(listItem);
     });
 
-    const perfilesEspecialistaId = [5,6]; // ID desde la base de datos medicos especilistas de everest y pana
-    const hasMedicoEspecialista = loguinSolicitud.some(item => perfilesEspecialistaId.includes(item.perfil_id));
-    const hasEspecialidad = especialidadUsuario && especialidadUsuario.length > 0;
+    const perfilesEspecialistaId = [5, 6]; // ID desde la base de datos medicos especilistas de everest y pana
+    const hasMedicoEspecialista = loguinSolicitud.some((item) =>
+      perfilesEspecialistaId.includes(item.perfil_id)
+    );
+    const hasEspecialidad =
+      especialidadUsuario && especialidadUsuario.length > 0;
 
     if (hasMedicoEspecialista || hasEspecialidad) {
-      const titleEspecialidadUsuario = modal.querySelector('#title-especialidad');
-      const especialidadUsuarioContainer = modal.querySelector('#modal-especialidad-usuario');
+      const titleEspecialidadUsuario = modal.querySelector(
+        "#title-especialidad"
+      );
+      const especialidadUsuarioContainer = modal.querySelector(
+        "#modal-especialidad-usuario"
+      );
       titleEspecialidadUsuario.hidden = false;
       especialidadUsuarioContainer.hidden = false;
-      especialidadUsuarioContainer.innerHTML = '';
+      especialidadUsuarioContainer.innerHTML = "";
 
       if (hasEspecialidad) {
         especialidadUsuario.forEach((item) => {
-          const listItem = document.createElement('li');
-          listItem.classList.add('list-group-item');
+          const listItem = document.createElement("li");
+          listItem.classList.add("list-group-item");
           listItem.textContent = `${item.especialidad}`;
           especialidadUsuarioContainer.appendChild(listItem);
         });
       }
     } else {
-      modal.querySelector('#title-especialidad').hidden = true;
-      modal.querySelector('#modal-especialidad-usuario').hidden = true;
+      modal.querySelector("#title-especialidad").hidden = true;
+      modal.querySelector("#modal-especialidad-usuario").hidden = true;
     }
 
     const modalInstance = new bootstrap.Modal(modal);
@@ -140,30 +177,33 @@ class pageTablesDatatables {
       const response = await fetch("/getCountTickets", {
         method: "GET",
         headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-        }
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+        },
       });
-      
-      if (!response.ok) throw new Error('Error al obtener los datos de la solicitud');
-      
+
+      if (!response.ok)
+        throw new Error("Error al obtener los datos de la solicitud");
+
       const data = await response.json();
       //console.log(data);
       if (!data) {
-        throw new Error('Datos incompletos recibidos del servidor');
+        throw new Error("Datos incompletos recibidos del servidor");
       }
-      
-      this.renderTodosLosTickets(data.countByStatus, data.countByTicketCloseUser);
 
+      this.renderTodosLosTickets(
+        data.countByStatus,
+        data.countByTicketCloseUser
+      );
     } catch (error) {
-      this.showToast('Error', `${error}`, 'error');
-      console.error('Fetch error:', error);
+      this.showToast("Error", `${error}`, "error");
+      console.error("Fetch error:", error);
     }
   }
 
   static renderTodosLosTickets(statusTickets, ticketsPorUsuario) {
     const { en_curso, respuesta, cerrados } = statusTickets;
-  
+
     const tarjetasFijas = `
       <div class="col-6 col-md-4 col-xl-2 animated fadeIn">
         <a class="block block-rounded block-link-shadow" href="javascript:void(0)">
@@ -201,8 +241,10 @@ class pageTablesDatatables {
         </a>
       </div>
     `;
-  
-    const tarjetasUsuarios = ticketsPorUsuario.map(tickets => `
+
+    const tarjetasUsuarios = ticketsPorUsuario
+      .map(
+        (tickets) => `
       <div class="col-6 col-md-4 col-xl-2 animated fadeIn">
         <a class="block block-rounded block-link-shadow" href="javascript:void(0)">
           <div class="block-content block-content-full">
@@ -216,12 +258,14 @@ class pageTablesDatatables {
           </div>
         </a>
       </div>
-    `).join('');
-  
+    `
+      )
+      .join("");
+
     // Render todo en una sola fila
     this.UsuarioCount = this.cardRow;
     this.UsuarioCount.innerHTML = tarjetasFijas + tarjetasUsuarios;
-  }  
+  }
 
   /*
    * Init DataTables functionality
@@ -229,7 +273,7 @@ class pageTablesDatatables {
   static initDataTables() {
     jQuery.extend(true, DataTable.ext.classes, {
       search: { input: "form-control" },
-      length: { select: "form-select" }
+      length: { select: "form-select" },
     });
 
     jQuery.extend(true, DataTable.defaults, {
@@ -242,23 +286,23 @@ class pageTablesDatatables {
           first: '<i class="fa fa-angle-double-left"></i>',
           previous: '<i class="fa fa-angle-left"></i>',
           next: '<i class="fa fa-angle-right"></i>',
-          last: '<i class="fa fa-angle-double-right"></i>'
-        }
-      }
+          last: '<i class="fa fa-angle-double-right"></i>',
+        },
+      },
     });
 
     jQuery.extend(true, DataTable.Buttons.defaults, {
-      dom: { button: { className: 'btn btn-sm btn-primary' } }
+      dom: { button: { className: "btn btn-sm btn-primary" } },
     });
 
     // Recuperar valor guardado del localStorage (o usar 10 como valor por defecto)
-    const savedPageLength = localStorage.getItem('datatable_length');
+    const savedPageLength = localStorage.getItem("datatable_length");
 
-    const table = jQuery('.js-dataTable-full').DataTable({
+    const table = jQuery(".js-dataTable-full").DataTable({
       ajax: {
-        url: '/fetchSolicitudesLoguin',
-        type: 'GET',
-        dataSrc: 'loguinAplicaciones',
+        url: "/fetchSolicitudesLoguin",
+        type: "GET",
+        dataSrc: "loguinAplicaciones",
       },
       //serverSide: true,
       processing: true,
@@ -266,24 +310,24 @@ class pageTablesDatatables {
       pagingType: "simple_numbers",
       pageLength: savedPageLength ? parseInt(savedPageLength) : 10,
       autoWidth: false,
-      order: [[3, 'desc']],
+      order: [[3, "desc"]],
       columns: [
-        { 
-          data: null,
-          orderable: false,
-          searchable: false,
-          defaultContent: ''
-        },
-        { data: 'ticket_id' },
-        { data: 'status_title' },
-        { data: 'fecha_creacion'},
-        { data: 'identificacion'},
-        { data: 'nombreCompleto' },
         {
           data: null,
           orderable: false,
           searchable: false,
-          className: 'text-center',
+          defaultContent: "",
+        },
+        { data: "ticket_id" },
+        { data: "status_title" },
+        { data: "fecha_creacion" },
+        { data: "identificacion" },
+        { data: "nombreCompleto" },
+        {
+          data: null,
+          orderable: false,
+          searchable: false,
+          className: "text-center",
           render: function (data, type, row) {
             return `
               <div class="btn-group">
@@ -300,32 +344,33 @@ class pageTablesDatatables {
                 </button>
               </div>
             `;
-            }
-          }
-          ],
-          drawCallback: function(settings) {
-            const api = this.api();
-            api.column(0, { search: 'applied', order: 'applied' })
-              .nodes()
-              .each(function(cell, i) {
-                cell.innerHTML = i + 1;
-              });
           },
-          columnDefs: [
-          {
-            targets: 1,
-            render: function (data, type, row) {
-              if (type === 'display') {
-                return `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${row.ticket_id}" target="_blank">LOG.${row.ticket_id}</a>`;
-              }
-              return data;
+        },
+      ],
+      drawCallback: function (settings) {
+        const api = this.api();
+        api
+          .column(0, { search: "applied", order: "applied" })
+          .nodes()
+          .each(function (cell, i) {
+            cell.innerHTML = i + 1;
+          });
+      },
+      columnDefs: [
+        {
+          targets: 1,
+          render: function (data, type, row) {
+            if (type === "display") {
+              return `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${row.ticket_id}" target="_blank">LOG.${row.ticket_id}</a>`;
             }
+            return data;
           },
-          {
-            targets: 2,
-            render: function (data, type, row) {
-              if (type === 'display') {
-              const div = document.createElement('div');
+        },
+        {
+          targets: 2,
+          render: function (data, type, row) {
+            if (type === "display") {
+              const div = document.createElement("div");
               div.innerHTML = data;
               const estado = div.textContent || div.innerText || "";
               //console.log(estado.trim());
@@ -347,17 +392,17 @@ class pageTablesDatatables {
               return `<span class="${badgeClass}"><i class="${icon} me-1"></i>${estado.trim()}</span>`;
             }
             return data;
-          }
+          },
         },
         {
           targets: 3,
           render: function (data, type, row) {
             const rawDate = new Date(data);
-            if (type === 'display') {
-              const formatted = new Intl.DateTimeFormat('es-ES', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
+            if (type === "display") {
+              const formatted = new Intl.DateTimeFormat("es-ES", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
                 //hour: '2-digit',
                 //minute: '2-digit',
                 //second: '2-digit',
@@ -366,31 +411,31 @@ class pageTablesDatatables {
               return `<span class="text-muted d-none d-md-table-cell">${formatted}</span>`;
             }
             return rawDate.getTime(); // timestamp para ordenamiento y búsqueda
-          }
+          },
         },
         {
           targets: 4,
           render: function (data, type, row) {
-            if (type === 'display') {
+            if (type === "display") {
               return `<span class="fw-semibold dt-type-numeric">${data}</span>`;
             }
             return data;
-          }
+          },
         },
         {
           targets: 5,
           render: function (data, type, row) {
-            if (type === 'display') {
+            if (type === "display") {
               return `<span class="fw-semibold d-none d-md-table-cell">${data}</span>`;
             }
             return data;
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
 
-    table.on('length.dt', function (e, settings, len) {
-      localStorage.setItem('datatable_length', len);
+    table.on("length.dt", function (e, settings, len) {
+      localStorage.setItem("datatable_length", len);
     });
 
     // Insertar filtro de estado
@@ -406,9 +451,11 @@ class pageTablesDatatables {
     `;
 
     // Insertar el filtro después del page length
-    const filtroRow = document.querySelector('#solicitudesTable_wrapper .row.mt-2.justify-content-between');
+    const filtroRow = document.querySelector(
+      "#solicitudesTable_wrapper .row.mt-2.justify-content-between"
+    );
     if (filtroRow) {
-      const temp = document.createElement('div');
+      const temp = document.createElement("div");
       temp.innerHTML = estadoFilterHTML;
       const filtroEstadoDiv = temp.firstElementChild;
 
@@ -423,9 +470,9 @@ class pageTablesDatatables {
     }
 
     // Filtro de estado
-    const estadoSelect = document.getElementById('filter-estado');
+    const estadoSelect = document.getElementById("filter-estado");
     if (estadoSelect) {
-      estadoSelect.addEventListener('change', function () {
+      estadoSelect.addEventListener("change", function () {
         const value = this.value;
         table.column(2).search(value).draw(); // columna "ESTADO"
       });
@@ -441,11 +488,13 @@ class pageTablesDatatables {
     `;
 
     // Insertar el botón después del filtro de estado
-    const refreshTemp = document.createElement('div');
+    const refreshTemp = document.createElement("div");
     refreshTemp.innerHTML = refreshButtonHTML;
     const refreshBtnDiv = refreshTemp.firstElementChild;
 
-    const filtroRowRefresh = document.querySelector('#solicitudesTable_wrapper .row.mt-2.justify-content-between');
+    const filtroRowRefresh = document.querySelector(
+      "#solicitudesTable_wrapper .row.mt-2.justify-content-between"
+    );
     if (filtroRowRefresh) {
       const children = filtroRowRefresh.children;
       if (children.length >= 2) {
@@ -456,25 +505,28 @@ class pageTablesDatatables {
       }
     }
 
-    document.getElementById('refresh-datatable').addEventListener('click', async function () {
-      // Recargar la tabla
-      const table = jQuery('.js-dataTable-full').DataTable();
-      table.ajax.reload(null, false); // false evita que se reinicie la paginación
+    document
+      .getElementById("refresh-datatable")
+      .addEventListener("click", async function () {
+        // Recargar la tabla
+        const table = jQuery(".js-dataTable-full").DataTable();
+        table.ajax.reload(null, false); // false evita que se reinicie la paginación
 
-      // Actualizar todas las cards
-      await pageTablesDatatables.getCountTickets();
-    });
-    
+        // Actualizar todas las cards
+        await pageTablesDatatables.getCountTickets();
+      });
 
     // Activar tooltips después del renderizado
-    table.on('draw', function () {
-      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    table.on("draw", function () {
+      const tooltipTriggerList = [].slice.call(
+        document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      );
       tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
       });
     });
 
-    jQuery('.js-dataTable-buttons').DataTable({
+    jQuery(".js-dataTable-buttons").DataTable({
       pagingType: "simple_numbers",
       pageLength: 5,
       autoWidth: false,
@@ -489,13 +541,13 @@ class pageTablesDatatables {
     this.initDataTables();
     this.SolicitudDetalleViewer();
     this.getCountTickets();
-     // Eliminar el valor de localStorage solo si se va a otra página
-    document.addEventListener('visibilitychange', function () {
-      if (document.visibilityState === 'hidden') {
+    // Eliminar el valor de localStorage solo si se va a otra página
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "hidden") {
         const navType = performance.getEntriesByType("navigation")[0].type;
 
-        if (navType !== 'reload') {
-          localStorage.removeItem('datatable_length');
+        if (navType !== "reload") {
+          localStorage.removeItem("datatable_length");
         }
       }
     });
