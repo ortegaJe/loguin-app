@@ -104,12 +104,6 @@ class pageTablesDatatables {
     especialidadUsuario
   ) {
     //console.log(loguinSolicitud);
-    const rawDate = new Date(usuario.fecha_creacion);
-    const fechaFormateada = `${rawDate.getDate().toString().padStart(2, "0")}-${(
-      rawDate.getMonth() + 1
-    )
-      .toString()
-      .padStart(2, "0")}-${rawDate.getFullYear()}`;
 
     const modal = document.getElementById("solicitudModal");
     modal.querySelector("#modal-documento").textContent = usuario.identificacion || "N/A";
@@ -122,7 +116,7 @@ class pageTablesDatatables {
       "N/A";
     modal.querySelector("#modal-ticket").setAttribute("target", "_blank");
     modal.querySelector("#modal-ticket-numero").textContent = `#${usuario.ticket_id}` || "N/A";
-    modal.querySelector("#modal-fecha").textContent = fechaFormateada || "N/A";
+    modal.querySelector("#modal-fecha").textContent = usuario.fecha_creacion || "N/A";
     modal.querySelector("#modal-observacion").textContent = usuario.observaciones;
 
     const aplicacionesPerfilesContainer = modal.querySelector(
