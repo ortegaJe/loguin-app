@@ -276,12 +276,12 @@ class LoguinCredentialController extends Controller
             ")
         )
         ->groupBy('d.name', 'd.id')
-        ->orderByDesc('c.users_id_lastupdater')
+        ->orderBy('cerrados', 'desc')
         ->limit(2)
         ->get();
     
         return response()->json([
-            'message' => 'Contador de tickets',
+            'message' => 'ok',
             'status' => 200,
             'countByStatus' => $countByStatus,
             'countByTicketCloseUser' => $countByTicketCloseUser,
