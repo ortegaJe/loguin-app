@@ -614,7 +614,8 @@ class LoguinTicketStoreController extends Controller
         // Asociar ticket con el grupo
         DB::table('glpi_groups_tickets')->insert([
             'tickets_id' => $ticketInfra,
-            'groups_id' => 38,
+            'groups_id' => 2, // ID del grupo "Infraestructura"
+            'type' => 2
         ]);
         
         // Update de la solicitud creada con el ticket
