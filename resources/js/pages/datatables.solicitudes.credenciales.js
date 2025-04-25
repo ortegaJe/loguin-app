@@ -185,7 +185,7 @@ class pageTablesDatatables {
             <div class="py-3 text-center">
               <div class="mb-3"><i class="far fa-comment fa-4x text-secondary"></i></div>
               <div class="fs-3 fw-semibold">${respuesta}</div>
-              <div class="fs-sm fw-semibold text-uppercase text-muted">Con Respuesta</div>
+              <div class="fs-sm fw-semibold text-uppercase text-muted">Respuesta</div>
             </div>
           </div>
         </a>
@@ -260,7 +260,7 @@ class pageTablesDatatables {
       ajax: {
         url: '/fetchSolicitudesLoguin',
         type: 'GET',
-        dataSrc: 'data.aplicaciones'
+        dataSrc: 'loguinAplicaciones',
       },
       //serverSide: true,
       processing: true,
@@ -276,7 +276,7 @@ class pageTablesDatatables {
           searchable: false,
           defaultContent: ''
         },
-        { data: 'ticket' },
+        { data: 'ticket_id' },
         { data: 'status_title' },
         { data: 'fecha_creacion'},
         { data: 'identificacion'},
@@ -320,7 +320,7 @@ class pageTablesDatatables {
             targets: 1,
             render: function (data, type, row) {
               if (type === 'display') {
-                return `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${row.ticket_id}" target="_blank">LOG.${row.ticket_id}</a>`;
+                return `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${row.ticket_id}" target="_blank">${row.ticket_id}</a>`;
               }
               return data;
             }

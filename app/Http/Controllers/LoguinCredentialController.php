@@ -264,8 +264,10 @@ class LoguinCredentialController extends Controller
         ->leftJoin('glpi_tickets as c', 'c.id', 'a.ticket_id')
         ->leftJoin('glpi_users as d', 'd.id', 'b.users_id_recipient')
         ->whereBetween('c.solvedate', [$primerDiaSemana, $ultimoDiaSemana])
+        ->where('itilcategories_id', 8)
         ->select(
             'd.name as analista_app',
+            'd.id as user_id',
             DB::raw("
                 COUNT(DISTINCT CASE
                     WHEN c.status >= 5 THEN a.ticket_id
@@ -273,7 +275,9 @@ class LoguinCredentialController extends Controller
                 END) as cerrados
             ")
         )
-        ->groupBy('d.name')
+        ->groupBy('d.name', 'd.id')
+        ->orderByDesc('c.users_id_lastupdater')
+        ->limit(2)
         ->get();
     
         return response()->json([

@@ -52,7 +52,7 @@
                         <div class="py-3 text-center">
                             <div class="mb-3"><i class="far fa-comment fa-4x text-secondary"></i></div>
                             <div class="fs-3 fw-semibold">0</div>
-                            <div class="fs-sm fw-semibold text-uppercase text-muted">Con Respuesta</div>
+                            <div class="fs-sm fw-semibold text-uppercase text-muted">Respuesta</div>
                         </div>
                     </div>
                 </a>
