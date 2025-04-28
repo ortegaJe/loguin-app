@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserProfiles;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -236,9 +237,15 @@ class LoguinCredentialController extends Controller
 
     public function getCountTickets()
     {
+        // Obtener el primer y último día de la semana actual
+        $carbon = CarbonImmutable::now()->locale('es');
+        $primerDiaSemana = $carbon->startOfWeek()->format('Y-m-d H:i:s');
+        $ultimoDiaSemana = $carbon->endOfWeek()->format('Y-m-d H:i:s');
+
         $countByStatus = DB::table('loguin_solicitud as b')
         ->leftJoin('glpi_tickets as c', 'c.id', 'b.ticket_id')
         ->leftJoin('glpi_itilfollowups as d', 'd.items_id', 'c.id')
+        ->whereBetween('c.date_creation', [$primerDiaSemana, $ultimoDiaSemana])
         ->selectRaw("
             SUM(CASE 
                 WHEN c.status = 2 AND d.items_id IS NULL THEN 1
@@ -252,19 +259,16 @@ class LoguinCredentialController extends Controller
                     WHEN c.status >= 5 THEN b.ticket_id
                     ELSE NULL
             END) as cerrados
-        ")
+        ", )
         ->first();
-
-        $carbon = CarbonImmutable::now()->locale('es');
-        $primerDiaSemana = $carbon->startOfWeek()->format('Y-m-d H:i:s');
-        $ultimoDiaSemana = $carbon->endOfWeek()->format('Y-m-d H:i:s');
     
         $countByTicketCloseUser = DB::table('loguin_solicitud as a')
         ->leftJoin('loguin_solicitud_detalle as b', 'b.solicitud_id', 'a.id')
         ->leftJoin('glpi_tickets as c', 'c.id', 'a.ticket_id')
         ->leftJoin('glpi_users as d', 'd.id', 'b.users_id_recipient')
-        ->whereBetween('c.solvedate', [$primerDiaSemana, $ultimoDiaSemana])
-        ->where('itilcategories_id', 8)
+        ->leftJoin('glpi_profiles_users as e', 'e.users_id', 'c.users_id_lastupdater')
+        ->where('e.profiles_id', UserProfiles::ANALISTA_APP->value)
+        ->whereBetween('c.date_creation', [$primerDiaSemana, $ultimoDiaSemana])
         ->select(
             'd.name as analista_app',
             'd.id as user_id',
@@ -284,7 +288,7 @@ class LoguinCredentialController extends Controller
             'message' => 'ok',
             'status' => 200,
             'countByStatus' => $countByStatus,
-            'countByTicketCloseUser' => $countByTicketCloseUser,
+            //'countByTicketCloseUser' => $countByTicketCloseUser,
         ]);
     }
 }

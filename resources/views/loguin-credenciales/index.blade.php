@@ -34,7 +34,7 @@
 @section('content')
     <div class="content">
         <div class="row g-sm" id="countTicketCard">
-            <div class="col-6 col-md-4 col-xl-2">
+            <div class="col-md-4">
                 <a class="block block-rounded block-link-shadow block-mode-loading-refresh block-mode-loading" href="javascript:void(0)">
                     <div class="block-content block-content-full">
                         <div class="py-3 text-center">
@@ -46,7 +46,7 @@
                 </a>
             </div>
 
-            <div class="col-6 col-md-4 col-xl-2 animated fadeIn">
+            <div class="col-md-4 animated fadeIn">
                 <a class="block block-rounded block-link-shadow  block-mode-loading-refresh block-mode-loading" href="javascript:void(0)">
                     <div class="block-content block-content-full">
                         <div class="py-3 text-center">
@@ -58,7 +58,7 @@
                 </a>
             </div>
 
-            <div class="col-6 col-md-4 col-xl-2 animated fadeIn">
+            <div class="col-md-4 animated fadeIn">
                 <a class="block block-rounded block-link-shadow  block-mode-loading-refresh block-mode-loading" href="javascript:void(0)">
                     <div class="block-content block-content-full">
                         <div class="py-3 text-center">
