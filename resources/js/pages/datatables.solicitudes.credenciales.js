@@ -187,7 +187,7 @@ class pageTablesDatatables {
 
       this.renderTodosLosTickets(
         data.countByStatus,
-        data.countByTicketCloseUser
+        //data.countByTicketCloseUser
       );
     } catch (error) {
       this.showToast("Error", `${error}`, "error");
@@ -195,11 +195,11 @@ class pageTablesDatatables {
     }
   }
 
-  static renderTodosLosTickets(statusTickets, ticketsPorUsuario) {
+  static renderTodosLosTickets(statusTickets) {
     const { en_curso, respuesta, cerrados } = statusTickets;
 
     const tarjetasFijas = `
-      <div class="col-6 col-md-4 col-xl-2 animated fadeIn">
+      <div class="col-md-4 animated fadeIn">
         <a class="block block-rounded block-link-shadow" href="javascript:void(0)">
           <div class="block-content block-content-full">
             <div class="py-3 text-center">
@@ -211,7 +211,7 @@ class pageTablesDatatables {
         </a>
       </div>
   
-      <div class="col-6 col-md-4 col-xl-2 animated fadeIn">
+      <div class="col-md-4 animated fadeIn">
         <a class="block block-rounded block-link-shadow" href="javascript:void(0)">
           <div class="block-content block-content-full">
             <div class="py-3 text-center">
@@ -223,7 +223,7 @@ class pageTablesDatatables {
         </a>
       </div>
   
-      <div class="col-6 col-md-4 col-xl-2 animated fadeIn">
+      <div class="col-md-4 animated fadeIn">
         <a class="block block-rounded block-link-shadow" href="javascript:void(0)">
           <div class="block-content block-content-full">
             <div class="py-3 text-center">
@@ -236,7 +236,7 @@ class pageTablesDatatables {
       </div>
     `;
 
-    const tarjetasUsuarios = ticketsPorUsuario
+/*     const tarjetasUsuarios = ticketsPorUsuario
       .map(
         (tickets) => `
       <div class="col-6 col-md-4 col-xl-2 animated fadeIn">
@@ -254,11 +254,11 @@ class pageTablesDatatables {
       </div>
     `
       )
-      .join("");
+      .join(""); */
 
     // Render todo en una sola fila
     this.UsuarioCount = this.cardRow;
-    this.UsuarioCount.innerHTML = tarjetasFijas + tarjetasUsuarios;
+    this.UsuarioCount.innerHTML = tarjetasFijas;
   }
 
   /*
