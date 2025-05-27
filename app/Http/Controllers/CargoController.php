@@ -9,7 +9,31 @@ use Illuminate\Support\Facades\Log;
 class CargoController extends Controller
 {
     public function index() {
-        return view('cargo.create');
+        return view('cargo.index');
+    }
+
+    public function fetchCargoList() {
+        $data = DB::table('loguin_cargo as a')
+            ->join('loguin_tipo_cargo as b', 'b.id', 'a.tipocargo_id')
+            ->select([
+                'a.id as cargo_id',
+                'a.name as nombre',
+                'b.id as tipo_cargo_id',
+                'b.name as nombre_tipo_cargo',
+                'a.sw_correo as correo',
+                'a.sw_dominio as dominio',
+                'a.sw_vpn as vpn',
+                'a.estado',
+                'a.fecha_creacion',
+                ])
+            ->orderBy('a.name')
+            ->get();
+
+        return response()->json([
+            'cargos' => $data,
+            'message' => 'Lista de cargos obtenida exitosamente',
+            'status' => 200,
+        ], 200);
     }
 
     public function getSedes() {
@@ -97,5 +121,31 @@ class CargoController extends Controller
                 'fecha_creacion' => now('America/Bogota'),
             ]);
         }
+    }
+
+    public function getOpcionesCargoInfra(Request $request) {
+        $cargoId = $request->query('cargoId');
+
+        if (!$cargoId) {
+            return response()->json([
+                'message' => 'ID de cargo no proporcionado',
+            ], 400);
+        }
+        $opcionesInfra = DB::table('loguin_cargo')
+            ->where('id', $cargoId)
+            ->select('id as cargo_id', 'name', 'sw_correo', 'sw_dominio', 'sw_vpn')
+            ->first();
+
+        if (!$opcionesInfra) {
+            return response()->json([
+                'message' => 'Cargo no encontrado',
+            ], 404);
+        }
+
+        return response()->json([
+            'opcionesInfra' => $opcionesInfra,
+            'message' => 'Opciones de infraestructura obtenidas exitosamente',
+            'status' => 200,
+        ], 200);
     }
 }

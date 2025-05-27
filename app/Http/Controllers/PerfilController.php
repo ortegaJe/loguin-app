@@ -41,6 +41,8 @@ class PerfilController extends Controller
             $aplicaciones = $validatedData['aplicaciones'];
             $sedes = $validatedData['sedes'];
 
+            $this->createIfNotExistsCargo($cargo, $sedes);
+
             $perfilId = $this->createPerfil($perfil, $aplicaciones);
 
             $this->createSedesCargoPerfil($cargo, $sedes, $perfilId);
@@ -70,6 +72,25 @@ class PerfilController extends Controller
                 'fecha_creacion' => now('America/Bogota'),
             ]);
         }
+    }
+
+    private function createIfNotExistsCargo($cargo_id, $sedes) {
+        // Verificar si el cargo ya existe en la base de datos
+        $cargo = DB::table('loguin_rel_tipo_cargo_sede')->where('cargo_id', $cargo_id)->first('cargo_id');
+        //error_log(__LINE__ . __METHOD__ . ' ID cargo --->' . $cargo->cargo_id);
+        // Si no existe, crear un nuevo registro
+        if (!$cargo) {
+            foreach ($sedes as $sede) {
+                $tipocargo_id = DB::table('loguin_cargo')->where('id', $cargo_id)->value('tipocargo_id');
+                DB::table('loguin_rel_tipo_cargo_sede')->insert([
+                    'tipocargo_id' => $tipocargo_id,
+                    'sede_id' => $sede,
+                    'cargo_id' => $cargo_id,
+                    'fecha_creacion' => now('America/Bogota'),
+                ]);
+            }
+        }
+        //return $cargo->id;
     }
 
     private function createSedesCargoPerfil($cargo, $sedes, $perfilId) {

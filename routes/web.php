@@ -44,7 +44,10 @@ Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN|ANALISTA_APP'])->group(func
     Route::get('fetchDataLoguin/{id}', [LoguinCredentialController::class, 'fetchDataLoguin']);
     Route::post('storeLoguin', [LoguinCredentialController::class, 'storeLoguin']);
     Route::get('getLoguins/aplicaciones/{id}', [LoguinCredentialController::class, 'getLoguins']);
-    Route::get('loguin/crear-cargos', [CargoController::class, 'index']);
+    Route::get('loguin/cargos', [CargoController::class, 'index']);
+    Route::get('fetchCargoList', [CargoController::class, 'fetchCargoList']);
+    //Route::get('loguin/crear-cargos', [CargoController::class, 'create']);
+    Route::get('getOpcionesCargoInfra', [CargoController::class, 'getOpcionesCargoInfra']);
     Route::post('storeCargo', [CargoController::class, 'storeCargo']);
     Route::get('loguin/crear-perfiles', [PerfilController::class, 'index']);
     Route::post('storePerfil', [PerfilController::class, 'storePerfil']);

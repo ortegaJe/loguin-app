@@ -305,6 +305,12 @@
                                                 <span class="nav-main-link-name">Perfiles</span>
                                             </a>
                                         </li>
+                                        <li class="nav-main-item">
+                                            <a class="nav-main-link{{ request()->is('loguin/asignacion-perfiles') ? ' active' : '' }}"
+                                                href="/loguin/asignacion-perfiles">
+                                                <span class="nav-main-link-name">Asignación Perfiles</span>
+                                            </a>
+                                        </li>
                                     </ul>
                                 </li>
                             @endif
