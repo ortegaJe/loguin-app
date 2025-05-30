@@ -194,6 +194,7 @@ class LoguinCredentialController extends Controller
                 'password_loguin' => $loguin['password_loguin'],
                 'mipres' => $loguin['mipres'],
                 'ruaf' => $loguin['ruaf'],
+                'agendas_ocultas' => $loguin['agendas_ocultas'],
                 'fecha_creacion_loguin' => now('America/Bogota'),
             ]);
         }
@@ -209,11 +210,13 @@ class LoguinCredentialController extends Controller
         ->select([
             'a.id as solicitud_id',
             'b.aplicacion_id',
+            'b.perfil_id',
             DB::raw("UPPER(CONCAT(c.name,' ',d.name)) as aplicacion_perfil"),
             'b.usuario_loguin',
             'b.password_loguin',
             'b.mipres',
-            'b.ruaf'
+            'b.ruaf',
+            'b.agendas_ocultas'
         ])->get();
     }
 
@@ -227,11 +230,13 @@ class LoguinCredentialController extends Controller
         ->select([
             'a.id as solicitud_id',
             'b.aplicacion_id',
+            'b.perfil_id',
             DB::raw("UPPER(CONCAT(c.name,' ',d.name)) as aplicacion_perfil"),
             'b.usuario_loguin',
             'b.password_loguin',
             'b.mipres',
-            'b.ruaf'
+            'b.ruaf',
+            'b.agendas_ocultas',
         ])->get();
     }
 
