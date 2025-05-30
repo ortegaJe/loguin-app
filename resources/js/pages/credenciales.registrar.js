@@ -71,11 +71,16 @@ class RenderDataSolicitudLoguin {
       (loguin) => loguin.aplicacion_id === 8 && loguin.ruaf !== null
     );
 
+    const validLoguinFilterAgendaOculta = loguins.filter(
+      (loguin) => loguin.aplicacion_id === 3 && loguin.agendas_ocultas !== null
+    );
+
     // Verificar si hay loguins válidos en cualquier categoría
     if (
       validLoguins.length > 0 ||
       validLoguinFilterMipres.length > 0 ||
-      validLoguinFilterRuaf.length > 0
+      validLoguinFilterRuaf.length > 0 ||
+      validLoguinFilterAgendaOculta.length > 0
     ) {
       loguinContent.innerHTML = "";
 
@@ -103,6 +108,15 @@ class RenderDataSolicitudLoguin {
         const table = this.createLoguinRuafTable(
           loguin.aplicacion_perfil,
           loguin.ruaf
+        );
+        loguinContent.appendChild(table);
+      });
+
+      // Agregar tabla para loguins de Agendas Ocultas
+      validLoguinFilterAgendaOculta.forEach((loguin) => {
+        const table = this.createLoguinAgendaOcultaTable(
+          loguin.aplicacion_perfil,
+          loguin.agendas_ocultas
         );
         loguinContent.appendChild(table);
       });
@@ -320,8 +334,9 @@ class RenderDataSolicitudLoguin {
     const corazaApps = loguinSolicitud.filter((app) => app.is_coraza === 1);
     const otherApps = loguinSolicitud.filter(
       (app) =>
-        app.is_coraza === 0 && app.aplicacion_id != 7 && app.aplicacion_id != 8
+        app.is_coraza === 0 && app.aplicacion_id != 7 && app.aplicacion_id != 8 && app.perfil_id != 123
     );
+    const agendasOcultas = loguinSolicitud.filter((app) => app.aplicacion_id === 3 && app.perfil_id === 123);
     const mipres = loguinSolicitud.filter((app) => app.aplicacion_id === 7);
     const ruaf = loguinSolicitud.filter((app) => app.aplicacion_id === 8);
 
@@ -690,6 +705,104 @@ class RenderDataSolicitudLoguin {
 
       formLoguin.appendChild(ruafcolDiv);
     });
+
+    // Crear bloque Agendas Ocultas
+    agendasOcultas.forEach((agOculta) => {
+      const agendasOcultascolDiv = document.createElement("div");
+      agendasOcultascolDiv.classList.add("col-md-6");
+
+      // Crear el bloque agOculta
+      const agOcultablockDiv = document.createElement("div");
+      agOcultablockDiv.classList.add("block", "block-themed", "block-rounded");
+      agOcultablockDiv.id = "aplicacion-agenda-oculta";
+      agendasOcultascolDiv.appendChild(agOcultablockDiv);
+
+      // Crear el encabezado del bloque
+      const blockHeader = document.createElement("div");
+      blockHeader.classList.add("block-header", "block-header-default");
+      agOcultablockDiv.appendChild(blockHeader);
+
+      const blockTitle = document.createElement("h3");
+      blockTitle.classList.add("block-title");
+      blockTitle.textContent = agOculta.aplicacion;
+      blockHeader.appendChild(blockTitle);
+
+      // Crear el contenido del bloque
+      const blockContent = document.createElement("div");
+      blockContent.classList.add("block-content", "block-content-full");
+      agOcultablockDiv.appendChild(blockContent);
+
+      // Crear fila principal
+      const agOcultarowDiv = document.createElement("div");
+      agOcultarowDiv.classList.add("row");
+      blockContent.appendChild(agOcultarowDiv);
+
+      // Columna izquierda
+      const agOcultacolLeftDiv = document.createElement("div");
+      agOcultacolLeftDiv.classList.add("col-lg-4");
+      agOcultarowDiv.appendChild(agOcultacolLeftDiv);
+
+      const leftText = document.createElement("p");
+      leftText.classList.add("text-muted");
+      const appProfileSpanagOculta = document.createElement("span");
+      appProfileSpanagOculta.classList.add("badge", "bg-primary-lighter", "app");
+      appProfileSpanagOculta.setAttribute("data-app-id", `${agOculta.aplicacion_id}`);
+      appProfileSpanagOculta.setAttribute("data-perfil-id", `${agOculta.perfil_id}`);
+      appProfileSpanagOculta.textContent = `${agOculta.perfil}`;
+      leftText.appendChild(appProfileSpanagOculta);
+      agOcultacolLeftDiv.appendChild(leftText);
+
+      // Columna derecha
+      const agOcultacolRightDiv = document.createElement("div");
+      agOcultacolRightDiv.classList.add("col-lg-8", "space-y-2");
+      agOcultarowDiv.appendChild(agOcultacolRightDiv);
+
+      const rowInnerDiv = document.createElement("div");
+      rowInnerDiv.classList.add(
+        "row",
+        "row-cols-lg-auto",
+        "g-3",
+        "align-items-center"
+      );
+      agOcultacolRightDiv.appendChild(rowInnerDiv);
+
+      const mb4Div = document.createElement("div");
+      mb4Div.classList.add("mb-4");
+      rowInnerDiv.appendChild(mb4Div);
+
+      const formLabel = document.createElement("label");
+      formLabel.classList.add("form-label");
+      formLabel.textContent = "Activar Agendas Ocultas";
+      mb4Div.appendChild(formLabel);
+
+      const spaceDiv = document.createElement("div");
+      spaceDiv.classList.add("space-x-2");
+      mb4Div.appendChild(spaceDiv);
+
+      const formCheckDiv = document.createElement("div");
+      formCheckDiv.classList.add(
+        "form-check",
+        "form-switch",
+        "form-check-inline",
+        "form-switch-lg"
+      );
+      spaceDiv.appendChild(formCheckDiv);
+
+      const formInput = document.createElement("input");
+      formInput.classList.add("form-check-input");
+      formInput.type = "checkbox";
+      formInput.value = "1";
+      formInput.id = "agendasOcultas";
+      formInput.name = "agendasOcultas";
+      formCheckDiv.appendChild(formInput);
+
+      const formLabelFor = document.createElement("label");
+      formLabelFor.classList.add("form-check-label");
+      formLabelFor.htmlFor = "agendasOcultas";
+      formCheckDiv.appendChild(formLabelFor);
+
+      formLoguin.appendChild(agendasOcultascolDiv);
+    });
   }
 
   static clearLoguinInputs() {
@@ -722,7 +835,7 @@ class RenderDataSolicitudLoguin {
 
     // Capturar datos de los bloques de aplicaciones, MIPRES, RUAF y observaciones
     const appsContainers = document.querySelectorAll(
-      "#aplicacion, #aplicacion-mipres, #aplicacion-ruaf"
+      "#aplicacion, #aplicacion-mipres, #aplicacion-ruaf, #aplicacion-agenda-oculta"
     );
 
     appsContainers.forEach((container) => {
@@ -742,6 +855,12 @@ class RenderDataSolicitudLoguin {
       );
       const ruaf = ruafCheckbox ? (ruafCheckbox.checked ? 1 : 0) : null;
 
+      const agendasOcultasCheckbox = container.querySelector(
+        'input[type="checkbox"][id="agendasOcultas"]'
+      );
+      const agendasOcultas = agendasOcultasCheckbox ? (agendasOcultasCheckbox.checked ? 1 : 0) : null;
+      //console.log(agendasOcultas);
+
       appBadges.forEach((badge) => {
         const appId = badge.getAttribute("data-app-id");
         const perfilId = badge.getAttribute("data-perfil-id");
@@ -754,6 +873,7 @@ class RenderDataSolicitudLoguin {
             password_loguin: loguinPassword,
             mipres: mipres,
             ruaf: ruaf,
+            agendas_ocultas: agendasOcultas,
           });
         }
       });
@@ -856,12 +976,17 @@ class RenderDataSolicitudLoguin {
 
       // Verificar si hay loguins registrados
       const loguinFilter = loguins.filter(
-        (app) => app.aplicacion_id != 7 && app.aplicacion_id != 8
+        (app) => app.aplicacion_id != 7 && app.aplicacion_id != 8 && app.perfil_id != 123
       ); // Si la aplicacion es diferente a 7 que es mipres id en db
       const loguinFilterMipres = loguins.filter(
         (app) => app.aplicacion_id === 7
       );
-      const loguinFilterRuaf = loguins.filter((app) => app.aplicacion_id === 8);
+      const loguinFilterRuaf = loguins.filter(
+        (app) => app.aplicacion_id === 8
+      );
+      const loguinFilterAgendaOculta = loguins.filter(
+        (app) => app.aplicacion_id === 3 && app.perfil_id === 123
+      );
 
       if (loguins.length > 0) {
         loguinContent.innerHTML = ""; // Limpiar el contenedor antes de renderizar
@@ -884,6 +1009,13 @@ class RenderDataSolicitudLoguin {
           const table = this.createLoguinRuafTable(
             loguin.aplicacion_perfil,
             loguin.ruaf
+          );
+          loguinContent.appendChild(table);
+        });
+        loguinFilterAgendaOculta.forEach((loguin) => {
+          const table = this.createLoguinAgendaOcultaTable(
+            loguin.aplicacion_perfil,
+            loguin.agendas_ocultas
           );
           loguinContent.appendChild(table);
         });
@@ -982,6 +1114,30 @@ class RenderDataSolicitudLoguin {
     thHead.textContent = appName;
     const tdHead = document.createElement("td");
     tdHead.textContent = `${ruaf === 1 ? "SI" : "NO"}`;
+    trHead.appendChild(thHead);
+    trHead.appendChild(tdHead);
+    thead.appendChild(trHead);
+
+    // Agregar encabezado y cuerpo a la tabla
+    table.appendChild(thead);
+    //table.appendChild(tbody);
+
+    // Retornar la tabla generada
+    return table;
+  }
+
+    static createLoguinAgendaOcultaTable(appName, agendasOcultas) {
+    // Crear el elemento tabla
+    const table = document.createElement("table");
+    table.classList.add("table", "table-bordered");
+
+    // Crear el encabezado de la tabla
+    const thead = document.createElement("thead");
+    const trHead = document.createElement("tr");
+    const thHead = document.createElement("th");
+    thHead.textContent = appName;
+    const tdHead = document.createElement("td");
+    tdHead.textContent = `${agendasOcultas === 1 ? "SI" : "NO"}`;
     trHead.appendChild(thHead);
     trHead.appendChild(tdHead);
     thead.appendChild(trHead);
