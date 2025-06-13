@@ -243,6 +243,10 @@ class RenderDataSolicitudLoguin {
       containerDatosPersonal.querySelector("#loguin-fecha-nacimiento").innerHTML =
       `<i class="fa fa-cake-candles me-2"></i>${fechaNacimiento}` || "N/A";
 
+    containerDatosSolicitud.querySelector("#loguin-zonal").classList.add("mb-4");
+    containerDatosSolicitud.querySelector("#loguin-zonal").innerHTML =
+      `<i class="fa fa-map-location-dot"></i> ${usuario.zonal}` || "N/A";
+
     containerDatosSolicitud.querySelector("#loguin-sede").classList.add("mb-4");
     containerDatosSolicitud.querySelector("#loguin-sede").innerHTML =
       `<i class="fa fa-building me-2"></i> ${usuario.sede}` || "N/A";
