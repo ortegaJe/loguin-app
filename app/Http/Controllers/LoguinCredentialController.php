@@ -54,6 +54,7 @@ class LoguinCredentialController extends Controller
             ->join('glpi_locations as c', 'c.id', 'a.sede_id')
             ->join('loguin_tipo_identificacion as d', 'd.id', 'b.tipoidentificacion_id')
             ->join('loguin_cargo as e', 'e.id', 'a.cargo_id')
+            ->join('glpi_locations as f', 'f.id', 'c.locations_id')
             ->where('a.id', $solicitudId)
             ->select([
                 'a.id as solicitud_id',
@@ -63,6 +64,7 @@ class LoguinCredentialController extends Controller
                 DB::raw("UPPER(CONCAT(b.nombres, ' ', b.apellidos)) as nombreCompleto"), 
                 'b.email',
                 DB::raw("DATE_FORMAT(b.fecha_nacimiento, '%m-%d-%Y') as fechaNacimiento"),
+                'f.name as zonal',
                 'c.name as sede',
                 DB::raw("UPPER(e.name) as cargo"),
                 'a.ticket_id',

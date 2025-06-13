@@ -175,6 +175,7 @@
                     </div>
                     <div class="block-content">
                         <address id="container-datos-solicitud">
+                            <span id="loguin-zonal"></span><br>
                             <span id="loguin-sede"></span><br>
                             <span id="loguin-cargo"></span><br>
                             <span id="loguin-especialidad" hidden></span><br>

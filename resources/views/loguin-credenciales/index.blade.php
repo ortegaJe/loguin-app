@@ -120,8 +120,11 @@
                                             <p class="mb-1">
                                                 <strong>Nombre Completo:</strong> <span id="modal-nombre"></span>
                                             </p>
-                                            <p>
+                                            <p class="mb-1">
                                                 <strong>Email:</strong> <span id="modal-email"></span>
+                                            </p>
+                                            <p>
+                                                <strong>Cargo:</strong> <span id="modal-cargo"></span>
                                             </p>
                                         </div>
                                     </div>

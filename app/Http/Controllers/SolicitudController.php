@@ -190,6 +190,7 @@ class SolicitudController extends Controller
             ->join('loguin_usuarios as b', 'b.id', 'a.usuario_id')
             ->join('glpi_locations as c', 'c.id', 'a.sede_id')
             ->join('glpi_locations as d', 'd.id', 'c.locations_id')
+            ->join('loguin_cargo as e', 'e.id', 'a.cargo_id')
             ->where('a.id', $solicitudId)
             ->select([
                 'a.id as solicitud_id',
@@ -197,6 +198,7 @@ class SolicitudController extends Controller
                 'b.identificacion',
                 DB::raw("CONCAT(b.nombres, ' ', b.apellidos) as nombreCompleto"), 
                 'b.email',
+                'e.name as cargo',
                 'c.name as sede',
                 'd.name as zonal',
                 'a.ticket_id',
@@ -211,6 +213,7 @@ class SolicitudController extends Controller
             ->join('loguin_solicitud_detalle as b', 'b.solicitud_id', 'a.id')
             ->join('loguin_aplicaciones as c', 'c.id', 'b.aplicacion_id')
             ->join('loguin_perfil as d', 'd.id', 'b.perfil_id')
+            ->join('loguin_cargo as e', 'e.id', 'a.cargo_id')
             ->where('b.solicitud_id', $solicitudId)
             ->select([
                 'a.id as solicitud_id',
