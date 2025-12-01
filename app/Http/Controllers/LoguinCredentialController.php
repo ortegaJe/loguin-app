@@ -258,7 +258,7 @@ class LoguinCredentialController extends Controller
                 WHEN c.status = 2 AND d.items_id IS NULL THEN 1
                 ELSE 0
             END) as en_curso,
-            SUM(CASE 
+            COUNT(DISTINCT CASE 
                 WHEN c.status = 2 AND c.id = d.items_id THEN 1
                 ELSE 0
             END) as respuesta,

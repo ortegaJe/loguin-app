@@ -82,7 +82,8 @@ class pageTablesDatatables {
         !data.usuario ||
         !data.usuario[0] ||
         !data.loguin_solicitud ||
-        !data.especialidad_usuario
+        !data.especialidad_usuario ||
+        !data.respuestas_y_soluciones
       ) {
         throw new Error("Datos incompletos recibidos del servidor");
       }
@@ -90,7 +91,8 @@ class pageTablesDatatables {
       this.showSolicitudModal(
         data.usuario[0],
         data.loguin_solicitud,
-        data.especialidad_usuario
+        data.especialidad_usuario,
+        data.respuestas_y_soluciones
       );
     } catch (error) {
       this.showToast("Error", `${error}`, "error");
@@ -101,7 +103,8 @@ class pageTablesDatatables {
   static async showSolicitudModal(
     usuario,
     loguinSolicitud,
-    especialidadUsuario
+    especialidadUsuario,
+    respuestasYSoluciones
   ) {
     //console.log(loguinSolicitud);
 
@@ -131,6 +134,104 @@ class pageTablesDatatables {
       listItem.textContent = `${item.aplicacion} ${item.perfil.toUpperCase()}`;
       aplicacionesPerfilesContainer.appendChild(listItem);
     });
+
+    const timelineContainer = modal.querySelector(
+      "#modal-timeline-container"
+    );
+    if (respuestasYSoluciones.length > 0) {
+      timelineContainer.hidden = false;
+    } else {
+      timelineContainer.hidden = true;
+    }
+
+    const timelineRespuestasContainer = modal.querySelector(
+      "#modal-timelime-respuestas"
+    );
+    timelineRespuestasContainer.innerHTML = "";
+
+    respuestasYSoluciones.map((item) => {
+      const listItem = document.createElement("li");
+      listItem.classList.add("timeline-event");
+      const fechaRespuesta = new Date(item.fecha);
+      const contenidoOriginal = item.contenido
+          .replace(/&#60;/g, "<") // Convertir inicio de tag
+          .replace(/&#62;/g, ">"); // Convertir fin de tag
+
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = contenidoOriginal; // El contenido ahora tiene HTML real (<a...>)
+
+      // Definimos la URL base que quieres añadir o reemplazar
+      const urlBase = "http://mesadeservicios.viva1a.com.co"; // Reemplaza esto con tu URL real
+
+      // 1. Filtrar y modificar los enlaces (<a>)
+      tempDiv.querySelectorAll('a').forEach(link => {
+          const hrefOriginal = link.getAttribute('href');
+          if (hrefOriginal) {
+              // Ejemplo: Si quieres que el href siempre comience con tu URL base
+              // Si el href original es relativo (ej: ALGO/glpi/...)
+              link.href = urlBase + hrefOriginal;
+          }
+      });
+
+      // 2. Filtrar y modificar las imágenes (<img>)
+      tempDiv.querySelectorAll('img').forEach(img => {
+          const srcOriginal = img.getAttribute('src');
+          if (srcOriginal) {
+              // Modificamos el src de la imagen de la misma manera
+              img.src = urlBase + srcOriginal;
+          }
+      });
+
+      // ----------------------------------------------------
+      // Resultado Final: Obtener el HTML limpio (o texto)
+      // ----------------------------------------------------
+
+      // Si quieres el contenido COMPLETO, incluyendo el HTML modificado:
+      const contenidoHTMLModificado = tempDiv.innerHTML;
+
+      // Si solo quieres el texto plano, quitando TODAS las etiquetas:
+      // const contenidoTextoPlano = tempDiv.textContent.trim();
+
+      // Selecciona la variable que deseas usar en tu `listItem.innerHTML`
+
+      const contenido = contenidoHTMLModificado.trim(); // Usamos el HTML modificado
+
+      //console.log(contenido);
+      const tipo = item.tipo === "respuesta" ? "far fa-comments bg-secondary" : "fa fa-check bg-info";
+      const tipoTippy = item.tipo === "respuesta" ? "Respuesta" : "Solución";
+      const formattedDate = new Intl.DateTimeFormat("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        //second: "2-digit",
+        hour12: true
+      }).format(fechaRespuesta);
+      listItem.innerHTML = `
+        <div class="timeline-event-time">${formattedDate}</div>
+        <i class="timeline-event-icon fa ${tipo} tippy-tooltip" data-tippy-tipo="${tipoTippy}"></i>
+        <div class="timeline-event-block">
+          <p class="fw-semibold"><i class="fa fa-user text-muted me-1"></i>${item.usuario}</p>
+          ${contenido}
+        </div>
+      `;
+
+      timelineRespuestasContainer.appendChild(listItem);
+
+      tippy('.tippy-tooltip', {
+          content: (instance) => {
+              const tipo = instance.getAttribute('data-tippy-tipo');
+              return `<strong>${tipo}</strong>`;
+          },
+          allowHTML: true,
+          theme: 'material',
+          animation: 'fade',
+          placement: 'top',
+          arrow: true,
+      });
+    });
+
 
     const perfilesEspecialistaId = [5, 6]; // ID desde la base de datos medicos especilistas de everest y pana
     const hasMedicoEspecialista = loguinSolicitud.some((item) =>
@@ -216,7 +317,7 @@ class pageTablesDatatables {
         <a class="block block-rounded block-link-shadow" href="javascript:void(0)">
           <div class="block-content block-content-full">
             <div class="py-3 text-center">
-              <div class="mb-3"><i class="far fa-comment fa-4x text-secondary"></i></div>
+              <div class="mb-3"><i class="far fa-comments fa-4x text-secondary"></i></div>
               <div class="fs-3 fw-semibold">${respuesta}</div>
               <div class="fs-sm fw-semibold text-uppercase text-muted">Respuesta</div>
             </div>
@@ -381,7 +482,8 @@ class pageTablesDatatables {
                 icon = "far fa-circle";
               } else if (estado.trim() === "Respuesta") {
                 badgeClass = "badge bg-secondary w-100";
-                icon = "far fa-comment";
+                icon = "far fa-comments";
+                return `<span class="${badgeClass}"><i class="${icon} me-1"></i>${estado.trim()}</span>`;
               }
 
               return `<span class="${badgeClass}"><i class="${icon} me-1"></i>${estado.trim()}</span>`;
@@ -393,6 +495,7 @@ class pageTablesDatatables {
           targets: 3,
           render: function (data, type, row) {
             const rawDate = new Date(data);
+
             if (type === "display") {
               const formatted = new Intl.DateTimeFormat("es-ES", {
                 day: "2-digit",
@@ -436,12 +539,13 @@ class pageTablesDatatables {
     // Insertar filtro de estado
     const estadoFilterHTML = `
       <div class="col-md-auto me-auto">
-        <select id="filter-estado" class="form-select form-select">
-          <option value="">Todos</option>
-          <option value="En curso">En curso</option>
-          <option value="Cerrado">Cerrado</option>
-          <option value="Respuesta">Respuesta</option>
-        </select>
+      <select id="filter-estado" class="form-select form-select">
+        <option value="" selected disabled>Estado</option>
+        <option value="">Todos</option>
+        <option value="En curso">En curso</option>
+        <option value="Cerrado">Cerrado</option>
+        <option value="Respuesta">Respuesta</option>
+      </select>
       </div>
     `;
 
@@ -456,20 +560,125 @@ class pageTablesDatatables {
 
       const children = filtroRow.children;
       if (children.length >= 1) {
-        // Insertar como segundo hijo
-        filtroRow.insertBefore(filtroEstadoDiv, children[1]);
+      // Insertar como segundo hijo
+      filtroRow.insertBefore(filtroEstadoDiv, children[1]);
       } else {
-        // Si no hay hijos, insertar simplemente
-        filtroRow.appendChild(filtroEstadoDiv);
+      // Si no hay hijos, insertar simplemente
+      filtroRow.appendChild(filtroEstadoDiv);
       }
     }
 
     // Filtro de estado
     const estadoSelect = document.getElementById("filter-estado");
+
     if (estadoSelect) {
       estadoSelect.addEventListener("change", function () {
-        const value = this.value;
-        table.column(2).search(value).draw(); // columna "ESTADO"
+      const value = this.value;
+      table.column(2).search(value).draw(); // columna "ESTADO"
+
+      // Resetea automáticamente el filtro de día de la semana
+      const diaSemanaEl = document.getElementById("filter-dia-semana");
+      if (diaSemanaEl) {
+        diaSemanaEl.value = ""; // volver a "Todos"
+
+        // Quitar el filtrado aplicado manualmente por aplicarFiltroDiaSemana
+        table.rows().every(function () {
+        const node = this.node();
+        if (node) node.style.display = "";
+        });
+
+        // Redibujar la tabla para asegurar consistencia
+        table.draw(false);
+      }
+      });
+    }
+
+      // Insertar filtro de estado
+    const diaSemanaFilterHTML = `
+      <div class="col-md-auto me-auto">
+      <select id="filter-dia-semana" class="form-select form-select">
+        <option value="" selected disabled>Día de la semana</option>
+        <option value="">Todos</option>
+        <option value="lunes">Lunes</option>
+        <option value="martes">Martes</option>
+        <option value="miercoles">Miércoles</option>
+        <option value="jueves">Jueves</option>
+        <option value="viernes">Viernes</option>
+        <option value="sabado">Sábado</option>
+        <option value="domingo">Domingo</option>
+      </select>
+      </div>
+    `;
+
+    // Insertar el filtro después del filtro de estado
+    const filtroRowDiaSemana = document.querySelector(
+      "#solicitudesTable_wrapper .row.mt-2.justify-content-between"
+    );
+
+    if (filtroRowDiaSemana) {
+      const tempDiaSemana = document.createElement("div");
+      tempDiaSemana.innerHTML = diaSemanaFilterHTML;
+      const filtroDiaSemanaDiv = tempDiaSemana.firstElementChild;
+      const childrenDiaSemana = filtroRowDiaSemana.children;
+      if (childrenDiaSemana.length >= 3) {
+      // Insertar como cuarto hijo (después del filtro de estado)
+      filtroRowDiaSemana.insertBefore(filtroDiaSemanaDiv, childrenDiaSemana[2]);
+      } else {
+      // Si no hay suficientes hijos, simplemente agregar al final
+      filtroRowDiaSemana.appendChild(filtroDiaSemanaDiv);
+      }
+    }
+
+    // Filtro de día de la semana
+    // Helpers: rango de semana actual y día
+    function getCurrentWeekRange() {
+    const today = new Date();
+    const day = today.getDay(); // 0=domingo, 1=lunes...
+    const diffToMonday = (day === 0 ? -6 : 1) - day;
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + diffToMonday);
+    monday.setHours(0, 0, 0, 0);
+
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+    return { monday, sunday };
+    }
+    
+    function getDayName(date) {
+    const days = ["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado"];
+    return days[date.getDay()];
+    }
+
+    const diaSemanaSelect = document.getElementById("filter-dia-semana");
+
+    function aplicarFiltroDiaSemana() {
+    const selectedDay = (diaSemanaSelect.value || "").toLowerCase();
+    const { monday, sunday } = getCurrentWeekRange();
+
+    table.rows().every(function () {
+      const rowData = this.data();
+      const rowNode = this.node();
+      if (!rowNode) return;
+
+      const rowDate = new Date(rowData.fecha_creacion);
+
+      if (rowDate >= monday && rowDate <= sunday) {
+        const dayOfWeek = getDayName(rowDate);
+        if (selectedDay === "" || dayOfWeek === selectedDay) {
+          rowNode.style.display = "";
+        } else {
+          rowNode.style.display = "none";
+        }
+      } else {
+        rowNode.style.display = "none";
+      }
+    });
+    }
+
+    if (diaSemanaSelect) {
+      diaSemanaSelect.addEventListener("change", function () {
+        aplicarFiltroDiaSemana();
       });
     }
 
@@ -494,7 +703,7 @@ class pageTablesDatatables {
       const children = filtroRowRefresh.children;
       if (children.length >= 2) {
         // Insertar como tercer hijo (después del filtro de estado)
-        filtroRowRefresh.insertBefore(refreshBtnDiv, children[3]);
+        filtroRowRefresh.insertBefore(refreshBtnDiv, children[4]);
       } else {
         filtroRowRefresh.appendChild(refreshBtnDiv);
       }
