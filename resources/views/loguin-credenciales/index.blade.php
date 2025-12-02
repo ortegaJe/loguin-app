@@ -22,6 +22,8 @@
     <script src="{{ asset('js/plugins/datatables-buttons/buttons.print.min.js') }}"></script>
     <script src="{{ asset('js/plugins/datatables-buttons/buttons.html5.min.js') }}"></script>
     <script src="{{ asset('/js/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
     <style>
         #solicitudesTable_wrapper {
             position: relative;
@@ -35,7 +37,8 @@
     <div class="content">
         <div class="row g-sm" id="countTicketCard">
             <div class="col-md-4">
-                <a class="block block-rounded block-link-shadow block-mode-loading-refresh block-mode-loading" href="javascript:void(0)">
+                <a class="block block-rounded block-link-shadow block-mode-loading-refresh block-mode-loading"
+                    href="javascript:void(0)">
                     <div class="block-content block-content-full">
                         <div class="py-3 text-center">
                             <div class="mb-3"><i class="far fa-circle fa-4x text-success"></i></div>
@@ -47,10 +50,11 @@
             </div>
 
             <div class="col-md-4 animated fadeIn">
-                <a class="block block-rounded block-link-shadow  block-mode-loading-refresh block-mode-loading" href="javascript:void(0)">
+                <a class="block block-rounded block-link-shadow  block-mode-loading-refresh block-mode-loading"
+                    href="javascript:void(0)">
                     <div class="block-content block-content-full">
                         <div class="py-3 text-center">
-                            <div class="mb-3"><i class="far fa-comment fa-4x text-secondary"></i></div>
+                            <div class="mb-3"><i class="far fa-comments fa-4x text-secondary"></i></div>
                             <div class="fs-3 fw-semibold">0</div>
                             <div class="fs-sm fw-semibold text-uppercase text-muted">Respuesta</div>
                         </div>
@@ -59,7 +63,8 @@
             </div>
 
             <div class="col-md-4 animated fadeIn">
-                <a class="block block-rounded block-link-shadow  block-mode-loading-refresh block-mode-loading" href="javascript:void(0)">
+                <a class="block block-rounded block-link-shadow  block-mode-loading-refresh block-mode-loading"
+                    href="javascript:void(0)">
                     <div class="block-content block-content-full">
                         <div class="py-3 text-center">
                             <div class="mb-3"><i class="fa fa-check fa-4x text-info"></i></div>
@@ -187,6 +192,35 @@
                                             <p>
                                                 <strong>Observación:</strong> <span id="modal-observacion"></span>
                                             </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12" id="modal-timeline-container" hidden>
+                                    <div class="block block-rounded block-bordered">
+                                        <div class="block-content">
+                                            <!-- Timeline Modern Style -->
+                                            <div class="block block-rounded">
+                                                <div class="block-header block-header-default">
+                                                    <h3 class="block-title"><i
+                                                            class="fa fa-comments fa-2x text-muted me-1"></i>Respuestas
+                                                    </h3>
+                                                    <div class="block-options">
+                                                        <button type="button" class="btn-block-option"
+                                                            data-toggle="block-option" data-action="state_toggle"
+                                                            data-action-mode="demo">
+                                                            <i class="si si-refresh"></i>
+                                                        </button>
+                                                        <button type="button" class="btn-block-option"
+                                                            data-toggle="block-option"
+                                                            data-action="content_toggle"></button>
+                                                    </div>
+                                                </div>
+                                                <div class="block-content">
+                                                    <ul class="timeline timeline-modern pull-t"
+                                                        id="modal-timelime-respuestas"></ul>
+                                                </div>
+                                            </div>
+                                            <!-- END Timeline Modern Style -->
                                         </div>
                                     </div>
                                 </div>

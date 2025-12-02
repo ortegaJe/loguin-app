@@ -74,6 +74,7 @@ class SolicitudController extends Controller
         $usuario = $this->getUsuario($solicitudId);
         $loguinSolicitud = $this->getLoguinSolicitud($solicitudId);
         $especialidadUsuario = $this->getEspecialidadUsuario($userId, $solicitudId);
+        $respuestasYSoluciones = $this->getAllFollowUpAndSolutions($usuario[0]->ticket_id);
     
         if ($usuario->isEmpty() && $loguinSolicitud->isEmpty() && $especialidadUsuario->isEmpty()) {
             return response()->json(['message' => 'No se encontró información'], 404);
@@ -83,6 +84,7 @@ class SolicitudController extends Controller
             'usuario' => $usuario,
             'loguin_solicitud' => $loguinSolicitud,
             'especialidad_usuario' => $especialidadUsuario,
+            'respuestas_y_soluciones' => $respuestasYSoluciones,
         ], 200);
     }
 
@@ -257,6 +259,34 @@ class SolicitudController extends Controller
             ->where('a.usuario_id', $userId)
             ->where('a.solicitud_id', $solicitudId)
             ->select('b.name as especialidad')
+            ->get();
+    }
+
+    private function getAllFollowUpAndSolutions($ticketId)
+    {
+        $query = DB::table('glpi_itilfollowups as a')
+            ->join('glpi_users as b', 'b.id', 'a.users_id')
+            ->select(
+                'a.items_id as ticket_id',
+                'a.content as contenido',
+                'a.date as fecha',
+                DB::raw("CONCAT(b.firstname, ' ', b.realname) as usuario"),
+                DB::raw("'respuesta' as tipo")
+            )
+            ->where('a.items_id', $ticketId);
+
+        return DB::table('glpi_itilsolutions as a')
+            ->join('glpi_users as b', 'b.id', 'a.users_id')
+            ->select(
+                'a.items_id as ticket_id',
+                'a.content as contenido',
+                'a.date_creation as fecha',
+                DB::raw("CONCAT(b.firstname, ' ', b.realname) as usuario"),
+                DB::raw("'solucion' as tipo")
+            )
+            ->where('a.items_id', $ticketId)
+            ->unionAll($query)
+            ->orderByDesc('fecha')
             ->get();
     }
 }
