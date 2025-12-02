@@ -168,7 +168,6 @@ class pageTablesDatatables {
           const hrefOriginal = link.getAttribute('href');
           if (hrefOriginal) {
               // Ejemplo: Si quieres que el href siempre comience con tu URL base
-              // Si el href original es relativo (ej: ALGO/glpi/...)
               link.href = urlBase + hrefOriginal;
           }
       });
@@ -179,6 +178,8 @@ class pageTablesDatatables {
           if (srcOriginal) {
               // Modificamos el src de la imagen de la misma manera
               img.src = urlBase + srcOriginal;
+              // Establecer ancho a 470px
+              img.setAttribute('width', '470'); 
           }
       });
 
