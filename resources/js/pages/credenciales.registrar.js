@@ -411,10 +411,15 @@ class RenderDataSolicitudLoguin {
       );
       userColDiv.appendChild(userInput);
 
-      const passColDiv = document.createElement("div");
+      const year = new Date();
+      const fullYear = year.getFullYear();
+      const defaultPass = "VIVA" + fullYear;
+
+     const passColDiv = document.createElement("div");
       passColDiv.classList.add("col-12");
       const passInput = document.createElement("input");
       passInput.type = "text";
+      passInput.value = defaultPass;
       passInput.classList.add("form-control", "password-loguin");
       passInput.placeholder = "Contraseña";
       passInput.setAttribute(
@@ -580,7 +585,7 @@ class RenderDataSolicitudLoguin {
 
       const formLabel = document.createElement("label");
       formLabel.classList.add("form-label");
-      formLabel.textContent = "Asociado";
+      formLabel.textContent = "Activo";
       mb4Div.appendChild(formLabel);
 
       const spaceDiv = document.createElement("div");
@@ -678,7 +683,7 @@ class RenderDataSolicitudLoguin {
 
       const formLabel = document.createElement("label");
       formLabel.classList.add("form-label");
-      formLabel.textContent = "Asociado";
+      formLabel.textContent = "Activo";
       mb4Div.appendChild(formLabel);
 
       const spaceDiv = document.createElement("div");
