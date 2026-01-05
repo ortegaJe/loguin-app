@@ -33,6 +33,25 @@
 
 @section('content')
     <div class="content">
+        <div class="row">
+            <div class="col-md-6 col-xl-3">
+                <a class="block block-rounded block-link-shadow" href="javascript:void(0)" id="newCargoBtn">
+                    <div class="block-content block-content-full block-sticky-options">
+                        <div class="block-options">
+                            <div class="block-options-item">
+                                <i class="fa fa-archive fa-2x text-success-light"></i>
+                            </div>
+                        </div>
+                        <div class="py-3 text-center">
+                            <div class="fs-2 fw-bold mb-0 text-success">
+                                <i class="fa fa-plus"></i>
+                            </div>
+                            <div class="fs-sm fw-semibold text-uppercase text-muted">Nuevo Cargo</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
         <div class="content-heading d-flex justify-content-between align-items-center">
             <span>
                 Solicitudes <small class="d-none d-sm-inline">Aplicaciones</small>
@@ -58,15 +77,44 @@
             </div>
         </div>
         <!-- END Partial Table -->
-        <!-- Modal Loguin -->
-        <div class="modal fade" id="solicitudModal" tabindex="-1" aria-labelledby="solicitudModalLabel" aria-hidden="true">
+        <!-- Modal Nuevo Cargo -->
+        <div class="modal fade" id="newCargoModal" tabindex="-1" aria-labelledby="newCargoModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="block block-rounded shadow-none mb-0">
+                        <div class="modal-header text-end border-bottom">
+                            <input type="text" id=cargoIdModal hidden>
+                            <h5 class="modal-title" id="newCargoModalTitle">Crear Nuevo Cargo</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="newCargoForm">
+                            <div class="block-content"></div>
+                            <div class="block-content block-content-full block-content-sm text-end border-top">
+                                <button type="submit" class="btn btn-alt-success">
+                                    Guardar
+                                </button>
+                                <button type="button" class="btn btn-alt-secondary" data-bs-dismiss="modal">
+                                    Cerrar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END Modal Nuevo Cargo -->
+        <!-- Modal Actualizar Permisos Cargo -->
+        <div class="modal fade" id="solicitudModal" tabindex="-1" aria-labelledby="solicitudModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog modal-dialog-popout modal-md" role="document">
                 <div class="modal-content">
                     <div class="block block-rounded shadow-none mb-0">
                         <div class="modal-header text-end border-bottom">
                             <input type="text" id=cargoIdModal hidden>
                             <h5 class="modal-title" id="solicitudModalTitle"></h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
                         </div>
                         <form id="OpcionesInfraForm">
                             <div class="block-content">
@@ -118,6 +166,6 @@
                 </div>
             </div>
         </div>
-        <!-- END Modal Loguin -->
+        <!-- END Modal Actualizar Permisos Cargo -->
     </div>
 @endsection

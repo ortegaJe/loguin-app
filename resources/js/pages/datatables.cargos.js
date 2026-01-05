@@ -15,6 +15,8 @@ class pageTablesDatatables {
       this.getModal = document.getElementById("solicitudModal");
       this.cargoIdModal = document.getElementById("cargoIdModal");
       this.titleModal = document.getElementById("solicitudModalTitle");
+      this.newCargoBtn = document.getElementById("newCargoBtn");
+      this.getModalNewCargo = document.getElementById("newCargoModal");
       this.toast = Swal.mixin({
       buttonsStyling: false,
       target: '#page-container',
@@ -38,6 +40,80 @@ class pageTablesDatatables {
       });
   
       toast.fire(title, message, type);
+    }
+
+    static openModalNewCargo() {
+      this.newCargoBtn.addEventListener("click", () => {
+        // Abrir modal para agregar nuevo cargo con el id newCargoModal
+        this.showModalNewCargo();
+      });
+    }
+
+    static showModalNewCargo() {
+      // Eliminar contenido anterior si existe
+      const prevContent = this.getModalNewCargo.querySelector("#newCargoContent");
+      if (prevContent) {
+        prevContent.remove();
+      }
+
+      // Crear nuevo contenido
+      const newCargoContent = document.createElement("div");
+      newCargoContent.id = "newCargoContent";
+
+      const nombreCargoInput = document.createElement("div");
+      nombreCargoInput.className = "mb-4";
+      nombreCargoInput.label = "Nombre del Cargo";
+
+      const nombreLabel = document.createElement("label");
+      nombreLabel.className = "form-label";
+      nombreLabel.htmlFor = "nombre-cargo";
+      nombreLabel.textContent = "Nombre del Cargo";
+
+      const nombreInput = document.createElement("input");
+      nombreInput.type = "text";
+      nombreInput.className = "form-control";
+      nombreInput.id = "nombre-cargo";
+      nombreInput.name = "nombre-cargo";
+      nombreInput.placeholder = "Ingrese el nombre del cargo";
+
+      const tipoCargo = document.createElement("div");
+      tipoCargo.className = "mb-4";
+      tipoCargo.label = 
+
+      nombreCargoInput.appendChild(nombreLabel);
+      nombreCargoInput.appendChild(nombreInput);
+
+      newCargoContent.appendChild(nombreCargoInput);
+      newCargoContent.appendChild(tipoCargo);
+
+      const opciones = [
+        {
+          id: "correo-institucional",
+          name: "correo-institucional",
+          icon: "fa-envelope",
+          tooltip: "Correo institucional",
+          //checked: opcionesInfra.sw_correo,
+        },
+        {
+          id: "usuario-dominio",
+          name: "usuario-dominio",
+          icon: "fa-user-circle",
+          tooltip: "Usuario de dominio",
+          //checked: opcionesInfra.sw_dominio,
+        },
+        {
+          id: "vpn",
+          name: "vpn",
+          icon: "fa-globe",
+          tooltip: "VPN",
+          //checked: opcionesInfra.sw_vpn,
+        },
+      ];
+
+      this.getModalNewCargo.querySelector(".block-content").appendChild(newCargoContent);
+
+      const modal = new bootstrap.Modal(this.getModalNewCargo);
+      modal.show();
     }
   
     static SolicitudDetalleViewer() {
@@ -85,7 +161,7 @@ class pageTablesDatatables {
           throw new Error("Error al obtener los datos del cargo");
   
         const data = await response.json();
-        console.log(data);
+        //console.log(data);
         if (!data.opcionesInfra) {
           throw new Error("Datos incompletos recibidos del servidor");
         }
@@ -98,7 +174,7 @@ class pageTablesDatatables {
     }
   
     static async showSolicitudModal(opcionesInfra) {
-      console.log(opcionesInfra);
+      //console.log(opcionesInfra);
 
       this.cargoIdModal.value = opcionesInfra.cargo_id;
       this.titleModal.textContent = opcionesInfra.name;
@@ -109,6 +185,7 @@ class pageTablesDatatables {
         prevContent.remove();
       }
 
+      // Crear nuevo contenido
       const opcionesInfraContent = document.createElement("div");
       opcionesInfraContent.className = "row g-3";
       opcionesInfraContent.id = "OpcionesInfraContent";
@@ -637,6 +714,7 @@ class pageTablesDatatables {
       this.initElements();
       this.initDataTables();
       this.SolicitudDetalleViewer();
+      this.openModalNewCargo();
       this.submitForm.addEventListener('submit', (event) => this.handleSubmit(event));
       //this.getCountTickets();
       // Eliminar el valor de localStorage solo si se va a otra página
