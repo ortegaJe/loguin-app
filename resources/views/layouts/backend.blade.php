@@ -156,8 +156,8 @@
                         </span>
                         <a class="link-fx fw-bold tracking-wide mx-auto" href="/">
                             <span class="smini-hidden">
-                                <i class="fa fa-users-gear text-primary"></i>
-                                <span class="fs-4 text-dual">Log</span><span class="fs-4 text-primary">uin</span>
+                                <i class="fa fa-edit text-primary"></i>
+                                <span class="fs-4 text-dual">Solicitudes</span><span class="fs-4 text-primary"></span>
                             </span>
                         </a>
                     </div>
@@ -292,6 +292,16 @@
                                     <i class="nav-main-link-icon fa fa-database"></i>
                                     <i class="nav-main-link-icon fa fa-users"></i>
                                     <span class="nav-main-link-name">Loguin</span>
+                                </a>
+                            </li>
+                            @endif
+                            @if (\App\Enums\UserProfiles::isSuperAdmin($userProfileEnum) || \App\Enums\UserProfiles::isInfraestructura($userProfileEnum))
+                            <li class="nav-main-heading">rips soft</li>
+                            <li class="nav-main-item">
+                                <a class="nav-main-link{{ request()->is('rips/formulario') ? ' active' : '' }}"
+                                    href="{{ route('rips.formulario') }}">
+                                    <i class="nav-main-link-icon fa fa-file-code"></i>
+                                    <span class="nav-main-link-name">Registrar Solicitud</span>
                                 </a>
                             </li>
                             @endif

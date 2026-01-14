@@ -58,6 +58,23 @@ Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN||INFRAESTRUCTURA'])->group(
 
 });
 
+Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN'])->group(function () {
+    Route::get('rips/formulario', [DropdownController::class, 'getIndexRips'])->name('rips.formulario');
+    Route::post('fetchSedes', [DropdownController::class, 'fetchSedes']);
+    Route::post('fetchTipoCargoSede', [DropdownController::class, 'fetchTipoCargoSede']);
+    Route::post('fetchCargoSede', [DropdownController::class, 'fetchCargoSede']);
+    Route::post('fetchCargoAppPerfil', [DropdownController::class, 'fetchCargoAppPerfil']);
+    Route::post('fetchSedesAdicionales', [DropdownController::class, 'fetchSedesAdicionales']);
+    Route::get('fetchEspecialidades', [DropdownController::class, 'fetchEspecialidades']);
+    Route::get('fetchDataIdentificacionLoguin', [DropdownController::class, 'fetchDataIdentificacionLoguin']);
+    Route::get('fetchDataAutoCompleteLoguin', [DropdownController::class, 'fetchDataAutoCompleteLoguin']);
+
+    Route::post('storeLoguinTicket', [LoguinTicketStoreController::class, 'storeLoguinTicket']);
+
+    Route::get('loguin/solicitudes', [SolicitudController::class, 'index']);
+    Route::get('getUsuariosConSolicitudes', [SolicitudController::class, 'getUsuariosConSolicitudes']);
+});
+
 Route::match(['get', 'post'], '/login',  [GlpiAuthController::class, 'login'])->name('login');
 Route::match(['get', 'post'], '/logout', [GlpiAuthController::class, 'logout'])->name('logout');
 

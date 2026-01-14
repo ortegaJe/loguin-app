@@ -253,4 +253,9 @@ class DropdownController extends Controller
             'fecha_nacimiento' => $fechaNacimientoFormat,
         ]);
     }
+
+    public function getIndexRips()
+    {
+        return view('rips.index');
+    }
 }

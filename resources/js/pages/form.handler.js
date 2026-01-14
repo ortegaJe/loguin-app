@@ -154,17 +154,37 @@ class ApplicationFormManager {
         }
     });
 
-    jQuery('.checkbox-group').on('change', function() {
-        jQuery('#main-form').validate().element('.checkbox-group');
-    });
+        jQuery('.checkbox-group').on('change', function() {
+            jQuery('#main-form').validate().element('.checkbox-group');
+        });
 
-    jQuery('.js-select2').on('change', e => {
-        jQuery(e.currentTarget).valid();
-    });
+        jQuery('.js-select2').on('change', e => {
+            jQuery(e.currentTarget).valid();
+        });
 
-    tippy('#myButton', {
-        content: 'My tooltip!',
-    });
+        jQuery('#v_copago').on('input', function() {
+            // Modifica el campo mascara para solo aceptar numeros de valor de copago y con el signo $ al comienzo
+            let value = jQuery(this).val();
+            value = value.replace(/[^0-9]/g, ''); // Elimina todo lo que no sea un número
+            if (value) {
+                value = '$' + parseInt(value, 10).toLocaleString(); // Formatea el número con comas y agrega el signo $
+            }
+            jQuery(this).val(value);
+        });
+
+        jQuery('#v_cuota').on('input', function() {
+            // Modifica el campo mascara para solo aceptar numeros de valor de copago y con el signo $ al comienzo
+            let value = jQuery(this).val();
+            value = value.replace(/[^0-9]/g, ''); // Elimina todo lo que no sea un número
+            if (value) {
+                value = '$' + parseInt(value, 10).toLocaleString(); // Formatea el número con comas y agrega el signo $
+            }
+            jQuery(this).val(value);
+        });
+
+        tippy('#myButton', {
+            content: 'My tooltip!',
+        });
     }
 
     static async handleFetchResponse(response) {
