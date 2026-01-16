@@ -42,6 +42,43 @@ class CargoController extends Controller
     }
 
     public function storeCargo(Request $request) {
+        // ver en consola el request recibido
+        //error_log(__LINE__ . __METHOD__ . ' data --->' .var_export( $request->all(), true));
+
+        // Iniciar una transacción para asegurar la consistencia de los datos
+        DB::beginTransaction();
+        
+        try {
+            $validatedData = $request->validate([
+                'nombre_cargo' => 'required|string',
+                'tipo_cargo' => 'required|array',
+                'opciones_infra' => 'nullable|array',
+            ]);
+
+            $cargo = $validatedData['nombre_cargo'];
+            $tipoCargo = $validatedData['tipo_cargo'] ?? [];
+            $opcionesInfra = $validatedData['opciones_infra'] ?? [];
+
+            $cargo = $this->createCargo($cargo, $tipoCargo, $opcionesInfra);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Datos guardados exitosamente',
+            ], 200);
+
+        } catch (\Exception $e) {
+            // Manejar errores y hacer rollback si es necesario
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Error al guardar los datos '.$e->getMessage(), 
+                'error' => $e->getFile(), 'line '.$e->getLine(),
+            ], 500);
+        }
+    }
+
+    public function storeCargoPerfiles(Request $request) {
         // Iniciar una transacción para asegurar la consistencia de los datos
         DB::beginTransaction();
         
@@ -79,15 +116,17 @@ class CargoController extends Controller
         }
     }
 
-    private function createCargo($cargo, $tipoCargoId, $opcionesInfra) {
+    private function createCargo($cargo, $tipoCargo, $opcionesInfra) {
+        //error_log(__LINE__ . __METHOD__ . ' data --->' .var_export($tipoCargo[0]['tipo_cargo_id'], true));
         // Inicializar los valores de infraestructura como 0 por defecto
         $swCorreo = 0;
         $swDominio = 0;
         $swVpn = 0;
+        $tipoCargoId = $tipoCargo[0]['tipo_cargo_id'];
 
         // Verificar si las opciones de infraestructura incluyen alguna de estas características
         foreach ($opcionesInfra as $infra) {
-            $nombre = strtolower($infra['radio_solicitud']);
+            $nombre = strtolower($infra['name']);
 
             if (strpos($nombre, 'correo') !== false) {
                 $swCorreo = 1;

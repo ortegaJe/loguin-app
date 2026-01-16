@@ -49,7 +49,7 @@ Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN|ANALISTA_APP'])->group(func
     //Route::get('loguin/crear-cargos', [CargoController::class, 'create']);
     Route::get('getOpcionesCargoInfra', [CargoController::class, 'getOpcionesCargoInfra']);
     Route::post('storeCargo', [CargoController::class, 'storeCargo']);
-    Route::get('loguin/crear-perfiles', [PerfilController::class, 'index']);
+    Route::get('loguin/perfiles', [PerfilController::class, 'index']);
     Route::post('storePerfil', [PerfilController::class, 'storePerfil']);
     Route::get('getSedes', [CargoController::class, 'getSedes']);
     Route::get('getAplicaciones', [PerfilController::class, 'getAplicaciones']);

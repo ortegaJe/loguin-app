@@ -7,11 +7,7 @@
 // DataTables, for more examples you can check out https://www.datatables.net/
 class pageTablesDatatables {
     static initElements() {
-      this.cardRow = document.getElementById("countTicketCard");
-      this.enCursoCount = document.getElementById("enCursoCount");
-      this.respuestaCount = document.getElementById("respuestaCount");
-      this.cerradoCount = document.getElementById("cerradoCount");
-      this.submitForm = document.getElementById("OpcionesInfraForm");
+      this.submitForm = document.getElementById("newCargoForm");
       this.getModal = document.getElementById("solicitudModal");
       this.cargoIdModal = document.getElementById("cargoIdModal");
       this.titleModal = document.getElementById("solicitudModalTitle");
@@ -52,9 +48,7 @@ class pageTablesDatatables {
     static showModalNewCargo() {
       // Eliminar contenido anterior si existe
       const prevContent = this.getModalNewCargo.querySelector("#newCargoContent");
-      if (prevContent) {
-        prevContent.remove();
-      }
+      if (prevContent) prevContent.remove();
 
       // Crear nuevo contenido
       const newCargoContent = document.createElement("div");
@@ -62,7 +56,6 @@ class pageTablesDatatables {
 
       const nombreCargoInput = document.createElement("div");
       nombreCargoInput.className = "mb-4";
-      nombreCargoInput.label = "Nombre del Cargo";
 
       const nombreLabel = document.createElement("label");
       nombreLabel.className = "form-label";
@@ -74,41 +67,92 @@ class pageTablesDatatables {
       nombreInput.className = "form-control";
       nombreInput.id = "nombre-cargo";
       nombreInput.name = "nombre-cargo";
-      nombreInput.placeholder = "Ingrese el nombre del cargo";
-
-      const tipoCargo = document.createElement("div");
-      tipoCargo.className = "mb-4";
-      tipoCargo.label = 
+      nombreInput.placeholder = "Ingrese el nombre del cargo..";
 
       nombreCargoInput.appendChild(nombreLabel);
       nombreCargoInput.appendChild(nombreInput);
 
+      const tipoCargo = document.createElement("div");
+      tipoCargo.className = "mb-4";
+      const tipoCargoLabel = document.createElement("label");
+      tipoCargoLabel.className = "form-label";
+      tipoCargoLabel.textContent = "Tipo de Cargo";
+      tipoCargo.appendChild(tipoCargoLabel);
+
+      const spacex2 = document.createElement("div");
+      spacex2.className = "space-x-2";
+      spacex2.id = "tipo-cargo-radio-opciones";
+      tipoCargo.appendChild(spacex2);
+
+      const opcionesTipoCargoRadio = [
+        { id: "administrativo", value: "1", text: "Administrativo", checked: true },
+        { id: "asistencial", value: "2", text: "Asistencial", checked: false }
+      ];
+
+      opcionesTipoCargoRadio.forEach((opcion) => {
+        const formCheck = document.createElement("div");
+        formCheck.className = "form-check form-check-inline";
+
+        const input = document.createElement("input");
+        input.className = "form-check-input";
+        input.type = "radio";
+        input.name = "tipo_cargo";
+        input.id = opcion.id;
+        input.value = opcion.value;
+        if (opcion.checked) input.checked = true;
+
+        const label = document.createElement("label");
+        label.className = "form-check-label";
+        label.htmlFor = opcion.id;
+        label.textContent = opcion.text;
+
+        formCheck.appendChild(input);
+        formCheck.appendChild(label);
+        spacex2.appendChild(formCheck);
+      });
+
+      const solicitudesInfra = document.createElement("div");
+      solicitudesInfra.className = "mb-4";
+      const solicitudesInfraLabel = document.createElement("label");
+      solicitudesInfraLabel.className = "form-label";
+      solicitudesInfraLabel.textContent = "Solicitudes de Infraestructura";
+      solicitudesInfra.appendChild(solicitudesInfraLabel);
+
+      const solicitudesInfraSpacex2 = document.createElement("div");
+      solicitudesInfraSpacex2.className = "space-x-2";
+      solicitudesInfraSpacex2.id = "opciones-infra-checkboxes";
+      solicitudesInfra.appendChild(solicitudesInfraSpacex2);
+
+      const opcionesSolicitudesIfraRadio = [
+        { id: "correo", text: "Correo Institucional", checked: true },
+        { id: "dominio", text: "Usuario de Dominio", checked: false },
+        { id: "vpn", text: "VPN", checked: false }
+      ];
+
+      opcionesSolicitudesIfraRadio.forEach((opcion) => {
+        const formCheck = document.createElement("div");
+        formCheck.className = "form-check form-check-inline";
+
+        const input = document.createElement("input");
+        input.className = "form-check-input";
+        input.type = "checkbox";
+        input.name = opcion.id;
+        input.id = opcion.id;
+        if (opcion.checked) input.checked = true;
+
+        const label = document.createElement("label");
+        label.className = "form-check-label";
+        label.htmlFor = opcion.id;
+        label.textContent = opcion.text;
+
+        formCheck.appendChild(input);
+        formCheck.appendChild(label);
+        solicitudesInfraSpacex2.appendChild(formCheck);
+      });
+
       newCargoContent.appendChild(nombreCargoInput);
       newCargoContent.appendChild(tipoCargo);
-
-      const opciones = [
-        {
-          id: "correo-institucional",
-          name: "correo-institucional",
-          icon: "fa-envelope",
-          tooltip: "Correo institucional",
-          //checked: opcionesInfra.sw_correo,
-        },
-        {
-          id: "usuario-dominio",
-          name: "usuario-dominio",
-          icon: "fa-user-circle",
-          tooltip: "Usuario de dominio",
-          //checked: opcionesInfra.sw_dominio,
-        },
-        {
-          id: "vpn",
-          name: "vpn",
-          icon: "fa-globe",
-          tooltip: "VPN",
-          //checked: opcionesInfra.sw_vpn,
-        },
-      ];
+      newCargoContent.appendChild(solicitudesInfra);
 
       this.getModalNewCargo.querySelector(".block-content").appendChild(newCargoContent);
 
@@ -255,30 +299,37 @@ class pageTablesDatatables {
     static async handleSubmit(event) {
         event.preventDefault();
 
-        const inputCheckedData = [];
-        const checkboxContainer = document.getElementById('OpcionesInfraContent');
-        const inputCheckboxes = checkboxContainer.querySelectorAll('.form-check');
+        const inputRadioData = [];
+        const radioContainer = document.getElementById('tipo-cargo-radio-opciones');
+        const inputRadios = radioContainer.querySelectorAll('input[type="radio"][name="tipo_cargo"]:checked');
+        inputRadios.forEach(radioInput => {
+            if (radioInput.checked) {
+              const checkboxName = radioInput.getAttribute('id');
+              const tipoCargoValue = parseInt(radioInput.value, 10);
 
-         inputCheckboxes.forEach(div => {
-            const checkboxInput = div.querySelector('input[id]:checked');
-
-            if (checkboxInput) {
-                const cargoId = this.cargoIdModal.value
-                const checkboxName = checkboxInput.getAttribute('name');
-
-                inputCheckedData.push({cargo_id: cargoId, name: checkboxName, checked: checkboxInput.checked});
+              inputRadioData.push({ tipo_cargo_nombre: checkboxName, tipo_cargo_id: tipoCargoValue });
             }
         });
 
-        console.log(inputCheckedData);
+        const inputCheckboxesData = [];
+        const checkboxContainer = document.getElementById('opciones-infra-checkboxes');
+        const inputCheckboxes = checkboxContainer.querySelectorAll('input[type="checkbox"]:checked');
+        inputCheckboxes.forEach(checkboxInput => {
+            const checkboxName = checkboxInput.getAttribute('name');
+            inputCheckboxesData.push({ name: checkboxName, checked: checkboxInput.checked });
+        });
 
         const formData = {
-          checkboxSolicitud: inputCheckedData,
+          nombre_cargo: document.getElementById('nombre-cargo').value,
+          tipo_cargo: inputRadioData,
+          opciones_infra: inputCheckboxesData
         }
+
+        //console.log(formData);
 
         this.toast.fire({
         title: 'Esta seguro?',
-        text: 'Se enviaran los datos del formulario para la creacion del loguin!',
+        text: 'Se enviaran los datos del formulario para la creacion del cargo!',
         icon: 'warning',
         showCancelButton: true,
         customClass: {
@@ -297,8 +348,8 @@ class pageTablesDatatables {
         }
         }).then(async result => {
             if (result.value) {                
-                /* try {
-                    const response = await fetch('/storeLoguinTicket', {
+                try {
+                    const response = await fetch('/storeCargo', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -308,118 +359,32 @@ class pageTablesDatatables {
                     });
 
                     if (!response.ok) {
-                        this.showToast('Error...', `Error al enviar Formulario Loguin ${response.statusText}`, 'error');
+                        this.showToast('Error...', `Error al enviar Formulario Cargo ${response.statusText}`, 'error');
                         throw new Error(`Error en la respuesta del servidor: ${response.statusText} - ${response.status}`);
                     }
 
                     const result = await response.json();
 
-                    const modalInstance = new bootstrap.Modal(this.getModal);
-                    modalInstance.close();
+                    // cerrar modal this.getModalNewCargo
+                    const modalInstance = bootstrap.Modal.getInstance(this.getModalNewCargo);
+                    modalInstance.hide();
+
+                    // mostrar toast exito
+                    this.showToast('Exito', 'Cargo creado exitosamente', 'success');
+
+                    // recargar datatable
+                    const table = jQuery('.js-dataTable-full').DataTable();
+                    table.ajax.reload(null, false); // false evita que se reinicie la paginación
+
                 } catch (error) {
                     console.error('Error al enviar el formulario:', error);
-                    this.showToast('Error...', `Error al enviar formulario loguin ${error}`, 'error');
-                } */
+                    this.showToast('Error...', `Error al enviar formulario cargo ${error}`, 'error');
+                }
             } else if (result.dismiss === 'cancel') {
                 //toast.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
             }
         });
 
-    }
-  
-    static async getCountTickets() {
-      try {
-        const response = await fetch("/getCountTickets", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-          },
-        });
-  
-        if (!response.ok)
-          throw new Error("Error al obtener los datos de la solicitud");
-  
-        const data = await response.json();
-        //console.log(data);
-        if (!data) {
-          throw new Error("Datos incompletos recibidos del servidor");
-        }
-  
-        this.renderTodosLosTickets(
-          data.countByStatus,
-          //data.countByTicketCloseUser
-        );
-      } catch (error) {
-        this.showToast("Error", `${error}`, "error");
-        console.error("Fetch error:", error);
-      }
-    }
-  
-    static renderTodosLosTickets(statusTickets) {
-      const { en_curso, respuesta, cerrados } = statusTickets;
-  
-      const tarjetasFijas = `
-        <div class="col-md-4 animated fadeIn">
-          <a class="block block-rounded block-link-shadow" href="javascript:void(0)">
-            <div class="block-content block-content-full">
-              <div class="py-3 text-center">
-                <div class="mb-3"><i class="far fa-circle fa-4x text-success"></i></div>
-                <div class="fs-3 fw-semibold">${en_curso}</div>
-                <div class="fs-sm fw-semibold text-uppercase text-muted">En Curso</div>
-              </div>
-            </div>
-          </a>
-        </div>
-    
-        <div class="col-md-4 animated fadeIn">
-          <a class="block block-rounded block-link-shadow" href="javascript:void(0)">
-            <div class="block-content block-content-full">
-              <div class="py-3 text-center">
-                <div class="mb-3"><i class="far fa-comment fa-4x text-secondary"></i></div>
-                <div class="fs-3 fw-semibold">${respuesta}</div>
-                <div class="fs-sm fw-semibold text-uppercase text-muted">Respuesta</div>
-              </div>
-            </div>
-          </a>
-        </div>
-    
-        <div class="col-md-4 animated fadeIn">
-          <a class="block block-rounded block-link-shadow" href="javascript:void(0)">
-            <div class="block-content block-content-full">
-              <div class="py-3 text-center">
-                <div class="mb-3"><i class="fa fa-check fa-4x text-info"></i></div>
-                <div class="fs-3 fw-semibold">${cerrados}</div>
-                <div class="fs-sm fw-semibold text-uppercase text-muted">Cerrados</div>
-              </div>
-            </div>
-          </a>
-        </div>
-      `;
-  
-  /*     const tarjetasUsuarios = ticketsPorUsuario
-        .map(
-          (tickets) => `
-        <div class="col-6 col-md-4 col-xl-2 animated fadeIn">
-          <a class="block block-rounded block-link-shadow" href="javascript:void(0)">
-            <div class="block-content block-content-full">
-              <div class="py-3 text-center">
-                <div class="mb-3"><i class="far fa-user fa-4x text-primary"></i></div>
-                <div class="fs-3 fw-semibold">${tickets.cerrados}</div>
-                <div class="fs-sm fw-semibold text-uppercase text-muted">
-                  ${tickets.analista_app == null ? null : tickets.analista_app}
-                </div>
-              </div>
-            </div>
-          </a>
-        </div>
-      `
-        )
-        .join(""); */
-  
-      // Render todo en una sola fila
-      this.UsuarioCount = this.cardRow;
-      this.UsuarioCount.innerHTML = tarjetasFijas;
     }
   
     /*
@@ -465,7 +430,7 @@ class pageTablesDatatables {
         pagingType: "simple_numbers",
         pageLength: savedPageLength ? parseInt(savedPageLength) : 10,
         autoWidth: false,
-        order: [[2, "asc"]],
+        order: [[3, "desc"]],
         columns: [
           {
             data: null,

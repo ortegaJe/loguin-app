@@ -84,7 +84,6 @@
                 <div class="modal-content">
                     <div class="block block-rounded shadow-none mb-0">
                         <div class="modal-header text-end border-bottom">
-                            <input type="text" id=cargoIdModal hidden>
                             <h5 class="modal-title" id="newCargoModalTitle">Crear Nuevo Cargo</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>

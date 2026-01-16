@@ -286,7 +286,9 @@
                                         <span class="nav-main-link-name">Loguin</span>
                                     </a>
                                 </li>
-                                <li class="nav-main-item">
+                                <li class="nav-main-item{{ request()->is('loguin/cargos') ? ' open' : '' }} ||
+                                    {{ request()->is('loguin/perfiles') ? ' open' : '' }} ||
+                                    {{ request()->is('loguin/asignacion-perfiles') ? ' open' : '' }}">
                                     <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu"
                                         aria-haspopup="true" aria-expanded="true" href="#">
                                         <i class="nav-main-link-icon fa fa-wrench"></i>
@@ -294,14 +296,14 @@
                                     </a>
                                     <ul class="nav-main-submenu">
                                         <li class="nav-main-item">
-                                            <a class="nav-main-link{{ request()->is('loguin/crear-cargos') ? ' active' : '' }}"
-                                                href="/loguin/crear-cargos">
+                                            <a class="nav-main-link{{ request()->is('loguin/cargos') ? ' active' : '' }}"
+                                                href="/loguin/cargos">
                                                 <span class="nav-main-link-name">Cargos</span>
                                             </a>
                                         </li>
                                         <li class="nav-main-item">
-                                            <a class="nav-main-link{{ request()->is('loguin/crear-perfiles') ? ' active' : '' }}"
-                                                href="/loguin/crear-perfiles">
+                                            <a class="nav-main-link{{ request()->is('loguin/perfiles') ? ' active' : '' }}"
+                                                href="/loguin/perfiles">
                                                 <span class="nav-main-link-name">Perfiles</span>
                                             </a>
                                         </li>
