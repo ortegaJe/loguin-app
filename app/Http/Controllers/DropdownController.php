@@ -256,6 +256,17 @@ class DropdownController extends Controller
 
     public function getIndexRips()
     {
-        return view('rips.index');
+        $data = [];
+        $data['contratos'] = DB::connection('sqlsrv')->table('Homologacion_PB')->get(['id','des_contrato']);
+
+        return view('rips.index', $data);
+    }
+
+    public function fetchContratosRips()
+    {
+        $data = [];
+        $data['contratos'] = DB::connection('sqlsrv')->table('Homologacion_PB')->get(['id','des_contrato']);
+
+        return response()->json($data);
     }
 }

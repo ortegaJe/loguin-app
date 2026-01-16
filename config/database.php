@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'glpi'),
+    'default' => env('DB_CONNECTION_GLPI', 'glpi'),
 
     /*
     |--------------------------------------------------------------------------

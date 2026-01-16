@@ -259,7 +259,7 @@
 
     {{-- <script type="module" src="{{ asset('js/form.handler.js') }}"></script> --}}
 
-    @vite(['resources/js/pages/form.handler.js'])
+    @vite(['resources/js/pages/form.handler.rips.js'])
     @vite(['resources/js/pages/MultiSelect.js'])
 @endsection
 
@@ -346,17 +346,16 @@
                                         </div>
                                     </div>
                                     <div class="row mb-4">
-                                        <div class="col-6">
-                                            <div class="form-floating">
-                                                <select class="form-select" id="zonal-dropdown" name="zonal-dropdown"
-                                                    for="zonal-dropdown" style="width: 100%;">
-                                                    <option selected disabled>Seleccione zonal..</option>
-                                                    <!-- Required for data-placeholder attribute to work with Select2 plugin -->
-                                                    <option value="">
+                                        <div class="col-12 mb-4">
+                                            <label class="form-label" for="zonal-dropdown">Contratos</label>
+                                            <select class="js-select2 form-select" id="zonal-dropdown" name="zonal-dropdown"
+                                                style="width: 100%;" data-placeholder="Choose one..">
+                                                <option></option>
+                                                @foreach ($contratos as $contrato)
+                                                    <option value="{{ $contrato->id }}">{{ $contrato->des_contrato }}
                                                     </option>
-                                                </select>
-                                                <label class="form-label" for="zonal-dropdown">Zonal</label>
-                                            </div>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         <div class="col-6">
                                             <div class="form-floating">

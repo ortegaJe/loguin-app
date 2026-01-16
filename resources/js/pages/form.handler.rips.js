@@ -162,6 +162,26 @@ class ApplicationFormManager {
             jQuery(e.currentTarget).valid();
         });
 
+        jQuery('#v_copago').on('input', function() {
+            // Modifica el campo mascara para solo aceptar numeros de valor de copago y con el signo $ al comienzo
+            let value = jQuery(this).val();
+            value = value.replace(/[^0-9]/g, ''); // Elimina todo lo que no sea un número
+            if (value) {
+                value = '$' + parseInt(value, 10).toLocaleString(); // Formatea el número con comas y agrega el signo $
+            }
+            jQuery(this).val(value);
+        });
+
+        jQuery('#v_cuota').on('input', function() {
+            // Modifica el campo mascara para solo aceptar numeros de valor de copago y con el signo $ al comienzo
+            let value = jQuery(this).val();
+            value = value.replace(/[^0-9]/g, ''); // Elimina todo lo que no sea un número
+            if (value) {
+                value = '$' + parseInt(value, 10).toLocaleString(); // Formatea el número con comas y agrega el signo $
+            }
+            jQuery(this).val(value);
+        });
+
         tippy('#myButton', {
             content: 'My tooltip!',
         });

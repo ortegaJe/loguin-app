@@ -60,7 +60,7 @@ Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN||INFRAESTRUCTURA'])->group(
 
 Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN'])->group(function () {
     Route::get('rips/formulario', [DropdownController::class, 'getIndexRips'])->name('rips.formulario');
-    Route::post('fetchSedes', [DropdownController::class, 'fetchSedes']);
+    Route::post('fetchContratosRips', [DropdownController::class, 'fetchContratosRips']);
     Route::post('fetchTipoCargoSede', [DropdownController::class, 'fetchTipoCargoSede']);
     Route::post('fetchCargoSede', [DropdownController::class, 'fetchCargoSede']);
     Route::post('fetchCargoAppPerfil', [DropdownController::class, 'fetchCargoAppPerfil']);
