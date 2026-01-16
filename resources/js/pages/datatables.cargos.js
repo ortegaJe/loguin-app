@@ -7,12 +7,16 @@
 // DataTables, for more examples you can check out https://www.datatables.net/
 class pageTablesDatatables {
     static initElements() {
-      this.submitForm = document.getElementById("newCargoForm");
-      this.getModal = document.getElementById("solicitudModal");
-      this.cargoIdModal = document.getElementById("cargoIdModal");
-      this.titleModal = document.getElementById("solicitudModalTitle");
       this.newCargoBtn = document.getElementById("newCargoBtn");
+      this.titleModalNewCargo = document.getElementById("newCargoModalTitle");
       this.getModalNewCargo = document.getElementById("newCargoModal");
+      this.submitForm = document.getElementById("newCargoForm");
+      
+      this.titleModalEditCargo = document.getElementById("editCargoModalTitle");
+
+      this.getModalEditCargo = document.getElementById("editCargoModal");
+      this.cargoId = document.getElementById("cargoId");
+
       this.toast = Swal.mixin({
       buttonsStyling: false,
       target: '#page-container',
@@ -159,142 +163,6 @@ class pageTablesDatatables {
       const modal = new bootstrap.Modal(this.getModalNewCargo);
       modal.show();
     }
-  
-    static SolicitudDetalleViewer() {
-      const table = document.getElementById("solicitudesTable");
-  
-      table.addEventListener("click", (event) => {
-        const button = event.target.closest(".btn-show");
-        const btnRegisterLoguin = event.target.closest(".btn-register-loguin");
-  
-        if (button) {
-          const solicitudId = button.getAttribute("data-cargo-id");
-          const usuarioId = button.getAttribute("data-usuario-id");
-  
-          this.fetchSolicitudLoguinData(solicitudId);
-        }
-  
-        if (btnRegisterLoguin) {
-          const loguinSolicitudId =
-            btnRegisterLoguin.getAttribute("data-solicitud-id");
-          const url = `/loguin/aplicaciones/solicitud/registrar/${loguinSolicitudId}`;
-          window.open(url, "_blank");
-        }
-      });
-    }
-  
-    static async fetchSolicitudLoguinData(cargoId) {
-      if (!cargoId) {
-        this.showToast(
-          "Error",
-          "No se pudo cargar los datos del cargo",
-          "error"
-        );
-        return;
-      }
-  
-      try {
-        const response = await fetch(`/getOpcionesCargoInfra?cargoId=${cargoId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json"
-          }
-        });
-  
-        if (!response.ok)
-          throw new Error("Error al obtener los datos del cargo");
-  
-        const data = await response.json();
-        //console.log(data);
-        if (!data.opcionesInfra) {
-          throw new Error("Datos incompletos recibidos del servidor");
-        }
-  
-        this.showSolicitudModal(data.opcionesInfra);
-      } catch (error) {
-        this.showToast("Error", `${error}`, "error");
-        console.error("Fetch error:", error);
-      }
-    }
-  
-    static async showSolicitudModal(opcionesInfra) {
-      //console.log(opcionesInfra);
-
-      this.cargoIdModal.value = opcionesInfra.cargo_id;
-      this.titleModal.textContent = opcionesInfra.name;
-
-      // Eliminar contenido anterior si existe
-      const prevContent = this.getModal.querySelector("#OpcionesInfraContent");
-      if (prevContent) {
-        prevContent.remove();
-      }
-
-      // Crear nuevo contenido
-      const opcionesInfraContent = document.createElement("div");
-      opcionesInfraContent.className = "row g-3";
-      opcionesInfraContent.id = "OpcionesInfraContent";
-
-      const opciones = [
-        {
-          id: "correo-institucional",
-          name: "correo-institucional",
-          icon: "fa-envelope",
-          tooltip: "Correo institucional",
-          checked: opcionesInfra.sw_correo,
-        },
-        {
-          id: "usuario-dominio",
-          name: "usuario-dominio",
-          icon: "fa-user-circle",
-          tooltip: "Usuario de dominio",
-          checked: opcionesInfra.sw_dominio,
-        },
-        {
-          id: "vpn",
-          name: "vpn",
-          icon: "fa-globe",
-          tooltip: "VPN",
-          checked: opcionesInfra.sw_vpn,
-        },
-      ];
-
-      opciones.forEach((opcion) => {
-        //console.log(opcion.checked); 
-        const colDiv = document.createElement("div");
-        colDiv.className = "col-6 col-sm-4";
-
-        const formCheckDiv = document.createElement("div");
-        formCheckDiv.className = "form-check form-block";
-
-        const input = document.createElement("input");
-        input.type = "checkbox";
-        input.className = "form-check-input";
-        input.id = opcion.id;
-        input.name = opcion.name;
-        input.checked = opcion.checked === 1 ? true : false;
-
-        const label = document.createElement("label");
-        label.className = "form-check-label bg-body-light text-center";
-        label.htmlFor = opcion.id;
-        label.setAttribute("data-bs-toggle", "tooltip");
-        label.setAttribute("data-bs-placement", "top");
-        label.setAttribute("data-bs-original-title", opcion.tooltip);
-
-        const icon = document.createElement("i");
-        icon.className = `fa ${opcion.icon} fa-2x text-muted me-1`;
-
-        label.appendChild(icon);
-        formCheckDiv.appendChild(input);
-        formCheckDiv.appendChild(label);
-        colDiv.appendChild(formCheckDiv);
-        opcionesInfraContent.appendChild(colDiv);
-      });
-
-      this.getModal.querySelector(".block-content").appendChild(opcionesInfraContent);
-  
-      const modalInstance = new bootstrap.Modal(this.getModal);
-      modalInstance.show();
-    }
 
     static async handleSubmit(event) {
         event.preventDefault();
@@ -385,6 +253,154 @@ class pageTablesDatatables {
             }
         });
 
+    }
+  
+    static openModalEditCargo() {
+      const table = document.getElementById("solicitudesTable");
+  
+      table.addEventListener("click", (event) => {
+        const button = event.target.closest(".btn-show");
+        const btnRegisterLoguin = event.target.closest(".btn-register-loguin");
+  
+        if (button) {
+          const cargoId = button.getAttribute("data-cargo-id");
+          const usuarioId = button.getAttribute("data-usuario-id");
+  
+          this.fetchEditCargo(cargoId);
+        }
+      });
+    }
+  
+    static async fetchEditCargo(cargoId) {
+      if (!cargoId) {
+        this.showToast(
+          "Error",
+          "No se pudo cargar los datos del cargo",
+          "error"
+        );
+        return;
+      }
+  
+      try {
+        const response = await fetch(`/getOpcionesCargoInfra?cargoId=${cargoId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+  
+        if (!response.ok)
+          throw new Error("Error al obtener los datos del cargo");
+  
+        const data = await response.json();
+        //console.log(data);
+        if (!data.opcionesInfra) {
+          throw new Error("Datos incompletos recibidos del servidor");
+        }
+        
+        this.showModalEditCargo(data.opcionesInfra);
+      } catch (error) {
+        this.showToast("Error", `${error}`, "error");
+        console.error("Fetch error:", error);
+      }
+    }
+  
+    static async showModalEditCargo(opcionesInfra) {
+      //console.log(opcionesInfra);
+
+      this.cargoId.value = opcionesInfra.cargo_id;
+      this.titleModalEditCargo.textContent = opcionesInfra.name;
+
+      // Eliminar contenido anterior si existe
+      const prevContent = this.getModalEditCargo.querySelector("#OpcionesInfraContent");
+      if (prevContent) {
+        prevContent.remove();
+      }
+
+      // Crear nuevo contenido
+      const opcionesInfraContent = document.createElement("div");
+      opcionesInfraContent.className = "row g-3";
+      opcionesInfraContent.id = "OpcionesInfraContent";
+
+      const nombreCargoInput = document.createElement("div");
+      nombreCargoInput.className = "mb-4";
+
+      const nombreLabel = document.createElement("label");
+      nombreLabel.className = "form-label";
+      nombreLabel.htmlFor = "nombre-cargo-edit";
+      nombreLabel.textContent = "Nombre del Cargo";
+
+      const nombreInput = document.createElement("input");
+      nombreInput.type = "text";
+      nombreInput.className = "form-control";
+      nombreInput.id = "nombre-cargo-edit";
+      nombreInput.name = "nombre-cargo-edit";
+      nombreInput.value = opcionesInfra.name;
+
+      nombreCargoInput.appendChild(nombreLabel);
+      nombreCargoInput.appendChild(nombreInput);
+      opcionesInfraContent.appendChild(nombreCargoInput);
+
+      const opciones = [
+        {
+          id: "correo-institucional",
+          name: "correo-institucional",
+          icon: "fa-envelope",
+          tooltip: "Correo institucional",
+          checked: opcionesInfra.sw_correo,
+        },
+        {
+          id: "usuario-dominio",
+          name: "usuario-dominio",
+          icon: "fa-user-circle",
+          tooltip: "Usuario de dominio",
+          checked: opcionesInfra.sw_dominio,
+        },
+        {
+          id: "vpn",
+          name: "vpn",
+          icon: "fa-globe",
+          tooltip: "VPN",
+          checked: opcionesInfra.sw_vpn,
+        },
+      ];
+
+      opciones.forEach((opcion) => {
+        //console.log(opcion.checked); 
+        const colDiv = document.createElement("div");
+        colDiv.className = "col-6 col-sm-4";
+
+        const formCheckDiv = document.createElement("div");
+        formCheckDiv.className = "form-check form-block";
+
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.className = "form-check-input";
+        input.id = opcion.id;
+        input.name = opcion.name;
+        input.checked = opcion.checked === 1 ? true : false;
+
+        const label = document.createElement("label");
+        label.className = "form-check-label bg-body-light text-center";
+        label.htmlFor = opcion.id;
+        label.setAttribute("data-bs-toggle", "tooltip");
+        label.setAttribute("data-bs-placement", "top");
+        label.setAttribute("data-bs-original-title", opcion.tooltip);
+
+        const icon = document.createElement("i");
+        icon.className = `fa ${opcion.icon} fa-2x text-muted me-1`;
+
+        label.appendChild(icon);
+        formCheckDiv.appendChild(input);
+        formCheckDiv.appendChild(label);
+        colDiv.appendChild(formCheckDiv);
+        opcionesInfraContent.appendChild(colDiv);
+      });
+      
+      this.getModalEditCargo.querySelector(".block-content").appendChild(opcionesInfraContent);
+  
+      const modalInstance = new bootstrap.Modal(this.getModalEditCargo);
+      modalInstance.show();
     }
   
     /*
@@ -677,9 +693,9 @@ class pageTablesDatatables {
      */
     static init() {
       this.initElements();
-      this.initDataTables();
-      this.SolicitudDetalleViewer();
       this.openModalNewCargo();
+      this.openModalEditCargo();
+      this.initDataTables();
       this.submitForm.addEventListener('submit', (event) => this.handleSubmit(event));
       //this.getCountTickets();
       // Eliminar el valor de localStorage solo si se va a otra página

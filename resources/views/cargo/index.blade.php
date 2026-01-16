@@ -54,7 +54,7 @@
         </div>
         <div class="content-heading d-flex justify-content-between align-items-center">
             <span>
-                Solicitudes <small class="d-none d-sm-inline">Aplicaciones</small>
+                Lista de Cargos<small class="d-none d-sm-inline"></small>
             </span>
         </div>
         <!-- Partial Table -->
@@ -104,54 +104,19 @@
         </div>
         <!-- END Modal Nuevo Cargo -->
         <!-- Modal Actualizar Permisos Cargo -->
-        <div class="modal fade" id="solicitudModal" tabindex="-1" aria-labelledby="solicitudModalLabel"
+        <div class="modal fade" id="editCargoModal" tabindex="-1" aria-labelledby="editCargoModalLabel"
             aria-hidden="true">
-            <div class="modal-dialog modal-dialog-popout modal-md" role="document">
+            <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
                 <div class="modal-content">
                     <div class="block block-rounded shadow-none mb-0">
                         <div class="modal-header text-end border-bottom">
-                            <input type="text" id=cargoIdModal hidden>
-                            <h5 class="modal-title" id="solicitudModalTitle"></h5>
+                            <input type="text" id=cargoId hidden>
+                            <h5 class="modal-title" id="editCargoModalTitle"></h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                         </div>
-                        <form id="OpcionesInfraForm">
-                            <div class="block-content">
-                                {{-- <div class="row g-3" id="OpcionesInfraContent">
-                                    <div class="col-6 col-sm-4">
-                                        <div class="form-check form-block">
-                                            <input type="checkbox" class="form-check-input" id="correo-institucional"
-                                                name="correo-institucional">
-                                            <label class="form-check-label bg-body-light text-center"
-                                                for="correo-institucional" data-bs-toggle="tooltip" data-bs-placement="top"
-                                                data-bs-original-title="Correo institucional">
-                                                <i class="fa fa-envelope fa-2x text-muted me-1"></i>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-6 col-sm-4">
-                                        <div class="form-check form-block">
-                                            <input type="checkbox" class="form-check-input" id="usuario-dominio"
-                                                name="usuario-dominio">
-                                            <label class="form-check-label bg-body-light text-center" for="usuario-dominio"
-                                                data-bs-toggle="tooltip" data-bs-placement="top"
-                                                data-bs-original-title="Usuario de dominio">
-                                                <i class="fa fa-user-circle fa-2x text-muted me-1"></i>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-6 col-sm-4">
-                                        <div class="form-check form-block">
-                                            <input type="checkbox" class="form-check-input" id="vpn" name="vpn">
-                                            <label class="form-check-label bg-body-light text-center" for="vpn"
-                                                data-bs-toggle="tooltip" data-bs-placement="top"
-                                                data-bs-original-title="VPN">
-                                                <i class="fa fa-globe fa-2x text-muted me-1"></i>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div> --}}
-                            </div>
+                        <form id="editCargoModalForm">
+                            <div class="block-content"></div>
                             <div class="block-content block-content-full block-content-sm text-end border-top">
                                 <button type="submit" class="btn btn-alt-success">
                                     Guardar
