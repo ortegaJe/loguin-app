@@ -162,7 +162,7 @@ class CargoController extends Controller
         }
     }
 
-    public function getOpcionesCargoInfra(Request $request) {
+    public function getPermisosCargo(Request $request) {
         $cargoId = $request->query('cargoId');
 
         if (!$cargoId) {
@@ -170,21 +170,113 @@ class CargoController extends Controller
                 'message' => 'ID de cargo no proporcionado',
             ], 400);
         }
-        $opcionesInfra = DB::table('loguin_cargo')
+        $permisosCargo = DB::table('loguin_cargo')
             ->where('id', $cargoId)
-            ->select('id as cargo_id', 'name', 'sw_correo', 'sw_dominio', 'sw_vpn')
+            ->select('id as cargo_id', 'name', 'tipocargo_id', 'sw_correo', 'sw_dominio', 'sw_vpn')
             ->first();
 
-        if (!$opcionesInfra) {
+        if (!$permisosCargo) {
             return response()->json([
                 'message' => 'Cargo no encontrado',
             ], 404);
         }
 
         return response()->json([
-            'opcionesInfra' => $opcionesInfra,
-            'message' => 'Opciones de infraestructura obtenidas exitosamente',
+            'permisosCargo' => $permisosCargo,
+            'message' => 'Permisos del cargo obtenidos exitosamente',
             'status' => 200,
         ], 200);
+    }
+
+    public function editCargo(Request $request, $id) {
+        try {
+            $validatedData = $request->validate([
+                'nombre_cargo' => 'required|string',
+                'tipo_cargo' => 'required|array',
+                'opciones_infra' => 'nullable|array',
+            ]);
+
+            $cargo = $validatedData['nombre_cargo'];
+            $tipoCargo = $validatedData['tipo_cargo'] ?? [];
+            $opcionesInfra = $validatedData['opciones_infra'] ?? [];
+
+            // Inicializar los valores de infraestructura como 0 por defecto
+            $swCorreo = 0;
+            $swDominio = 0;
+            $swVpn = 0;
+            $tipoCargoId = $tipoCargo[0]['tipo_cargo_id'];
+
+            // Verificar si las opciones de infraestructura incluyen alguna de estas características
+            foreach ($opcionesInfra as $infra) {
+                $nombre = strtolower($infra['name']);
+
+                if (strpos($nombre, 'correo-edit') !== false) {
+                    $swCorreo = 1;
+                }
+                if (strpos($nombre, 'dominio-edit') !== false) {
+                    $swDominio = 1;
+                }
+                if (strpos($nombre, 'vpn-edit') !== false) {
+                    $swVpn = 1;
+                }
+            }
+
+            DB::table('loguin_cargo')
+                ->where('id', $id)
+                ->update([
+                    'name' => $cargo,
+                    'tipocargo_id' => $tipoCargoId,
+                    'sw_correo' => $swCorreo,
+                    'sw_dominio' => $swDominio,
+                    'sw_vpn' => $swVpn,
+                ]);
+
+            return response()->json([
+                'message' => 'Cargo actualizado exitosamente',
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al actualizar el cargo: '.$e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function activateCargo(Request $request, $id) {
+        try {
+            DB::table('loguin_cargo')
+                ->where('id', $id)
+                ->update([
+                    'estado' => 1,
+                ]);
+
+            return response()->json([
+                'message' => 'Cargo activado exitosamente',
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al activar el cargo: '.$e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function inactivateCargo(Request $request, $id) {
+        try {
+            DB::table('loguin_cargo')
+                ->where('id', $id)
+                ->update([
+                    'estado' => 0,
+                ]);
+
+            return response()->json([
+                'message' => 'Cargo inactivado exitosamente',
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al inactivar el cargo: '.$e->getMessage(),
+            ], 500);
+        }
     }
 }

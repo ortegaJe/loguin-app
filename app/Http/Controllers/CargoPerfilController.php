@@ -1,0 +1,115 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class CargoPerfilController extends Controller
+{
+        public function index() {
+
+        $cargos = DB::table('loguin_cargo as a')
+        ->join('loguin_tipo_cargo as b', 'b.id', 'a.tipocargo_id')
+        ->where('a.estado', 1)
+        ->where('b.estado', 1)
+        ->orderBy('a.name')
+        ->get(['a.id', DB::raw("CONCAT(a.name, ' - ', b.name) AS name")]);
+
+        return view('cargo-perfil.create', compact('cargos'));
+    }
+
+    public function getAppPerfiles() {
+        $data['app_perfiles'] = DB::table('loguin_aplicaciones as a')
+                                    ->join('loguin_perfil as b', 'b.aplicacion_id', 'a.id')
+                                    ->where('a.estado', 1)
+                                    ->orderBy('a.name')
+                                    ->get([DB::raw("CONCAT(a.name, ' - ', b.name) AS perfil"), 'a.id as aplicacion_id', 'b.id as perfil_id']);
+        return response()->json($data);
+    }
+
+    public function getSedes() {
+        $data['sedes'] = DB::table('glpi_locations')->where('sw_regional', 0)->orderBy('name')->get(['name', 'id']);
+        return response()->json($data);
+    }
+
+    public function storePerfil(Request $request) {
+        // Iniciar una transacción para asegurar la consistencia de los datos
+        DB::beginTransaction();
+        
+        try {
+            $validatedData = $request->validate([
+                'cargo' => 'required|integer',
+                'perfil' => 'required|string',
+                'aplicaciones' => 'required|array',
+                'sedes' => 'required|array',
+            ]);
+
+            $cargo = $validatedData['cargo'];
+            $perfil = $validatedData['perfil'];
+            $aplicaciones = $validatedData['aplicaciones'];
+            $sedes = $validatedData['sedes'];
+
+            $this->createIfNotExistsCargo($cargo, $sedes);
+
+            $perfilId = $this->createPerfil($perfil, $aplicaciones);
+
+            $this->createSedesCargoPerfil($cargo, $sedes, $perfilId);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Datos guardados exitosamente',
+            ], 200);
+
+        } catch (\Exception $e) {
+            // Manejar errores y hacer rollback si es necesario
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Error al guardar los datos '.$e->getMessage(), 
+                'error' => $e->getFile(), 'line '.$e->getLine(),
+            ], 500);
+        }
+    }
+
+    private function createPerfil($perfil, $aplicaciones) {
+        foreach ($aplicaciones as $aplicacion) {
+            return DB::table('loguin_perfil')->insertGetId([
+                'name' => $perfil,
+                'aplicacion_id' => $aplicacion,
+                'fecha_creacion' => now('America/Bogota'),
+            ]);
+        }
+    }
+
+    private function createIfNotExistsCargo($cargo_id, $sedes) {
+        // Verificar si el cargo ya existe en la base de datos
+        $cargo = DB::table('loguin_rel_tipo_cargo_sede')->where('cargo_id', $cargo_id)->first('cargo_id');
+        //error_log(__LINE__ . __METHOD__ . ' ID cargo --->' . $cargo->cargo_id);
+        // Si no existe, crear un nuevo registro
+        if (!$cargo) {
+            foreach ($sedes as $sede) {
+                $tipocargo_id = DB::table('loguin_cargo')->where('id', $cargo_id)->value('tipocargo_id');
+                DB::table('loguin_rel_tipo_cargo_sede')->insert([
+                    'tipocargo_id' => $tipocargo_id,
+                    'sede_id' => $sede,
+                    'cargo_id' => $cargo_id,
+                    'fecha_creacion' => now('America/Bogota'),
+                ]);
+            }
+        }
+        //return $cargo->id;
+    }
+
+    private function createSedesCargoPerfil($cargo, $sedes, $perfilId) {
+        foreach ($sedes as $sede) {
+            DB::table('loguin_rel_cargo_sede')->insert([
+                'cargo_id' => $cargo,
+                'sede_id' => $sede,
+                'perfil_id' => $perfilId,
+                'fecha_creacion' => now('America/Bogota'),
+            ]);
+        }
+    }
+}

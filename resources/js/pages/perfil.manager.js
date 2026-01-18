@@ -1,5 +1,5 @@
 import MultiSelect from './MultiSelect.js'; // Adjust the path as needed
-    let aplicacionesSeleccionadasIds = [];
+    let appPerfilesSeleccionadosIds = [];
     let sedesSeleccionadasIds = [];
 
 class PerfilFormManager {
@@ -38,10 +38,10 @@ class PerfilFormManager {
         toast.fire(title, message, type);
     }
 
-    static async getAplicaciones() {
+    static async getAppPerfiles() {
 
         try {
-            const response = await fetch("/getAplicaciones", {
+            const response = await fetch("/getAppPerfiles", {
                 method: "GET",
                 headers: {
                     'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ class PerfilFormManager {
 
             const data = await response.json();
             //this.blockSedes.hidden = false;
-            this.MultiSelectAplicaciones(data.aplicaciones);
+            this.MultiSelectAplicaciones(data.app_perfiles);
 
         } catch (error) {
             console.error('Fetch error:', error);
@@ -64,17 +64,17 @@ class PerfilFormManager {
         }
     }
 
-    static async MultiSelectAplicaciones(aplicaciones) {
+    static async MultiSelectAplicaciones(appPerfiles) {
         const selectElement = this.aplicaciones;
         selectElement.multiSelect = new MultiSelect(selectElement, {
-            data: aplicaciones.map(aplicacion => ({
-                value: aplicacion.id,
-                text: aplicacion.name,
+            data: appPerfiles.map(aplicacion => ({
+                value: aplicacion.perfil_id,
+                text: aplicacion.perfil,
             })),
             placeholder: 'Seleccione aplicación..',
             onSelect: function (value, text) {
                 //console.log('Selected:', value, text);
-                aplicacionesSeleccionadasIds = selectElement.multiSelect.selectedValues;
+                appPerfilesSeleccionadosIds = selectElement.multiSelect.selectedValues;
             }
         });
     
@@ -141,7 +141,7 @@ class PerfilFormManager {
         const formData = {
             cargo: this.cargo.value,
             perfil: this.perfil.value,
-            aplicaciones: aplicacionesSeleccionadasIds,
+            aplicaciones: appPerfilesSeleccionadosIds,
             sedes: sedesSeleccionadasIds,
         };
 
@@ -203,7 +203,7 @@ class PerfilFormManager {
 
     static init() {
         this.initFormElements();
-        this.getAplicaciones();
+        this.getAppPerfiles();
         this.getSedes();
         //this.sedeDropdown.addEventListener('change', () => this.sedeChangeHandler());
         this.mainForm.addEventListener('submit', (event) => this.handleSubmit(event));

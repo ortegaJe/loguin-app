@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CargoController;
+use App\Http\Controllers\CargoPerfilController;
 use App\Http\Controllers\DropdownController;
 use App\Http\Controllers\GlpiAuthController;
 use App\Http\Controllers\InfraCredentialController;
@@ -46,13 +47,19 @@ Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN|ANALISTA_APP'])->group(func
     Route::get('getLoguins/aplicaciones/{id}', [LoguinCredentialController::class, 'getLoguins']);
     Route::get('loguin/cargos', [CargoController::class, 'index']);
     Route::get('fetchCargoList', [CargoController::class, 'fetchCargoList']);
-    //Route::get('loguin/crear-cargos', [CargoController::class, 'create']);
-    Route::get('getOpcionesCargoInfra', [CargoController::class, 'getOpcionesCargoInfra']);
+    Route::get('getPermisosCargo', [CargoController::class, 'getPermisosCargo']);
     Route::post('storeCargo', [CargoController::class, 'storeCargo']);
-    Route::get('loguin/perfiles', [PerfilController::class, 'index']);
-    Route::post('storePerfil', [PerfilController::class, 'storePerfil']);
-    Route::get('getSedes', [CargoController::class, 'getSedes']);
-    Route::get('getAplicaciones', [PerfilController::class, 'getAplicaciones']);
+    Route::put('editCargo/{id}', [CargoController::class, 'editCargo']);
+    Route::put('activateCargo/{id}', [CargoController::class, 'activateCargo']);
+    Route::put('inactivateCargo/{id}', [CargoController::class, 'inactivateCargo']);
+    //Route::get('loguin/perfiles', [PerfilController::class, 'index']);
+    //Route::post('storePerfil', [PerfilController::class, 'storePerfil']);
+    //Route::get('getSedes', [CargoController::class, 'getSedes']);
+    //Route::get('getAplicaciones', [PerfilController::class, 'getAplicaciones']);
+    Route::get('loguin/asignacion-perfiles', [CargoPerfilController::class, 'index']);
+    Route::post('storePerfil', [CargoPerfilController::class, 'storePerfil']);
+    Route::get('getSedes', [CargoPerfilController::class, 'getSedes']);
+    Route::get('getAppPerfiles', [CargoPerfilController::class, 'getAppPerfiles']);
 });    
 
 Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN||INFRAESTRUCTURA'])->group(function () {

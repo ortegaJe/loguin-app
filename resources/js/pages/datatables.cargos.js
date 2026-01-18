@@ -7,15 +7,11 @@
 // DataTables, for more examples you can check out https://www.datatables.net/
 class pageTablesDatatables {
     static initElements() {
-      this.newCargoBtn = document.getElementById("newCargoBtn");
-      this.titleModalNewCargo = document.getElementById("newCargoModalTitle");
-      this.getModalNewCargo = document.getElementById("newCargoModal");
-      this.submitForm = document.getElementById("newCargoForm");
-      
-      this.titleModalEditCargo = document.getElementById("editCargoModalTitle");
-
-      this.getModalEditCargo = document.getElementById("editCargoModal");
+      this.cargoBtn = document.getElementById("cargoBtn");
+      this.titleModalCargo = document.getElementById("cargoModalTitle");
+      this.getModalCargo = document.getElementById("cargoModal");
       this.cargoId = document.getElementById("cargoId");
+      this.submitForm = document.getElementById("cargoForm");
 
       this.toast = Swal.mixin({
       buttonsStyling: false,
@@ -42,17 +38,55 @@ class pageTablesDatatables {
       toast.fire(title, message, type);
     }
 
-    static openModalNewCargo() {
-      this.newCargoBtn.addEventListener("click", () => {
-        // Abrir modal para agregar nuevo cargo con el id newCargoModal
+    static recargarTabla() {
+      const table = jQuery('.js-dataTable-full').DataTable();
+      table.ajax.reload(null, false); // false evita que se reinicie la paginación
+    }
+
+    static openModalCargo() {
+      // Abrir modal para agregar nuevo cargo con el id newCargoModal
+      this.cargoBtn.addEventListener("click", () => {
         this.showModalNewCargo();
+      });
+
+      // Abrir modal para editar cargo y modal inactivar cargo
+      const table = document.getElementById("solicitudesTable");
+  
+      table.addEventListener("click", (event) => {
+        const btnEdit = event.target.closest(".btn-edit");
+        const btnInactive = event.target.closest(".btn-inactive");
+        const btnActive = event.target.closest(".btn-activate");
+  
+        if (btnEdit) {
+          const cargoId = btnEdit.getAttribute("data-cargo-id");  
+          this.fetchCargo(cargoId);
+        }
+
+          if (btnActive) {
+          const cargoId = btnActive.getAttribute("data-cargo-id"); 
+          const cargoNombre = btnActive.getAttribute("data-cargo-nombre");
+          this.activateCargo(event, cargoId, cargoNombre);
+        }
+
+        if (btnInactive) {
+          const cargoId = btnInactive.getAttribute("data-cargo-id"); 
+          const cargoNombre = btnInactive.getAttribute("data-cargo-nombre");
+          this.inactivateCargo(event, cargoId, cargoNombre);
+        }
       });
     }
 
     static showModalNewCargo() {
+      this.submitForm.dataset.mode = 'create';
+      // Configurar el título del modal
+      this.titleModalCargo.textContent = "Crear Nuevo Cargo";
+
       // Eliminar contenido anterior si existe
-      const prevContent = this.getModalNewCargo.querySelector("#newCargoContent");
+      const prevContent = this.getModalCargo.querySelector("#newCargoContent");
       if (prevContent) prevContent.remove();
+
+      const prevContentEditCargo = this.getModalCargo.querySelector("#OpcionesInfraContent");
+      if (prevContentEditCargo) prevContentEditCargo.remove();
 
       // Crear nuevo contenido
       const newCargoContent = document.createElement("div");
@@ -158,13 +192,13 @@ class pageTablesDatatables {
       newCargoContent.appendChild(tipoCargo);
       newCargoContent.appendChild(solicitudesInfra);
 
-      this.getModalNewCargo.querySelector(".block-content").appendChild(newCargoContent);
+      this.getModalCargo.querySelector(".block-content").appendChild(newCargoContent);
 
-      const modal = new bootstrap.Modal(this.getModalNewCargo);
+      const modal = new bootstrap.Modal(this.getModalCargo);
       modal.show();
     }
 
-    static async handleSubmit(event) {
+    static async storeCargo(event) {
         event.preventDefault();
 
         const inputRadioData = [];
@@ -197,7 +231,7 @@ class pageTablesDatatables {
 
         this.toast.fire({
         title: 'Esta seguro?',
-        text: 'Se enviaran los datos del formulario para la creacion del cargo!',
+        text: 'Se enviaran los datos del formulario para la creación del cargo!',
         icon: 'warning',
         showCancelButton: true,
         customClass: {
@@ -227,26 +261,25 @@ class pageTablesDatatables {
                     });
 
                     if (!response.ok) {
-                        this.showToast('Error...', `Error al enviar Formulario Cargo ${response.statusText}`, 'error');
+                        this.showToast('Error...', `Error al enviar datos del cargo ${response.statusText}`, 'error');
                         throw new Error(`Error en la respuesta del servidor: ${response.statusText} - ${response.status}`);
                     }
 
-                    const result = await response.json();
+                    //const result = await response.json();
 
-                    // cerrar modal this.getModalNewCargo
-                    const modalInstance = bootstrap.Modal.getInstance(this.getModalNewCargo);
+                    // cerrar modal this.getModalCargo
+                    const modalInstance = bootstrap.Modal.getInstance(this.getModalCargo);
                     modalInstance.hide();
 
                     // mostrar toast exito
                     this.showToast('Exito', 'Cargo creado exitosamente', 'success');
 
                     // recargar datatable
-                    const table = jQuery('.js-dataTable-full').DataTable();
-                    table.ajax.reload(null, false); // false evita que se reinicie la paginación
+                    this.recargarTabla();
 
                 } catch (error) {
                     console.error('Error al enviar el formulario:', error);
-                    this.showToast('Error...', `Error al enviar formulario cargo ${error}`, 'error');
+                    this.showToast('Error...', `Error al enviar datos del cargo ${error}`, 'error');
                 }
             } else if (result.dismiss === 'cancel') {
                 //toast.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
@@ -255,23 +288,7 @@ class pageTablesDatatables {
 
     }
   
-    static openModalEditCargo() {
-      const table = document.getElementById("solicitudesTable");
-  
-      table.addEventListener("click", (event) => {
-        const button = event.target.closest(".btn-show");
-        const btnRegisterLoguin = event.target.closest(".btn-register-loguin");
-  
-        if (button) {
-          const cargoId = button.getAttribute("data-cargo-id");
-          const usuarioId = button.getAttribute("data-usuario-id");
-  
-          this.fetchEditCargo(cargoId);
-        }
-      });
-    }
-  
-    static async fetchEditCargo(cargoId) {
+    static async fetchCargo(cargoId) {
       if (!cargoId) {
         this.showToast(
           "Error",
@@ -282,7 +299,7 @@ class pageTablesDatatables {
       }
   
       try {
-        const response = await fetch(`/getOpcionesCargoInfra?cargoId=${cargoId}`, {
+        const response = await fetch(`/getPermisosCargo?cargoId=${cargoId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json"
@@ -294,32 +311,33 @@ class pageTablesDatatables {
   
         const data = await response.json();
         //console.log(data);
-        if (!data.opcionesInfra) {
+        if (!data.permisosCargo) {
           throw new Error("Datos incompletos recibidos del servidor");
         }
-        
-        this.showModalEditCargo(data.opcionesInfra);
+
+        this.showModalEditCargo(data.permisosCargo);
       } catch (error) {
         this.showToast("Error", `${error}`, "error");
         console.error("Fetch error:", error);
       }
     }
   
-    static async showModalEditCargo(opcionesInfra) {
-      //console.log(opcionesInfra);
+    static async showModalEditCargo(permisosCargo) {
+      //console.log(permisosCargo);
+      this.submitForm.dataset.mode = 'edit';
 
-      this.cargoId.value = opcionesInfra.cargo_id;
-      this.titleModalEditCargo.textContent = opcionesInfra.name;
+      this.titleModalCargo.textContent = "Editar Cargo";
+      this.cargoId.value = permisosCargo.cargo_id;
 
       // Eliminar contenido anterior si existe
-      const prevContent = this.getModalEditCargo.querySelector("#OpcionesInfraContent");
-      if (prevContent) {
-        prevContent.remove();
-      }
+      const prevContentNewCargo = this.getModalCargo.querySelector("#newCargoContent");
+      if (prevContentNewCargo) prevContentNewCargo.remove();
+
+      const prevContentEditCargo = this.getModalCargo.querySelector("#OpcionesInfraContent");
+      if (prevContentEditCargo) prevContentEditCargo.remove();
 
       // Crear nuevo contenido
       const opcionesInfraContent = document.createElement("div");
-      opcionesInfraContent.className = "row g-3";
       opcionesInfraContent.id = "OpcionesInfraContent";
 
       const nombreCargoInput = document.createElement("div");
@@ -335,72 +353,336 @@ class pageTablesDatatables {
       nombreInput.className = "form-control";
       nombreInput.id = "nombre-cargo-edit";
       nombreInput.name = "nombre-cargo-edit";
-      nombreInput.value = opcionesInfra.name;
+      nombreInput.value = permisosCargo.name;
 
-      nombreCargoInput.appendChild(nombreLabel);
-      nombreCargoInput.appendChild(nombreInput);
-      opcionesInfraContent.appendChild(nombreCargoInput);
+      const tipoCargo = document.createElement("div");
+      tipoCargo.className = "mb-4";
+      const tipoCargoLabel = document.createElement("label");
+      tipoCargoLabel.className = "form-label";
+      tipoCargoLabel.textContent = "Tipo de Cargo";
+      tipoCargo.appendChild(tipoCargoLabel);
+
+      const spacex2 = document.createElement("div");
+      spacex2.className = "space-x-2";
+      spacex2.id = "tipo-cargo-radio-opciones-edit";
+      tipoCargo.appendChild(spacex2);
+
+      const opcionesTipoCargoRadio = [
+        { id: "administrativo", 
+          value: "1", 
+          text: "Administrativo", 
+          checked: permisosCargo.tipocargo_id == 1 ? true : false 
+        },
+        { id: "asistencial", 
+          value: "2", 
+          text: "Asistencial", 
+          checked: permisosCargo.tipocargo_id == 2 ? true : false 
+        }
+      ];
+
+      opcionesTipoCargoRadio.forEach((opcion) => {
+        const formCheck = document.createElement("div");
+        formCheck.className = "form-check form-check-inline";
+
+        const input = document.createElement("input");
+        input.className = "form-check-input";
+        input.type = "radio";
+        input.name = "tipo_cargo_edit";
+        input.id = opcion.id;
+        input.value = opcion.value;
+        if (opcion.checked) input.checked = true;
+
+        const label = document.createElement("label");
+        label.className = "form-check-label";
+        label.htmlFor = opcion.id;
+        label.textContent = opcion.text;
+
+        formCheck.appendChild(input);
+        formCheck.appendChild(label);
+        spacex2.appendChild(formCheck);
+      });
+
+      const solicitudesInfra = document.createElement("div");
+      solicitudesInfra.className = "mb-4";
+      const solicitudesInfraLabel = document.createElement("label");
+      solicitudesInfraLabel.className = "form-label";
+      solicitudesInfraLabel.textContent = "Solicitudes de Infraestructura";
+      solicitudesInfra.appendChild(solicitudesInfraLabel);
+
+      const solicitudesInfraSpacex2 = document.createElement("div");
+      solicitudesInfraSpacex2.className = "space-x-2";
+      solicitudesInfraSpacex2.id = "opciones-infra-checkboxes-edit";
+      solicitudesInfra.appendChild(solicitudesInfraSpacex2);
 
       const opciones = [
         {
-          id: "correo-institucional",
-          name: "correo-institucional",
+          id: "correo-edit",
+          name: "correo-edit",
           icon: "fa-envelope",
-          tooltip: "Correo institucional",
-          checked: opcionesInfra.sw_correo,
+          text: "Correo institucional",
+          checked: permisosCargo.sw_correo,
         },
         {
-          id: "usuario-dominio",
-          name: "usuario-dominio",
+          id: "dominio-edit",
+          name: "dominio-edit",
           icon: "fa-user-circle",
-          tooltip: "Usuario de dominio",
-          checked: opcionesInfra.sw_dominio,
+          text: "Usuario de dominio",
+          checked: permisosCargo.sw_dominio,
         },
         {
-          id: "vpn",
-          name: "vpn",
+          id: "vpn-edit",
+          name: "vpn-edit",
           icon: "fa-globe",
-          tooltip: "VPN",
-          checked: opcionesInfra.sw_vpn,
+          text: "VPN",
+          checked: permisosCargo.sw_vpn,
         },
       ];
 
       opciones.forEach((opcion) => {
-        //console.log(opcion.checked); 
-        const colDiv = document.createElement("div");
-        colDiv.className = "col-6 col-sm-4";
-
-        const formCheckDiv = document.createElement("div");
-        formCheckDiv.className = "form-check form-block";
+        const formCheck = document.createElement("div");
+        formCheck.className = "form-check form-check-inline";
 
         const input = document.createElement("input");
-        input.type = "checkbox";
         input.className = "form-check-input";
+        input.type = "checkbox";
+        input.name = opcion.id;
         input.id = opcion.id;
-        input.name = opcion.name;
-        input.checked = opcion.checked === 1 ? true : false;
+        if (opcion.checked) input.checked = true;
+        // input.checked = opcion.checked === 1 ? true : false;
 
         const label = document.createElement("label");
-        label.className = "form-check-label bg-body-light text-center";
+        label.className = "form-check-label";
         label.htmlFor = opcion.id;
-        label.setAttribute("data-bs-toggle", "tooltip");
-        label.setAttribute("data-bs-placement", "top");
-        label.setAttribute("data-bs-original-title", opcion.tooltip);
+        label.textContent = opcion.text;
 
-        const icon = document.createElement("i");
-        icon.className = `fa ${opcion.icon} fa-2x text-muted me-1`;
-
-        label.appendChild(icon);
-        formCheckDiv.appendChild(input);
-        formCheckDiv.appendChild(label);
-        colDiv.appendChild(formCheckDiv);
-        opcionesInfraContent.appendChild(colDiv);
+        formCheck.appendChild(input);
+        formCheck.appendChild(label);
+        solicitudesInfraSpacex2.appendChild(formCheck);
       });
+
+      nombreCargoInput.appendChild(nombreLabel);
+      nombreCargoInput.appendChild(nombreInput);
+      opcionesInfraContent.appendChild(nombreCargoInput);
+      opcionesInfraContent.appendChild(tipoCargo);
+      opcionesInfraContent.appendChild(solicitudesInfra);
       
-      this.getModalEditCargo.querySelector(".block-content").appendChild(opcionesInfraContent);
+      this.getModalCargo.querySelector(".block-content").appendChild(opcionesInfraContent);
   
-      const modalInstance = new bootstrap.Modal(this.getModalEditCargo);
+      const modalInstance = new bootstrap.Modal(this.getModalCargo);
       modalInstance.show();
+    }
+
+    static async updateCargo(event) {
+        event.preventDefault();
+
+        const inputRadioData = [];
+        const radioContainer = document.getElementById('tipo-cargo-radio-opciones-edit');
+        const inputRadios = radioContainer.querySelectorAll('input[type="radio"][name="tipo_cargo_edit"]:checked');
+        inputRadios.forEach(radioInput => {
+            if (radioInput.checked) {
+              const checkboxName = radioInput.getAttribute('id');
+              const tipoCargoValue = parseInt(radioInput.value, 10);
+
+              inputRadioData.push({ tipo_cargo_nombre: checkboxName, tipo_cargo_id: tipoCargoValue });
+            }
+        });
+
+        const inputCheckboxesData = [];
+        const checkboxContainer = document.getElementById('opciones-infra-checkboxes-edit');
+        const inputCheckboxes = checkboxContainer.querySelectorAll('input[type="checkbox"]:checked');
+        inputCheckboxes.forEach(checkboxInput => {
+            const checkboxName = checkboxInput.getAttribute('name');
+            inputCheckboxesData.push({ name: checkboxName, checked: checkboxInput.checked });
+        });
+
+        const formData = {
+          cargo_id: this.cargoId.value,
+          nombre_cargo: document.getElementById('nombre-cargo-edit').value,
+          tipo_cargo: inputRadioData,
+          opciones_infra: inputCheckboxesData
+        }
+
+        //console.log(formData);
+
+        this.toast.fire({
+        title: 'Esta seguro?',
+        text: 'Se enviaran los datos del formulario para la actualización del cargo!',
+        icon: 'warning',
+        showCancelButton: true,
+        customClass: {
+            confirmButton: 'btn btn-success m-1',
+            cancelButton: 'btn btn-secondary m-1'
+        },
+        confirmButtonText: 'Si, enviar!',
+        cancelButtonText: 'Cancelar',
+        html: false,
+        preConfirm: e => {
+            return new Promise(resolve => {
+            setTimeout(() => {
+                resolve();
+            }, 50);
+            });
+        }
+        }).then(async result => {
+            if (result.value) {                
+                try {
+                    const response = await fetch(`${'/editCargo/' + this.cargoId.value}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    if (!response.ok) {
+                        this.showToast('Error...', `Error al enviar formulario para actualizar el cargo ${response.statusText}`, 'error');
+                        throw new Error(`Error en la respuesta del servidor: ${response.statusText} - ${response.status}`);
+                    }
+
+                    const result = await response.json();
+
+                    // cerrar modal this.getModalCargo
+                    const modalInstance = bootstrap.Modal.getInstance(this.getModalCargo);
+                    modalInstance.hide();
+
+                    // mostrar toast exito
+                    this.showToast('Exito', 'Cargo actualizado exitosamente', 'success');
+
+                    // recargar datatable
+                    this.recargarTabla();
+
+                } catch (error) {
+                    console.error('Error al enviar el formulario:', error);
+                    this.showToast('Error...', `Error al enviar formulario cargo ${error}`, 'error');
+                }
+            } else if (result.dismiss === 'cancel') {
+                //toast.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
+            }
+        });
+
+    }
+
+    static async activateCargo(event, cargoId, cargoNombre) {
+      event.preventDefault();
+
+      const formData = {
+        cargo_id: cargoId,
+      }
+
+      //console.log(formData);
+
+      this.toast.fire({
+      title: '¿Esta seguro?',
+      text: `¿Desea activar el cargo ${cargoNombre}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      customClass: {
+          confirmButton: 'btn btn-success m-1',
+          cancelButton: 'btn btn-secondary m-1'
+      },
+      confirmButtonText: 'Si, activar!',
+      cancelButtonText: 'Cancelar',
+      html: false,
+      preConfirm: e => {
+          return new Promise(resolve => {
+          setTimeout(() => {
+              resolve();
+          }, 50);
+          });
+      }
+      }).then(async result => {
+          if (result.value) {                
+              try {
+                  const response = await fetch(`${'/activateCargo/' + cargoId}`, {
+                      method: 'PUT',
+                      headers: {
+                          'Content-Type': 'application/json',
+                          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                      },
+                      body: JSON.stringify(formData)
+                  });
+
+                  if (!response.ok) {
+                      this.showToast('Error...', `Error al enviar datos para activar el cargo ${response.statusText}`, 'error');
+                      throw new Error(`Error en la respuesta del servidor: ${response.statusText} - ${response.status}`);
+                  }
+
+                  // mostrar toast exito
+                  this.showToast('Exito', 'Cargo activado exitosamente', 'success');
+
+                  // recargar datatable
+                  this.recargarTabla();
+
+              } catch (error) {
+                  console.error('Error al enviar los datos del cargo:', error);
+                  this.showToast('Error...', `Error al enviar los datos del cargo ${error}`, 'error');
+              }
+          } else if (result.dismiss === 'cancel') {
+              //toast.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
+          }
+      });
+    }
+
+    static async inactivateCargo(event, cargoId, cargoNombre) {
+      event.preventDefault();
+
+      const formData = {
+        cargo_id: cargoId,
+      }
+
+      //console.log(formData);
+
+      this.toast.fire({
+      title: '¿Esta seguro?',
+      text: `¿Desea inactivar el cargo ${cargoNombre}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      customClass: {
+          confirmButton: 'btn btn-danger m-1',
+          cancelButton: 'btn btn-secondary m-1'
+      },
+      confirmButtonText: 'Si, inactivar!',
+      cancelButtonText: 'Cancelar',
+      html: false,
+      preConfirm: e => {
+          return new Promise(resolve => {
+          setTimeout(() => {
+              resolve();
+          }, 50);
+          });
+      }
+      }).then(async result => {
+          if (result.value) {                
+              try {
+                  const response = await fetch(`${'/inactivateCargo/' + cargoId}`, {
+                      method: 'PUT',
+                      headers: {
+                          'Content-Type': 'application/json',
+                          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                      },
+                      body: JSON.stringify(formData)
+                  });
+
+                  if (!response.ok) {
+                      this.showToast('Error...', `Error al enviar datos para inactivar el cargo ${response.statusText}`, 'error');
+                      throw new Error(`Error en la respuesta del servidor: ${response.statusText} - ${response.status}`);
+                  }
+
+                  // mostrar toast exito
+                  this.showToast('Exito', 'Cargo inactivado exitosamente', 'success');
+
+                  // recargar datatable
+                  this.recargarTabla();
+
+              } catch (error) {
+                  console.error('Error al enviar los datos del cargo:', error);
+                  this.showToast('Error...', `Error al enviar los datos del cargo ${error}`, 'error');
+              }
+          } else if (result.dismiss === 'cancel') {
+              //toast.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
+          }
+      });
     }
   
     /*
@@ -464,20 +746,30 @@ class pageTablesDatatables {
             searchable: false,
             className: "text-center",
             render: function (data, type, row) {
+              const isActive = row.estado === 1;
               return `
-                <div class="btn-group">
-                  <button type="button" class="btn btn-sm btn-danger"
-                    data-toggle="click-ripple" data-bs-toggle="tooltip" title="Inactivar"
-                    data-solicitud-id="${row.cargo_id}"
-                    data-usuario-id="">
-                    <i class="fa fa-times"></i>
-                  </button>
-                  <button type="button" class="btn btn-sm btn-secondary btn-show"
-                    data-toggle="click-ripple" data-bs-toggle="tooltip" title="Ver Solicitudes"
-                    data-cargo-id="${row.cargo_id}">
-                    <i class="fa fa-tags"></i>
-                  </button>
-                </div>
+          <div class="btn-group">
+            ${isActive ? `
+              <button type="button" class="btn btn-sm btn-danger btn-inactive"
+                data-toggle="click-ripple" data-bs-toggle="tooltip" title="Inactivar"
+                data-cargo-id="${row.cargo_id}"
+                data-cargo-nombre="${row.nombre}">
+                <i class="fa fa-times"></i>
+              </button>
+            ` : `
+              <button type="button" class="btn btn-sm btn-success btn-activate"
+                data-toggle="click-ripple" data-bs-toggle="tooltip" title="Activar"
+                data-cargo-id="${row.cargo_id}"
+                data-cargo-nombre="${row.nombre}">
+                <i class="fa fa-check"></i>
+              </button>
+            `}
+            <button type="button" class="btn btn-sm btn-secondary btn-edit"
+              data-toggle="click-ripple" data-bs-toggle="tooltip" title="Ver Solicitudes"
+              data-cargo-id="${row.cargo_id}">
+              <i class="fa fa-tags"></i>
+            </button>
+          </div>
               `;
             },
           },
@@ -664,11 +956,7 @@ class pageTablesDatatables {
         .getElementById("refresh-datatable")
         .addEventListener("click", async function () {
           // Recargar la tabla
-          const table = jQuery(".js-dataTable-full").DataTable();
-          table.ajax.reload(null, false); // false evita que se reinicie la paginación
-  
-          // Actualizar todas las cards
-          //await pageTablesDatatables.getCountTickets();
+          pageTablesDatatables.recargarTabla();
         });
   
       // Activar tooltips después del renderizado
@@ -693,11 +981,25 @@ class pageTablesDatatables {
      */
     static init() {
       this.initElements();
-      this.openModalNewCargo();
-      this.openModalEditCargo();
+      this.openModalCargo();
       this.initDataTables();
-      this.submitForm.addEventListener('submit', (event) => this.handleSubmit(event));
-      //this.getCountTickets();
+      this.submitForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const mode = this.submitForm.dataset.mode;
+
+        if (mode === 'create') {
+          this.storeCargo(event);
+          return;
+        }
+
+        if (mode === 'edit') {
+          this.updateCargo(event);
+          return;
+        }
+
+        console.log('Modo de formulario no definido');
+      });
       // Eliminar el valor de localStorage solo si se va a otra página
       document.addEventListener("visibilitychange", function () {
         if (document.visibilityState === "hidden") {

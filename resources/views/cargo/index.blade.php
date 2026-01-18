@@ -35,7 +35,7 @@
     <div class="content">
         <div class="row">
             <div class="col-md-6 col-xl-3">
-                <a class="block block-rounded block-link-shadow" href="javascript:void(0)" id="newCargoBtn">
+                <a class="block block-rounded block-link-shadow" href="javascript:void(0)" id="cargoBtn">
                     <div class="block-content block-content-full block-sticky-options">
                         <div class="block-options">
                             <div class="block-options-item">
@@ -77,46 +77,19 @@
             </div>
         </div>
         <!-- END Partial Table -->
-        <!-- Modal Nuevo Cargo -->
-        <div class="modal fade" id="newCargoModal" tabindex="-1" aria-labelledby="newCargoModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="block block-rounded shadow-none mb-0">
-                        <div class="modal-header text-end border-bottom">
-                            <h5 class="modal-title" id="newCargoModalTitle">Crear Nuevo Cargo</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <form id="newCargoForm">
-                            <div class="block-content"></div>
-                            <div class="block-content block-content-full block-content-sm text-end border-top">
-                                <button type="submit" class="btn btn-alt-success">
-                                    Guardar
-                                </button>
-                                <button type="button" class="btn btn-alt-secondary" data-bs-dismiss="modal">
-                                    Cerrar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- END Modal Nuevo Cargo -->
-        <!-- Modal Actualizar Permisos Cargo -->
-        <div class="modal fade" id="editCargoModal" tabindex="-1" aria-labelledby="editCargoModalLabel"
+        <!-- Modal Cargo -->
+        <div class="modal fade" id="cargoModal" tabindex="-1" aria-labelledby="cargoModalLabel"
             aria-hidden="true">
             <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
                 <div class="modal-content">
                     <div class="block block-rounded shadow-none mb-0">
                         <div class="modal-header text-end border-bottom">
                             <input type="text" id=cargoId hidden>
-                            <h5 class="modal-title" id="editCargoModalTitle"></h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
+                            <h5 class="modal-title" id="cargoModalTitle"></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <form id="editCargoModalForm">
-                            <div class="block-content"></div>
+                        <form id="cargoForm">
+                            <div class="block-content" id="cargoContent"></div>
                             <div class="block-content block-content-full block-content-sm text-end border-top">
                                 <button type="submit" class="btn btn-alt-success">
                                     Guardar
@@ -130,6 +103,6 @@
                 </div>
             </div>
         </div>
-        <!-- END Modal Actualizar Permisos Cargo -->
+        <!-- END Modal Cargo -->
     </div>
 @endsection
