@@ -25,9 +25,7 @@ class CargoController extends Controller
                 'a.sw_vpn as vpn',
                 'a.estado',
                 'a.fecha_creacion',
-                ])
-            ->orderBy('a.name')
-            ->get();
+                ])->get();
 
         return response()->json([
             'cargos' => $data,

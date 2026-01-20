@@ -7,14 +7,14 @@ use Illuminate\Support\Facades\DB;
 
 class CargoPerfilController extends Controller
 {
-        public function index() {
+    public function index() {
 
         $cargos = DB::table('loguin_cargo as a')
         ->join('loguin_tipo_cargo as b', 'b.id', 'a.tipocargo_id')
         ->where('a.estado', 1)
         ->where('b.estado', 1)
         ->orderBy('a.name')
-        ->get(['a.id', DB::raw("CONCAT(a.name, ' - ', b.name) AS name")]);
+        ->get(['a.id', DB::raw("CONCAT(a.name, ' - ', b.name) AS name"), 'a.tipocargo_id']);
 
         return view('cargo-perfil.create', compact('cargos'));
     }
@@ -24,7 +24,7 @@ class CargoPerfilController extends Controller
                                     ->join('loguin_perfil as b', 'b.aplicacion_id', 'a.id')
                                     ->where('a.estado', 1)
                                     ->orderBy('a.name')
-                                    ->get([DB::raw("CONCAT(a.name, ' - ', b.name) AS perfil"), 'a.id as aplicacion_id', 'b.id as perfil_id']);
+                                    ->get([DB::raw("UPPER(CONCAT(a.name, ' - ', b.name)) AS perfil"), 'a.id as aplicacion_id', 'b.id as perfil_id']);
         return response()->json($data);
     }
 
@@ -39,22 +39,20 @@ class CargoPerfilController extends Controller
         
         try {
             $validatedData = $request->validate([
+                'tipo_cargo_id' => 'required|integer',
                 'cargo' => 'required|integer',
-                'perfil' => 'required|string',
-                'aplicaciones' => 'required|array',
+                'app_perfiles' => 'required|array',
                 'sedes' => 'required|array',
             ]);
 
+            $tipoCargoId = $validatedData['tipo_cargo_id'];
             $cargo = $validatedData['cargo'];
-            $perfil = $validatedData['perfil'];
-            $aplicaciones = $validatedData['aplicaciones'];
+            $appPerfiles = $validatedData['app_perfiles'];
             $sedes = $validatedData['sedes'];
 
-            $this->createIfNotExistsCargo($cargo, $sedes);
+            $this->createTipoCargoSede($tipoCargoId, $cargo, $sedes);
 
-            $perfilId = $this->createPerfil($perfil, $aplicaciones);
-
-            $this->createSedesCargoPerfil($cargo, $sedes, $perfilId);
+            $this->createCargoSedesPerfil($cargo, $sedes, $appPerfiles);
 
             DB::commit();
 
@@ -73,43 +71,31 @@ class CargoPerfilController extends Controller
         }
     }
 
-    private function createPerfil($perfil, $aplicaciones) {
-        foreach ($aplicaciones as $aplicacion) {
-            return DB::table('loguin_perfil')->insertGetId([
-                'name' => $perfil,
-                'aplicacion_id' => $aplicacion,
+    private function createTipoCargoSede($tipoCargoId, $cargoId, $sedes) {
+        foreach ($sedes as $sede) {
+            DB::table('loguin_rel_tipo_cargo_sede')->insert([
+                'tipocargo_id' => $tipoCargoId,
+                'sede_id' => $sede,
+                'cargo_id' => $cargoId,
                 'fecha_creacion' => now('America/Bogota'),
             ]);
         }
     }
 
-    private function createIfNotExistsCargo($cargo_id, $sedes) {
-        // Verificar si el cargo ya existe en la base de datos
-        $cargo = DB::table('loguin_rel_tipo_cargo_sede')->where('cargo_id', $cargo_id)->first('cargo_id');
-        //error_log(__LINE__ . __METHOD__ . ' ID cargo --->' . $cargo->cargo_id);
-        // Si no existe, crear un nuevo registro
-        if (!$cargo) {
-            foreach ($sedes as $sede) {
-                $tipocargo_id = DB::table('loguin_cargo')->where('id', $cargo_id)->value('tipocargo_id');
-                DB::table('loguin_rel_tipo_cargo_sede')->insert([
-                    'tipocargo_id' => $tipocargo_id,
-                    'sede_id' => $sede,
-                    'cargo_id' => $cargo_id,
+    private function createCargoSedesPerfil($cargo, $sedes, $appPerfiles) {
+        $data = [];
+
+        foreach ($sedes as $sede) {
+            foreach ($appPerfiles as $perfil) {
+                $data[] = [
+                    'cargo_id'       => $cargo,
+                    'sede_id'        => $sede,
+                    'perfil_id'      => $perfil,
                     'fecha_creacion' => now('America/Bogota'),
-                ]);
+                ];
             }
         }
-        //return $cargo->id;
-    }
 
-    private function createSedesCargoPerfil($cargo, $sedes, $perfilId) {
-        foreach ($sedes as $sede) {
-            DB::table('loguin_rel_cargo_sede')->insert([
-                'cargo_id' => $cargo,
-                'sede_id' => $sede,
-                'perfil_id' => $perfilId,
-                'fecha_creacion' => now('America/Bogota'),
-            ]);
-        }
+        DB::table('loguin_rel_cargo_sede')->insert($data);
     }
 }

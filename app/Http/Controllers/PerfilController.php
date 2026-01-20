@@ -16,7 +16,20 @@ class PerfilController extends Controller
         ->orderBy('a.name')
         ->get(['a.id', DB::raw("CONCAT(a.name, ' - ', b.name) AS name")]);
 
-        return view('perfil.create', compact('cargos'));
+        return view('perfil.index', compact('cargos'));
+    }
+
+    public function fetchPerfilList() {
+        $data = DB::table('loguin_perfil as a')
+            ->join('loguin_aplicaciones as b', 'b.id', 'a.aplicacion_id')
+            ->select(['a.id as perfil_id', 'a.name as nombre_perfil', 'a.estado', 'b.name as aplicacion', 'a.fecha_creacion'])
+            ->get();
+
+        return response()->json([
+            'perfiles' => $data,
+            'message' => 'Lista de perfiles obtenida exitosamente',
+            'status' => 200,
+        ], 200);
     }
 
     public function getAplicaciones() {

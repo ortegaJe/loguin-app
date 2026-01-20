@@ -1,6 +1,6 @@
 @extends('layouts.backend')
 
-@section('title', 'Cargos')
+@section('title', 'Cargos de Usuario')
 
 @section('css')
     <link rel="stylesheet" href="{{ asset('js/plugins/datatables-bs5/css/dataTables.bootstrap5.min.css') }}">

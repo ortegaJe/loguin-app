@@ -197,7 +197,7 @@
     <script type="module">
         Codebase.helpersOnLoad(['jq-select2', 'jq-notify', 'jq-validation']);
     </script>
-    @vite(['resources/js/pages/perfil.manager.js'])
+    @vite(['resources/js/pages/cargo.perfil.manager.js'])
     @vite(['resources/js/pages/MultiSelect.js'])
 @endsection
 
@@ -222,48 +222,13 @@
                                     <option></option>
                                     <!-- Required for data-placeholder attribute to work with Select2 plugin -->
                                     @forelse ($cargos as $cargo)
-                                        <option value="{{ $cargo->id }}">{{ $cargo->name }}</option>
+                                        <option value="{{ $cargo->id }}" data-tipo-cargo="{{ $cargo->tipocargo_id }}">
+                                            {{ $cargo->name }}
+                                        </option>
                                     @empty
                                         <option value="">SIN REGISTROS</option>
                                     @endforelse
                                 </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <!-- Floating Labels Contact -->
-                    <div class="block block-rounded h-100 mb-0">
-                        <div class="block-header block-header-default">
-                            <h3 class="block-title">Nombre</h3>
-                            <div class="block-options"></div>
-                        </div>
-                        <div class="block-content">
-                            <div class="mb-4 p-2">
-                                <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="fa fa-suitcase"></i>
-                                    </span>
-                                    <div class="form-floating">
-                                        <input type="text" class="form-control" id="perfil" name="perfil"
-                                            placeholder="perfil">
-                                        <label for="perfil">Ingrese nombre del perfil..</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- END Floating Labels Contact -->
-                </div>
-                <div class="col-md-6">
-                    <div class="block block-rounded h-100 mb-0">
-                        <div class="block-header block-header-default">
-                            <h3 class="block-title">Aplicaciones</h3>
-                            <div class="block-options"></div>
-                        </div>
-                        <div class="block-content">
-                            <div class="mb-4 p-2">
-                                <select id="aplicacion" name="aplicacion" multiple data-multi-select></select>
                             </div>
                         </div>
                     </div>
@@ -277,6 +242,19 @@
                         <div class="block-content">
                             <div class="mb-4 p-2">
                                 <select id="sedes" name="sedes" multiple data-multi-select></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="block block-rounded h-100 mb-0">
+                        <div class="block-header block-header-default">
+                            <h3 class="block-title">Aplicaciones y perfiles</h3>
+                            <div class="block-options"></div>
+                        </div>
+                        <div class="block-content">
+                            <div class="mb-4 p-2">
+                                <select id="aplicacion" name="aplicacion" multiple data-multi-select></select>
                                 <button type="submit" class="btn btn-success mt-4" id="btnSubmit">
                                     <i class="far fa-save me-1"></i>Guardar
                                 </button>
