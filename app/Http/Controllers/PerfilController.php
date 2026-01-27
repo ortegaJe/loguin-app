@@ -43,22 +43,14 @@ class PerfilController extends Controller
         
         try {
             $validatedData = $request->validate([
-                'cargo' => 'required|integer',
-                'perfil' => 'required|string',
-                'aplicaciones' => 'required|array',
-                'sedes' => 'required|array',
+                'nombre_perfil' => 'required|string',
+                'aplicacion' => 'required|integer',
             ]);
 
-            $cargo = $validatedData['cargo'];
-            $perfil = $validatedData['perfil'];
-            $aplicaciones = $validatedData['aplicaciones'];
-            $sedes = $validatedData['sedes'];
+            $perfil = $validatedData['nombre_perfil'];
+            $aplicacion = $validatedData['aplicacion'];
 
-            $this->createIfNotExistsCargo($cargo, $sedes);
-
-            $perfilId = $this->createPerfil($perfil, $aplicaciones);
-
-            $this->createSedesCargoPerfil($cargo, $sedes, $perfilId);
+            $this->createPerfil($perfil, $aplicacion);
 
             DB::commit();
 
@@ -77,43 +69,110 @@ class PerfilController extends Controller
         }
     }
 
-    private function createPerfil($perfil, $aplicaciones) {
-        foreach ($aplicaciones as $aplicacion) {
-            return DB::table('loguin_perfil')->insertGetId([
-                'name' => $perfil,
-                'aplicacion_id' => $aplicacion,
-                'fecha_creacion' => now('America/Bogota'),
-            ]);
-        }
+    private function createPerfil($perfil, $aplicacion) {
+        return DB::table('loguin_perfil')->insert([
+            'name' => $perfil,
+            'aplicacion_id' => $aplicacion,
+            'fecha_creacion' => now('America/Bogota'),
+        ]);
     }
 
-    private function createIfNotExistsCargo($cargo_id, $sedes) {
-        // Verificar si el cargo ya existe en la base de datos
-        $cargo = DB::table('loguin_rel_tipo_cargo_sede')->where('cargo_id', $cargo_id)->first('cargo_id');
-        //error_log(__LINE__ . __METHOD__ . ' ID cargo --->' . $cargo->cargo_id);
-        // Si no existe, crear un nuevo registro
-        if (!$cargo) {
-            foreach ($sedes as $sede) {
-                $tipocargo_id = DB::table('loguin_cargo')->where('id', $cargo_id)->value('tipocargo_id');
-                DB::table('loguin_rel_tipo_cargo_sede')->insert([
-                    'tipocargo_id' => $tipocargo_id,
-                    'sede_id' => $sede,
-                    'cargo_id' => $cargo_id,
-                    'fecha_creacion' => now('America/Bogota'),
+    public function getPerfilesApp(Request $request) {
+        $perfilId = $request->query('perfilId');
+
+        if (!$perfilId) {
+            return response()->json([
+                'message' => 'ID de Perfil no proporcionado',
+            ], 400);
+        }
+        $perfilApp = DB::table('loguin_perfil')
+            ->where('id', $perfilId)
+            ->select('id as perfil_id', 'name', 'aplicacion_id')
+            ->first();
+
+        if (!$perfilApp) {
+            return response()->json([
+                'message' => 'Perfil no encontrado',
+            ], 404);
+        }
+
+        return response()->json([
+            'perfilApp' => $perfilApp,
+            'message' => 'Datos del perfil obtenidos exitosamente',
+            'status' => 200,
+        ], 200);
+    }
+
+    public function editPerfilApp(Request $request, $id) {
+        // Iniciar una transacción para asegurar la consistencia de los datos
+        DB::beginTransaction();
+        
+        try {
+            $validatedData = $request->validate([
+                'nombre_perfil' => 'required|string',
+                'aplicacion' => 'required|integer',
+            ]);
+
+            $perfil = $validatedData['nombre_perfil'];
+            $aplicacion = $validatedData['aplicacion'];
+
+            DB::table('loguin_perfil')
+                ->where('id', $id)
+                ->update([
+                    'name' => $perfil,
+                    'aplicacion_id' => $aplicacion,
                 ]);
-            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Datos actualizados exitosamente',
+            ], 200);
+
+        } catch (\Exception $e) {
+            // Manejar errores y hacer rollback si es necesario
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Error al actualizar los datos '.$e->getMessage(), 
+                'error' => $e->getFile(), 'line '.$e->getLine(),
+            ], 500);
         }
-        //return $cargo->id;
     }
 
-    private function createSedesCargoPerfil($cargo, $sedes, $perfilId) {
-        foreach ($sedes as $sede) {
-            DB::table('loguin_rel_cargo_sede')->insert([
-                'cargo_id' => $cargo,
-                'sede_id' => $sede,
-                'perfil_id' => $perfilId,
-                'fecha_creacion' => now('America/Bogota'),
-            ]);
+    public function activatePerfil($id) {
+        try {
+            DB::table('loguin_perfil')
+                ->where('id', $id)
+                ->update(['estado' => 1]);
+
+            return response()->json([
+                'message' => 'Perfil activado exitosamente',
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al activar el perfil '.$e->getMessage(), 
+                'error' => $e->getFile(), 'line '.$e->getLine(),
+            ], 500);
+        }
+    }
+
+    public function inactivatePerfil($id) {
+        try {
+            DB::table('loguin_perfil')
+                ->where('id', $id)
+                ->update(['estado' => 0]);
+
+            return response()->json([
+                'message' => 'Perfil inactivado exitosamente',
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al inactivar el perfil '.$e->getMessage(), 
+                'error' => $e->getFile(), 'line '.$e->getLine(),
+            ], 500);
         }
     }
 }

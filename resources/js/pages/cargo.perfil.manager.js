@@ -18,7 +18,22 @@ class PerfilFormManager {
               cancelButton: 'btn btn-danger m-1',
               input: 'form-control'
             }
-          });
+        });
+
+        // Init Form Validation
+      jQuery('#main-form').validate({
+        ignore: [],
+        rules: {
+            'cargo': {
+              required: true,
+            }
+        },
+        messages: {
+            'cargo': {
+                required: "Este campo es obligatorio",
+            }
+        }
+      });
     }
 
     static async showToast(title, message, type) 
@@ -128,18 +143,18 @@ class PerfilFormManager {
     // borrar los valores del select y del formulario
     static clearForm() {
         this.cargo.value = '';
-        this.aplicaciones.multiSelect.clear();
-        this.sedes.multiSelect.clear();
+        this.aplicaciones.multiSelect = '';
+        this.sedes.multiSelect = '';
     }
 
     static async handleSubmit(event) {
         event.preventDefault();
 
-/*         if (!jQuery('#main-form').valid()) {
+        if (!jQuery('#main-form').valid()) {
             // Si la validación falla, detén el proceso y no envíes el formulario
-            console.log('El formulario contiene campos que deben ser validados, no se enviará.');
+            //console.log('El formulario contiene campos que deben ser validados, no se enviará.');
             return;
-        } */
+        }
 
         const formData = {
             tipo_cargo_id: this.tipoCargoId(),
@@ -173,7 +188,7 @@ class PerfilFormManager {
         }).then(async result => {
             if (result.value) {                
                 try {
-                    const response = await fetch('/storePerfil', {
+                    const response = await fetch('/storeCargoPerfil', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

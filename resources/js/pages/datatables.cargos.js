@@ -22,6 +22,28 @@ class pageTablesDatatables {
         input: 'form-control'
         }
       });
+
+      // Init Form Validation
+      jQuery('#cargoForm').validate({
+        ignore: [],
+        rules: {
+            'nombre-cargo': {
+              required: true,
+            },
+            'nombre-cargo-edit': {
+              required: true,
+            }
+        },
+        messages: {
+            'nombre-cargo': {
+                required: "Este campo es obligatorio",
+            },
+            'nombre-cargo-edit': {
+                required: "Este campo es obligatorio",
+            }
+        }
+      });
+      
     }
 
     static async showToast(title, message, type) {
@@ -201,6 +223,12 @@ class pageTablesDatatables {
     static async storeCargo(event) {
         event.preventDefault();
 
+        if (!jQuery('#cargoForm').valid()) {
+          // Si la validación falla, detén el proceso y no envíes el formulario
+          //console.log('El formulario contiene campos que deben ser validados, no se enviará.');
+          return;
+        }
+
         const inputRadioData = [];
         const radioContainer = document.getElementById('tipo-cargo-radio-opciones');
         const inputRadios = radioContainer.querySelectorAll('input[type="radio"][name="tipo_cargo"]:checked');
@@ -315,14 +343,14 @@ class pageTablesDatatables {
           throw new Error("Datos incompletos recibidos del servidor");
         }
 
-        this.showModalEditCargo(data.permisosCargo);
+        this.showModalEditCargo(data.permisosCargo, data.perfilSedes);
       } catch (error) {
         this.showToast("Error", `${error}`, "error");
         console.error("Fetch error:", error);
       }
     }
-  
-    static async showModalEditCargo(permisosCargo) {
+
+    static async showModalEditCargo(permisosCargo, perfilSedes) {
       //console.log(permisosCargo);
       this.submitForm.dataset.mode = 'edit';
 
@@ -460,11 +488,48 @@ class pageTablesDatatables {
         solicitudesInfraSpacex2.appendChild(formCheck);
       });
 
+      // agregar datatable en el modal para visualizar los perfiles y sedes asignadas al cargo
+      const perfilSedesTable = document.createElement("table");
+      perfilSedesTable.className = "table table-bordered table-hover table-striped table-vcenter";
+      perfilSedesTable.id = "perfil-sedes-table";
+
+      const perfilSedesThead = document.createElement("thead");
+      perfilSedesThead.innerHTML = `
+        <tr>
+          <th>Sede</th>
+          <th>Perfil</th>
+          <th>Aplicación</th>
+          <th>Acciones</th>
+        </tr>
+      `;
+      perfilSedesTable.appendChild(perfilSedesThead);
+
+      const perfilSedesTbody = document.createElement("tbody");
+      perfilSedes.forEach((item) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${item.sede_nombre}</td>
+          <td>${item.perfil_nombre.toUpperCase()}</td>
+          <td>${item.aplicacion_nombre}</td>
+          <td class="text-center"><input type="checkbox" class="form-check-input" id="checkbox-perfil" data-id="${item.id}" ${item.estado === 1 ? 'checked' : ''}></td>
+        `;
+        perfilSedesTbody.appendChild(row);
+      });
+      perfilSedesTable.appendChild(perfilSedesTbody);
+
+      const tableContainer = document.createElement("div");
+      tableContainer.className = "table-responsive";
+      tableContainer.style.maxHeight = "300px";
+      tableContainer.style.overflowY = "auto";
+      tableContainer.style.display = "block";
+      tableContainer.appendChild(perfilSedesTable);
+
       nombreCargoInput.appendChild(nombreLabel);
       nombreCargoInput.appendChild(nombreInput);
       opcionesInfraContent.appendChild(nombreCargoInput);
       opcionesInfraContent.appendChild(tipoCargo);
       opcionesInfraContent.appendChild(solicitudesInfra);
+      opcionesInfraContent.appendChild(tableContainer);
       
       this.getModalCargo.querySelector(".block-content").appendChild(opcionesInfraContent);
   
@@ -474,6 +539,12 @@ class pageTablesDatatables {
 
     static async updateCargo(event) {
         event.preventDefault();
+
+        if (!jQuery('#cargoForm').valid()) {
+          // Si la validación falla, detén el proceso y no envíes el formulario
+          //console.log('El formulario contiene campos que deben ser validados, no se enviará.');
+          return;
+        }
 
         const inputRadioData = [];
         const radioContainer = document.getElementById('tipo-cargo-radio-opciones-edit');
@@ -495,11 +566,23 @@ class pageTablesDatatables {
             inputCheckboxesData.push({ name: checkboxName, checked: checkboxInput.checked });
         });
 
+        const inputCheckboxPerfilData = [];
+        const perfilTable = document.getElementById('perfil-sedes-table');
+
+        if (perfilTable) {
+          const checkedPerfilBoxes = perfilTable.querySelectorAll('input[type="checkbox"]');
+          checkedPerfilBoxes.forEach(checkboxInput => {
+            const cargoPerfilId = checkboxInput.getAttribute('data-id');
+            inputCheckboxPerfilData.push({ cargo_perfil_id: cargoPerfilId, checked: checkboxInput.checked });
+          });
+        }
+
         const formData = {
           cargo_id: this.cargoId.value,
           nombre_cargo: document.getElementById('nombre-cargo-edit').value,
           tipo_cargo: inputRadioData,
-          opciones_infra: inputCheckboxesData
+          opciones_infra: inputCheckboxesData,
+          perfiles_sedes: inputCheckboxPerfilData
         }
 
         //console.log(formData);
@@ -765,9 +848,9 @@ class pageTablesDatatables {
               </button>
             `}
             <button type="button" class="btn btn-sm btn-secondary btn-edit"
-              data-toggle="click-ripple" data-bs-toggle="tooltip" title="Ver Solicitudes"
+              data-toggle="click-ripple" data-bs-toggle="tooltip" title="Actualizar"
               data-cargo-id="${row.cargo_id}">
-              <i class="fa fa-tags"></i>
+              <i class="fa fa-pencil"></i>
             </button>
           </div>
               `;

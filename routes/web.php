@@ -56,9 +56,12 @@ Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN|ANALISTA_APP'])->group(func
     Route::get('fetchPerfilList', [PerfilController::class, 'fetchPerfilList']);
     Route::get('getAplicaciones', [PerfilController::class, 'getAplicaciones']);
     Route::post('storePerfil', [PerfilController::class, 'storePerfil']);
-    //Route::get('getSedes', [CargoController::class, 'getSedes']);
+    Route::get('getPerfilesApp', [PerfilController::class, 'getPerfilesApp']);
+    Route::put('editPerfilApp/{id}', [PerfilController::class, 'editPerfilApp']);
+    Route::put('activatePerfil/{id}', [PerfilController::class, 'activatePerfil']);
+    Route::put('inactivatePerfil/{id}', [PerfilController::class, 'inactivatePerfil']);
     Route::get('loguin/asignacion-perfiles', [CargoPerfilController::class, 'index']);
-    Route::post('storePerfil', [CargoPerfilController::class, 'storePerfil']);
+    Route::post('storeCargoPerfil', [CargoPerfilController::class, 'storeCargoPerfil']);
     Route::get('getSedes', [CargoPerfilController::class, 'getSedes']);
     Route::get('getAppPerfiles', [CargoPerfilController::class, 'getAppPerfiles']);
 });    

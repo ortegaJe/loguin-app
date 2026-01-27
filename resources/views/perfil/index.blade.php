@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="{{ asset('js/plugins/datatables-buttons-bs5/css/buttons.bootstrap5.min.css') }}">
     <link rel="stylesheet" href="{{ asset('js/plugins/datatables-responsive-bs5/css/responsive.bootstrap5.min.css') }}">
     <link rel="stylesheet" href="{{ asset('/js/plugins/sweetalert2/sweetalert2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('/js/plugins/select2/css/select2.min.css') }}">
+    <style>
+        .select2-container--default .select2-selection--single.error {
+            border: 1px solid red !important;
+        }
+    </style>
 @endsection
 
 @section('js')
@@ -22,6 +28,10 @@
     <script src="{{ asset('js/plugins/datatables-buttons/buttons.print.min.js') }}"></script>
     <script src="{{ asset('js/plugins/datatables-buttons/buttons.html5.min.js') }}"></script>
     <script src="{{ asset('/js/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+    <script src="{{ asset('/js/plugins/select2/js/select2.full.min.js') }}"></script>
+    <script src="{{ asset('/js/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
+    <script src="{{ asset('/js/plugins/jquery-validation/additional-methods.js') }}"></script>
+    <script type="module">Codebase.helpersOnLoad(['js-select2', 'jq-validation']);</script>
     <style>
         #solicitudesTable_wrapper {
             position: relative;
@@ -84,7 +94,7 @@
                 <div class="modal-content">
                     <div class="block block-rounded shadow-none mb-0">
                         <div class="modal-header text-end border-bottom">
-                            <input type="text" id=cargoId hidden>
+                            <input type="text" id="perfilId" hidden>
                             <h5 class="modal-title" id="perfilModalTitle"></h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>

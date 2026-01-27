@@ -33,7 +33,7 @@ class CargoPerfilController extends Controller
         return response()->json($data);
     }
 
-    public function storePerfil(Request $request) {
+    public function storeCargoPerfil(Request $request) {
         // Iniciar una transacción para asegurar la consistencia de los datos
         DB::beginTransaction();
         

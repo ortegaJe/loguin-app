@@ -192,8 +192,15 @@
             color: #212529;
         }
     </style>
+    <style>
+        .select2-container--default .select2-selection--single.error {
+  border: 1px solid red !important;
+}
+    </style>
 @section('js')
     <script src="{{ asset('/js/plugins/select2/js/select2.full.min.js') }}"></script>
+    <script src="{{ asset('/js/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
+    <script src="{{ asset('/js/plugins/jquery-validation/additional-methods.js') }}"></script>
     <script type="module">
         Codebase.helpersOnLoad(['jq-select2', 'jq-notify', 'jq-validation']);
     </script>

@@ -23,6 +23,7 @@ class CargoController extends Controller
                 'a.sw_correo as correo',
                 'a.sw_dominio as dominio',
                 'a.sw_vpn as vpn',
+
                 'a.estado',
                 'a.fecha_creacion',
                 ])->get();
@@ -179,8 +180,25 @@ class CargoController extends Controller
             ], 404);
         }
 
+        $perfilSedes = DB::table('loguin_rel_cargo_sede as a')
+            ->join('glpi_locations as b', 'b.id', 'a.sede_id')
+            ->join('loguin_perfil as c', 'c.id', 'a.perfil_id')
+            ->join('loguin_aplicaciones as d', 'd.id', 'c.aplicacion_id')
+            ->where('a.cargo_id', $cargoId)
+            ->select(
+                'a.id',
+                'b.id as sede_id', 
+                'b.name as sede_nombre', 
+                'c.id as perfil_id', 
+                'c.name as perfil_nombre', 
+                'd.id as aplicacion_id', 
+                'd.name as aplicacion_nombre',
+                'a.estado')
+            ->get();
+
         return response()->json([
             'permisosCargo' => $permisosCargo,
+            'perfilSedes' => $perfilSedes,
             'message' => 'Permisos del cargo obtenidos exitosamente',
             'status' => 200,
         ], 200);
@@ -192,11 +210,13 @@ class CargoController extends Controller
                 'nombre_cargo' => 'required|string',
                 'tipo_cargo' => 'required|array',
                 'opciones_infra' => 'nullable|array',
+                'perfiles_sedes' => 'nullable|array',
             ]);
 
             $cargo = $validatedData['nombre_cargo'];
             $tipoCargo = $validatedData['tipo_cargo'] ?? [];
             $opcionesInfra = $validatedData['opciones_infra'] ?? [];
+            $perfilesSedes = $validatedData['perfiles_sedes'] ?? [];
 
             // Inicializar los valores de infraestructura como 0 por defecto
             $swCorreo = 0;
@@ -228,6 +248,18 @@ class CargoController extends Controller
                     'sw_dominio' => $swDominio,
                     'sw_vpn' => $swVpn,
                 ]);
+
+            // Actualizar perfiles y sedes
+            foreach ($perfilesSedes as $perfilSede) {
+                $cargoPerfilId = $perfilSede['cargo_perfil_id'];
+                $estado = $perfilSede['checked'] ? 1 : 0;
+
+                DB::table('loguin_rel_cargo_sede')
+                    ->where('id', $cargoPerfilId)
+                    ->update([
+                        'estado' => $estado,
+                    ]);
+            }
 
             return response()->json([
                 'message' => 'Cargo actualizado exitosamente',

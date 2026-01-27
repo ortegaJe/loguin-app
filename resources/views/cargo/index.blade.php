@@ -22,6 +22,9 @@
     <script src="{{ asset('js/plugins/datatables-buttons/buttons.print.min.js') }}"></script>
     <script src="{{ asset('js/plugins/datatables-buttons/buttons.html5.min.js') }}"></script>
     <script src="{{ asset('/js/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+    <script src="{{ asset('/js/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
+    <script src="{{ asset('/js/plugins/jquery-validation/additional-methods.js') }}"></script>
+    <script type="module">Codebase.helpersOnLoad(['jq-validation']);</script>
     <style>
         #solicitudesTable_wrapper {
             position: relative;
