@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Controllers\CargoController;
+use App\Http\Controllers\CargoPerfilController;
 use App\Http\Controllers\DropdownController;
 use App\Http\Controllers\GlpiAuthController;
 use App\Http\Controllers\InfraCredentialController;
 use App\Http\Controllers\LoguinCredentialController;
 use App\Http\Controllers\LoguinTicketStoreController;
+use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SolicitudController;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
@@ -46,8 +49,26 @@ Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN|ANALISTA_APP'])->group(func
     Route::post('storeLoguin', [LoguinCredentialController::class, 'storeLoguin']);
     Route::get('getLoguins/aplicaciones/{id}', [LoguinCredentialController::class, 'getLoguins']);
     Route::get('getCountTickets', [LoguinCredentialController::class, 'getCountTickets']);
-
-});
+    Route::get('loguin/cargos', [CargoController::class, 'index']);
+    Route::get('fetchCargoList', [CargoController::class, 'fetchCargoList']);
+    Route::get('getPermisosCargo', [CargoController::class, 'getPermisosCargo']);
+    Route::post('storeCargo', [CargoController::class, 'storeCargo']);
+    Route::put('editCargo/{id}', [CargoController::class, 'editCargo']);
+    Route::put('activateCargo/{id}', [CargoController::class, 'activateCargo']);
+    Route::put('inactivateCargo/{id}', [CargoController::class, 'inactivateCargo']);
+    Route::get('loguin/perfiles', [PerfilController::class, 'index']);
+    Route::get('fetchPerfilList', [PerfilController::class, 'fetchPerfilList']);
+    Route::get('getAplicaciones', [PerfilController::class, 'getAplicaciones']);
+    Route::post('storePerfil', [PerfilController::class, 'storePerfil']);
+    Route::get('getPerfilesApp', [PerfilController::class, 'getPerfilesApp']);
+    Route::put('editPerfilApp/{id}', [PerfilController::class, 'editPerfilApp']);
+    Route::put('activatePerfil/{id}', [PerfilController::class, 'activatePerfil']);
+    Route::put('inactivatePerfil/{id}', [PerfilController::class, 'inactivatePerfil']);
+    Route::get('loguin/asignacion-perfiles', [CargoPerfilController::class, 'index']);
+    Route::post('storeCargoPerfil', [CargoPerfilController::class, 'storeCargoPerfil']);
+    Route::get('getSedes', [CargoPerfilController::class, 'getSedes']);
+    Route::get('getAppPerfiles', [CargoPerfilController::class, 'getAppPerfiles']);
+});    
 
 Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN||INFRAESTRUCTURA'])->group(function () {
     Route::get('loguin/infraestructura/solicitudes', [SolicitudController::class, 'getRequestLoguinInfra'])->name('loguin.infra');
@@ -55,7 +76,6 @@ Route::middleware(['auth:glpi', 'profile:SUPER_ADMIN||INFRAESTRUCTURA'])->group(
     Route::get('fetchDataLoguinInfra/{id}', [InfraCredentialController::class, 'fetchDataLoguinInfra']);
     Route::post('storeLoguinInfra', [InfraCredentialController::class, 'storeLoguinInfra']);
     Route::get('getLoguins/infraestructura/{id}', [InfraCredentialController::class, 'getLoguinInfra']);
-
 });
 
 Route::match(['get', 'post'], '/login',  [GlpiAuthController::class, 'login'])->name('login');

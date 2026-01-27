@@ -21,6 +21,7 @@ export default defineConfig({
                 'resources/js/pages/datatables.solicitudes.credenciales.infra.js', 
                 'resources/js/pages/credenciales.infra.registrar.js',
                 'resources/js/pages/MultiSelect.js',
+                'resources/js/pages/cargos.manager.js',
             ],
             refresh: true,
         }),

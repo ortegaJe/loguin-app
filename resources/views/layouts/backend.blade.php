@@ -248,52 +248,86 @@
                                 //$profileRol = \App\Enums\UserProfiles::isSuperAdmin($userProfileEnum);
 
                                 //echo $profileRol ? 'Es Super Admin' : 'No es Super Admin';
+
                             @endphp
-                            @if (\App\Enums\UserProfiles::isSuperAdmin($userProfileEnum) || \App\Enums\UserProfiles::isContratacion($userProfileEnum))
-                            <li class="nav-main-heading">Contratación</li>
-                            <li class="nav-main-item{{ request()->is('*') ? ' open' : '' }}">
-                                <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu"
-                                    aria-haspopup="true" aria-expanded="true" href="#">
-                                    <i class="nav-main-link-icon fa fa-users"></i>
-                                    <span class="nav-main-link-name">Loguin</span>
-                                </a>
-                                <ul class="nav-main-submenu">
-                                    <li class="nav-main-item">
-                                        <a class="nav-main-link{{ request()->is('loguin/formulario') ? ' active' : '' }}"
-                                            href="/loguin/formulario">
-                                            <span class="nav-main-link-name">Registrar Solicitud</span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-main-item">
-                                        <a class="nav-main-link{{ request()->is('loguin/solicitudes') ? ' active' : '' }}"
-                                            href="/loguin/solicitudes">
-                                            <span class="nav-main-link-name">Solicitudes</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
+                            @if (
+                                \App\Enums\UserProfiles::isSuperAdmin($userProfileEnum) ||
+                                    \App\Enums\UserProfiles::isContratacion($userProfileEnum))
+                                <li class="nav-main-heading">Contratación</li>
+                                <li class="nav-main-item{{ request()->is('loguin/formulario') ? ' open' : '' }}">
+                                    <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu"
+                                        aria-haspopup="true" aria-expanded="true" href="#">
+                                        <i class="nav-main-link-icon fa fa-users"></i>
+                                        <span class="nav-main-link-name">Loguin</span>
+                                    </a>
+                                    <ul class="nav-main-submenu">
+                                        <li class="nav-main-item">
+                                            <a class="nav-main-link{{ request()->is('loguin/formulario') ? ' active' : '' }}"
+                                                href="/loguin/formulario">
+                                                <span class="nav-main-link-name">Registrar Solicitud</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-main-item">
+                                            <a class="nav-main-link{{ request()->is('loguin/solicitudes') ? ' active' : '' }}"
+                                                href="/loguin/solicitudes">
+                                                <span class="nav-main-link-name">Solicitudes</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
                             @endif
                             @if (\App\Enums\UserProfiles::isSuperAdmin($userProfileEnum) || \App\Enums\UserProfiles::isAnalistaApp($userProfileEnum))
-                            <li class="nav-main-heading">Aplicaciones</li>
-                            <li class="nav-main-item">
-                                <a class="nav-main-link{{ request()->is('loguin/aplicaciones/solicitudes') ? ' active' : '' }}"
-                                    href="{{ route('loguin.app') }}">
-                                    <i class="nav-main-link-icon fa fa-database"></i>
-                                    <i class="nav-main-link-icon fa fa-users"></i>
-                                    <span class="nav-main-link-name">Loguin</span>
-                                </a>
-                            </li>
+                                <li class="nav-main-heading">Aplicaciones</li>
+                                <li class="nav-main-item">
+                                    <a class="nav-main-link{{ request()->is('loguin/aplicaciones/solicitudes') ? ' active' : '' }}"
+                                        href="{{ route('loguin.app') }}">
+                                        <i class="nav-main-link-icon fa fa-database"></i>
+                                        <i class="nav-main-link-icon fa fa-users"></i>
+                                        <span class="nav-main-link-name">Loguin</span>
+                                    </a>
+                                </li>
+                                <li class="nav-main-item{{ request()->is('loguin/cargos') ? ' open' : '' }} ||
+                                    {{ request()->is('loguin/perfiles') ? ' open' : '' }} ||
+                                    {{ request()->is('loguin/asignacion-perfiles') ? ' open' : '' }}">
+                                    <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu"
+                                        aria-haspopup="true" aria-expanded="true" href="#">
+                                        <i class="nav-main-link-icon fa fa-wrench"></i>
+                                        <span class="nav-main-link-name">Configuración</span>
+                                    </a>
+                                    <ul class="nav-main-submenu">
+                                        <li class="nav-main-item">
+                                            <a class="nav-main-link{{ request()->is('loguin/cargos') ? ' active' : '' }}"
+                                                href="/loguin/cargos">
+                                                <span class="nav-main-link-name">Cargos</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-main-item">
+                                            <a class="nav-main-link{{ request()->is('loguin/perfiles') ? ' active' : '' }}"
+                                                href="/loguin/perfiles">
+                                                <span class="nav-main-link-name">Perfiles</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-main-item">
+                                            <a class="nav-main-link{{ request()->is('loguin/asignacion-perfiles') ? ' active' : '' }}"
+                                                href="/loguin/asignacion-perfiles">
+                                                <span class="nav-main-link-name">Asignación de perfiles</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
                             @endif
-                            @if (\App\Enums\UserProfiles::isSuperAdmin($userProfileEnum) || \App\Enums\UserProfiles::isInfraestructura($userProfileEnum))
-                            <li class="nav-main-heading">Infraestructura</li>
-                            <li class="nav-main-item">
-                                <a class="nav-main-link{{ request()->is('loguin/infraestructura/solicitudes') ? ' active' : '' }}"
-                                    href="{{ route('loguin.infra') }}">
-                                    <i class="nav-main-link-icon fa fa-database"></i>
-                                    <i class="nav-main-link-icon fa fa-users"></i>
-                                    <span class="nav-main-link-name">Loguin</span>
-                                </a>
-                            </li>
+                            @if (
+                                \App\Enums\UserProfiles::isSuperAdmin($userProfileEnum) ||
+                                    \App\Enums\UserProfiles::isInfraestructura($userProfileEnum))
+                                <li class="nav-main-heading">Infraestructura</li>
+                                <li class="nav-main-item">
+                                    <a class="nav-main-link{{ request()->is('loguin/infraestructura/solicitudes') ? ' active' : '' }}"
+                                        href="{{ route('loguin.infra') }}">
+                                        <i class="nav-main-link-icon fa fa-database"></i>
+                                        <i class="nav-main-link-icon fa fa-users"></i>
+                                        <span class="nav-main-link-name">Loguin</span>
+                                    </a>
+                                </li>
                             @endif
                         </ul>
                     </div>
