@@ -206,6 +206,10 @@ class PerfilFormManager {
                     //console.log(result);
                     this.clearForm();
                     this.showToast('Perfil Creado!', ` `, 'success');
+                    // recargar la página después de un breve retraso para mostrar el mensaje de éxito
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
 
                 } catch (error) {
                     console.error('Error al guardar los datos del perfil:', error);
