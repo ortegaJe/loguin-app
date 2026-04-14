@@ -422,10 +422,10 @@ class RenderDataSolicitudLoguin {
       passInput.value = defaultPass;
       passInput.classList.add("form-control", "password-loguin");
       passInput.placeholder = "Contraseña";
-      passInput.setAttribute(
+/*       passInput.setAttribute(
         "onkeypress",
         "return /[0-9a-zA-Z]/i.test(event.key);"
-      );
+      ); */
       passColDiv.appendChild(passInput);
 
       corazaFormRowDiv.appendChild(userColDiv);
