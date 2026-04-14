@@ -1,5 +1,7 @@
 @extends('layouts.backend')
 
+@section('title', 'Cargo Perfiles')
+
 @section('css')
     <link rel="stylesheet" href="{{ asset('/js/plugins/select2/css/select2.min.css') }}">
     <style>

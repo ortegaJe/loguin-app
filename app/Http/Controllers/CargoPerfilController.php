@@ -72,13 +72,20 @@ class CargoPerfilController extends Controller
     }
 
     private function createTipoCargoSede($tipoCargoId, $cargoId, $sedes) {
-        foreach ($sedes as $sede) {
-            DB::table('loguin_rel_tipo_cargo_sede')->insert([
-                'tipocargo_id' => $tipoCargoId,
-                'sede_id' => $sede,
-                'cargo_id' => $cargoId,
-                'fecha_creacion' => now('America/Bogota'),
-            ]);
+        $ifExistCargoId = DB::table('loguin_rel_tipo_cargo_sede')
+                            ->where('tipocargo_id', $tipoCargoId)
+                            ->where('cargo_id', $cargoId)
+                            ->exists();
+
+        if (!$ifExistCargoId) {
+            foreach ($sedes as $sede) {
+                DB::table('loguin_rel_tipo_cargo_sede')->insert([
+                    'tipocargo_id' => $tipoCargoId,
+                    'sede_id' => $sede,
+                    'cargo_id' => $cargoId,
+                    'fecha_creacion' => now('America/Bogota'),
+                ]);
+            }
         }
     }
 
