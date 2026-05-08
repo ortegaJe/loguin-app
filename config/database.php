@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('DB_DATABASE_GLPI', 'glpi'),
+    'default' => env('DB_DATABASE_GLPI', 'glpidb'),
 
     /*
     |--------------------------------------------------------------------------
@@ -59,7 +59,7 @@ return [
             ]) : [],
         ],
 
-        'glpi' => [
+        'glpidb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL_GLPI'),
             'host' => env('DB_HOST_GLPI', '127.0.0.1'),

@@ -82,6 +82,6 @@ Route::match(['get', 'post'], '/login',  [GlpiAuthController::class, 'login'])->
 Route::match(['get', 'post'], '/logout', [GlpiAuthController::class, 'logout'])->name('logout');
 
 Route::get('query', function () {
-    $glpi = DB::table('glpi_locations')->where('sw_regional', 1)->get();
+    $glpi = DB::table('glpi_tickets')->get();
     return response()->json($glpi);
 });
