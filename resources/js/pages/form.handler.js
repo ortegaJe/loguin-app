@@ -13,7 +13,8 @@ class ApplicationFormManager {
         this.blockSolicitud = document.getElementById('block-solicitud');
         this.rowEspecialidad = document.getElementById('row-especialidad');
         this.radioAdicionSedeMultiple = document.getElementById('radio-adicion-sedes-multiples');
-        this.radioAdicionSedeMultipleContainer = document.getElementById('radio-adicion-sedes-multiples-container');
+        this.radioAdicionSedeMultipleContainer = 
+            document.getElementById('radio-adicion-sedes-multiples-container');        
         this.rowSedeMultiple = document.getElementById('row-sedes-multiple');
         this.sedeMultiple = document.getElementById('sedes-multiple');
         this.searchEspecialidad = document.getElementById('search-especialidad');
@@ -406,11 +407,13 @@ class ApplicationFormManager {
             const espPanaPerfilId = data.perfil_esp_pana_id;
 
             // Valida si el cargo seleccionado es especialista EVEREST
-            if (espEverestPerfilId != false) this.sedesAdicionalesChangeHandler(espEverestPerfilId);
+            if (espEverestPerfilId != false || espPanaPerfilId != false) 
+                this.sedesAdicionalesChangeHandler(espEverestPerfilId, espPanaPerfilId);
     
             // oculta y setea el contenedor del input especialidaddes antes de agregar nuevos elementos
             //this.rowEspecialidad.hidden = this.perfilesEspecialistaId.includes(idCargo) ? false : true;
             this.rowEspecialidad.hidden = (espPanaPerfilId !== false || espEverestPerfilId !== false) ? false : true;
+
             this.searchEspecialidad.value = '';
             
             // Limpiar los contenedores de checkboxes después de la animación
@@ -536,9 +539,10 @@ class ApplicationFormManager {
         }
     }
 
-    static async sedesAdicionalesChangeHandler(perfilId) {
+    static async sedesAdicionalesChangeHandler(espEverestPerfilId, espEverestNepsPerfilId) {
+        console.log('espEverestPerfilId:', espEverestPerfilId, 'espEverestNepsPerfilId:', espEverestNepsPerfilId);
     
-        if (perfilId) {
+        if (espEverestPerfilId !== false || espEverestNepsPerfilId !== false) {
             this.radioAdicionSedeMultiple.hidden = false;
             const radioAdicionSedeMultipleHTML = `
                 <div class="form-check form-check-inline">

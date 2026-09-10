@@ -404,18 +404,18 @@ class LoguinTicketStoreController extends Controller
 
         // Insertar el ticket en la base de datos
         $ticketId = DB::table('glpi_tickets')->insertGetId([
-            'name' => 'SOLICITUD USUARIO LOGIN (PANA, EVEREST) - ' . $identificacion,
+            'name' => 'SOLICITUD USUARIO LOGIN - ' . $identificacion,
             'content' => $encodedTable,
             'users_id_recipient' => $currentUser, // ID del usuario que envía la solicitud
             'date_creation' => now('America/Bogota'),
             'date' => now('America/Bogota'), // Fecha de creación del ticket
-            'time_to_own' => now('America/Bogota')->addHour(), // Tiempo para asignar el ticket
-            'time_to_resolve' => now('America/Bogota')->addHour(72), // Tiempo para resolver el ticket
+            'time_to_own' => now('America/Bogota')->addHour(2), // Tiempo para asignar el ticket
+            'time_to_resolve' => now('America/Bogota')->addHour(48), // Tiempo para resolver el ticket
             'date_mod' => now('America/Bogota'),
             'users_id_lastupdater' => $currentUser, // ID del usuario que envía la solicitud
-            'itilcategories_id' => 8, // Categoría del ticket
+            'itilcategories_id' => 3809, // Categoría del ticket
             'locations_id' => $sedeId, // ID de la sede
-            'entities_id' => 1, // ID de la entidad raiz de la organización VIVA COLOMBIA
+            'entities_id' => 11, // ID de la entidad raiz de la organización VIVA COLOMBIA
             'closedate' => null,
             'solvedate' => null,
             'takeintoaccountdate' => null,
@@ -426,8 +426,8 @@ class LoguinTicketStoreController extends Controller
             'priority' => 3,
             'type' => 2,
             'global_validation' => 1,
-            'slas_id_ttr' => 5,
-            'slas_id_tto' => 7,
+            'slas_id_ttr' => 241,
+            'slas_id_tto' => 239,
             'slalevels_id_ttr' => 0,
             'begin_waiting_date' => null,
             'sla_waiting_duration' => 0,
@@ -451,7 +451,7 @@ class LoguinTicketStoreController extends Controller
         // Asignar el ticket al grupo "Loguin"
         DB::table('glpi_groups_tickets')->insert([
             'tickets_id' => $ticketId,
-            'groups_id' => 6, // ID del grupo "Loguin"
+            'groups_id' => 34, // ID del grupo "Loguin"
             'type' => 2
         ]);
 
@@ -567,18 +567,18 @@ class LoguinTicketStoreController extends Controller
         $solicitudInfra = DB::table('loguin_solicitud_infraestructura')->insertGetId($solicitudes);
     
         $ticketInfra = DB::table('glpi_tickets')->insertGetId([
-            'name' => 'SOLICITUD USUARIO LOGUIN (CORREO, USUARIO DOMINIO, VPN)- ' . $identificacion,
+            'name' => 'SOLICITUD USUARIO LOGIN (CORREO, USUARIO DOMINIO, VPN) - ' . $identificacion,
             'content' => $infraTable,
             'users_id_recipient' => $currentUser,
             'date_creation' => now('America/Bogota'),
             'date' => now('America/Bogota'),
-            'time_to_own' => now('America/Bogota')->addHour(),
-            'time_to_resolve' => now('America/Bogota')->addHour(72),
+            'time_to_own' => now('America/Bogota')->addHour(2),
+            'time_to_resolve' => now('America/Bogota')->addHour(48),
             'date_mod' => now('America/Bogota'),
             'users_id_lastupdater' => $currentUser,
-            'itilcategories_id' => 48,
+            'itilcategories_id' => 3829, // Categoría del ticket
             'locations_id' => $sedeId,
-            'entities_id' => 1, // ID de la entidad raiz de la organización VIVA COLOMBIA
+            'entities_id' => 11, // ID de la entidad raiz de la organización VIVA COLOMBIA
             'closedate' => null, 
             'solvedate' => null , 
             'takeintoaccountdate' => null, 
@@ -589,8 +589,8 @@ class LoguinTicketStoreController extends Controller
             'priority' => 3, 
             'type' => 2, 
             'global_validation' => 1, 
-            'slas_id_ttr' => 5, 
-            'slas_id_tto' => 7, 
+            'slas_id_ttr' => 252, 
+            'slas_id_tto' => 247, 
             'slalevels_id_ttr' => 0, 
             'begin_waiting_date' => null,
             'sla_waiting_duration' => 0,
@@ -614,7 +614,7 @@ class LoguinTicketStoreController extends Controller
         // Asociar ticket con el grupo
         DB::table('glpi_groups_tickets')->insert([
             'tickets_id' => $ticketInfra,
-            'groups_id' => 2, // ID del grupo "Infraestructura"
+            'groups_id' => 33, // ID del grupo "Infraestructura"
             'type' => 2
         ]);
         

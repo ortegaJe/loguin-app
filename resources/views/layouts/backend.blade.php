@@ -157,7 +157,7 @@
                         <a class="link-fx fw-bold tracking-wide mx-auto" href="/">
                             <span class="smini-hidden">
                                 <i class="fa fa-users-gear text-primary"></i>
-                                <span class="fs-4 text-dual">Log</span><span class="fs-4 text-primary">uin</span>
+                                <span class="fs-4 text-dual">Log</span><span class="fs-4 text-primary">in</span>
                             </span>
                         </a>
                     </div>
@@ -258,7 +258,7 @@
                                     <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu"
                                         aria-haspopup="true" aria-expanded="true" href="#">
                                         <i class="nav-main-link-icon fa fa-users"></i>
-                                        <span class="nav-main-link-name">Loguin</span>
+                                        <span class="nav-main-link-name">Login</span>
                                     </a>
                                     <ul class="nav-main-submenu">
                                         <li class="nav-main-item">

@@ -171,7 +171,7 @@ class DropdownController extends Controller
                 ])
                 ->where('d.locations_id', $zonal_id)
                 ->where('b.cargo_id', $cargo_id)
-                ->whereIn('c.aplicacion_id', [2])
+                ->whereIn('c.aplicacion_id', [2,21])
                 ->whereIn('b.perfil_id', function ($query) use ($sede_id) {
                     $query->select('b2.perfil_id')
                         ->from('loguin_rel_cargo_sede as b2')

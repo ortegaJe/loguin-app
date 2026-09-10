@@ -90,10 +90,10 @@
                 <div class="py-4 px-1 text-center mb-4">
                     <a class="link-fx fw-bold" href="index.html">
                         <i class="fa fa-users-cog"></i>
-                        <span class="fs-4 text-body-color">Log</span><span class="fs-4">uin</span>
+                        <span class="fs-4 text-body-color">Log</span><span class="fs-4">in</span>
                     </a>
                     <h1 class="h3 fw-bold mt-5 mb-2">Bienvenido</h1>
-                    <h2 class="h5 fw-medium text-muted mb-0">Por favor ingresa usuario GLPI</h2>
+                    <h2 class="h5 fw-medium text-muted mb-0">Por favor ingresa usuario ORBIT</h2>
                 </div>
                 <!-- END Header -->
 
@@ -118,7 +118,7 @@
                             <div class="row g-sm mb-4">
                                 <div class="col-12 mb-2">
                                     <button type="submit" class="btn btn-lg btn-alt-primary w-100 py-3 fw-semibold">
-                                        Iniciar Sesión
+                                        Iniciar sesión
                                     </button>
                                 </div>
                             </div>

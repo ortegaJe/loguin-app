@@ -4,9 +4,9 @@ namespace App\Enums;
 enum UserProfiles: int
 {
     case SUPER_ADMIN     = 4;
-    case ANALISTA_APP    = 12;
-    case INFRAESTRUCTURA = 14;
-    case CONTRATACION    = 15;
+    case ANALISTA_APP    = 13;
+    case CONTRATACION    = 14;
+    case INFRAESTRUCTURA = 15;
 
     public static function values(): array
     {

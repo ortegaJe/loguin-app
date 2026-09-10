@@ -269,7 +269,7 @@
                 <form id="main-form">
                     <div class="block block-themed block-rounded">
                         <div class="block-header">
-                            <h3 class="block-title">Formulario de Solicitud Loguin</h3>
+                            <h3 class="block-title">Formulario de Solicitud Login</h3>
                             <div class="block-options">
                                 {{-- <button type="button" class="btn-block-option" data-toggle="block-option"
                                     data-action="content_toggle" hidden>
@@ -433,7 +433,7 @@
                                         <div class="col-lg-6">
                                             <p class="text-muted">
                                                 Seleccione las sedes adicionales a las que desea que se le
-                                                asigne el loguin:
+                                                asigne el login:
                                             </p>
                                         </div>
                                         <div class="col-lg-8 col-xl-6">

@@ -200,6 +200,13 @@ class LoguinCredentialController extends Controller
                 'fecha_creacion_loguin' => now('America/Bogota'),
             ]);
         }
+
+        DB::table('loguin_solicitud')
+            ->where('id', $solicitud)
+            ->update([
+                'estado' => 0, // Estado actualizado a "Cerrado"
+                'fecha_cerrado' => $aplicacionesLoguin[0]['fecha_creacion_loguin'] ?? now('America/Bogota'),
+            ]);
     }
 
     private function hasLoguins($solicitudId)
@@ -254,18 +261,21 @@ class LoguinCredentialController extends Controller
         ->leftJoin('glpi_itilfollowups as d', 'd.items_id', 'c.id')
         ->whereBetween('c.date_creation', [$primerDiaSemana, $ultimoDiaSemana])
         ->selectRaw("
-            SUM(CASE 
-                WHEN c.status = 2 AND d.items_id IS NULL THEN 1
-                ELSE 0
-            END) as en_curso,
             COUNT(DISTINCT CASE 
-                WHEN c.status = 2 AND c.id = d.items_id THEN 1
-                ELSE 0
-            END) as respuesta,
+                WHEN c.status = 2 
+                THEN c.id
+            END) AS en_curso,
+
             COUNT(DISTINCT CASE 
-                    WHEN c.status >= 5 THEN b.ticket_id
-                    ELSE NULL
-            END) as cerrados
+                WHEN c.status = 2 
+                    AND c.id = d.items_id 
+                THEN c.id
+            END) AS respuesta,
+
+            COUNT(DISTINCT CASE 
+                    WHEN c.status >= 5 
+                    THEN c.id
+            END) AS cerrados
         ", )
         ->first();
     
