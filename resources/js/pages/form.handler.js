@@ -1,3 +1,5 @@
+import { glpiTicketUrl } from "../helpers/glpi";
+
 import MultiSelect from './MultiSelect.js'; // Adjust the path as needed
 
 class ApplicationFormManager {
@@ -767,23 +769,59 @@ class ApplicationFormManager {
                     const ticketInfraNumber = result.ticketInfraestructura !== null ? result.ticketInfraestructura : null;
 
                     if (ticketLoguinNumber) {
-                        const URLTicketLoguin = `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${ticketLoguinNumber}" target="_blank">#${ticketLoguinNumber}</a>`;
+                        const URLTicketLoguin = `<a class="fw-semibold" href="
+                        ${glpiTicketUrl(ticketLoguinNumber)}" target="_blank">
+                        #${ticketLoguinNumber}</a>`;
+
                         console.log('ID de ticketLoguin:', ticketLoguinNumber);
-                        this.showToast('Formulario Loguin Enviado!', `TICKET Loguin ${URLTicketLoguin}`, 'success');
+
+                        this.showToast(
+                            'Formulario Loguin Enviado!', 
+                            `TICKET Loguin ${URLTicketLoguin}`, 
+                            'success'
+                        );
                     }
                     
                     if (ticketInfraNumber) {
-                        const URLticketInfraNumber = `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${ticketInfraNumber}" target="_blank">#${ticketInfraNumber}</a>`;
-                        console.log('ID de ticketInfraestructura:', ticketInfraNumber);
-                        this.showToast('Formulario Loguin Enviado!', `TICKET Infraestructura ${URLticketInfraNumber}`, 'success');
+                        const URLticketInfraNumber = `<a class="fw-semibold" href=" ${glpiTicketUrl(ticketInfraNumber)}"    target="_blank">
+                        #${ticketInfraNumber}</a>`;
+
+                        console.log(
+                            'ID de ticketInfraestructura:', ticketInfraNumber
+                        );
+
+                        this.showToast(
+                            'Formulario Loguin Enviado!', 
+                            `TICKET Infraestructura ${URLticketInfraNumber}`, 
+                            'success'
+                        );
                     }
 
                     if (ticketLoguinNumber && ticketInfraNumber) {
-                        const URLTicketLoguin = `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${ticketLoguinNumber}" target="_blank">#${ticketLoguinNumber}</a>`;
-                        const URLticketInfraNumber = `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${ticketInfraNumber}" target="_blank">#${ticketInfraNumber}</a>`;
-                        console.log('ID de ticketInfraestructura:', ticketInfraNumber);
-                        console.log('ID de ticketLoguin:', ticketLoguinNumber);
-                        this.showToast('Formulario Loguin Enviado!', `TICKET Loguin ${URLTicketLoguin} <br> TICKET Infraestructura ${URLticketInfraNumber}`, 'success');
+                        const URLTicketLoguin = `<a class="fw-semibold" href="
+                        ${glpiTicketUrl(ticketLoguinNumber)}" target="_blank">
+                        #${ticketLoguinNumber}</a>`;
+
+                        const URLticketInfraNumber = `<a class="fw-semibold" href="${glpiTicketUrl(ticketInfraNumber)}" target="_blank">
+                        #${ticketInfraNumber}</a>`;
+
+                        console.log(
+                            'ID de ticketInfraestructura:', 
+                            ticketInfraNumber
+                        );
+
+                        console.log(
+                            'ID de ticketLoguin:', 
+                            ticketLoguinNumber
+                        );
+
+                        this.showToast(
+                            'Formulario Loguin Enviado!', 
+                            `TICKET Loguin ${URLTicketLoguin} 
+                            <br> TICKET Infraestructura 
+                            ${URLticketInfraNumber}`, 
+                            'success'
+                        );
                     }
 
                     this.clearForm();

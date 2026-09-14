@@ -1,3 +1,4 @@
+import { glpiTicketUrl } from "../helpers/glpi";
 /*
  *  Document   : datatables.js
  *  Author     : pixelcave
@@ -116,8 +117,7 @@ class pageTablesDatatables {
     modal.querySelector("#modal-zonal").textContent = usuario.zonal || "N/A";
     modal.querySelector("#modal-sede").textContent = usuario.sede || "N/A";
     modal.querySelector("#modal-ticket").href =
-      `http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${usuario.ticket_id}` ||
-      "N/A";
+      glpiTicketUrl(usuario.ticket_id) ||"N/A";
     modal.querySelector("#modal-ticket").setAttribute("target", "_blank");
     modal.querySelector("#modal-ticket-numero").textContent = `#${usuario.ticket_id}` || "N/A";
     modal.querySelector("#modal-fecha").textContent = usuario.fecha_creacion || "N/A";
@@ -161,7 +161,7 @@ class pageTablesDatatables {
       tempDiv.innerHTML = contenidoOriginal; // El contenido ahora tiene HTML real (<a...>)
 
       // Definimos la URL base que quieres añadir o reemplazar
-      const urlBase = "http://mesadeservicios.viva1a.com.co"; // Reemplaza esto con tu URL real
+      const urlBase = window.appConfig.glpi.url; // Reemplaza esto con tu URL real
 
       // 1. Filtrar y modificar los enlaces (<a>)
       tempDiv.querySelectorAll('a').forEach(link => {
@@ -458,7 +458,8 @@ class pageTablesDatatables {
           targets: 1,
           render: function (data, type, row) {
             if (type === "display") {
-              return `<a class="fw-semibold" href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${row.ticket_id}" target="_blank">LOG.${row.ticket_id}</a>`;
+              return `<a class="fw-semibold" href="${glpiTicketUrl(
+                row.ticket_id)}" target="_blank">LOG.${row.ticket_id}</a>`;
             }
             return data;
           },

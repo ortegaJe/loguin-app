@@ -1,3 +1,5 @@
+import { glpiTicketUrl } from "../helpers/glpi";
+
 class RenderDataSolicitudLoguinInfra {
   static initFormElements() {
     this.formLoguin = document.getElementById("form-loguin");
@@ -148,8 +150,7 @@ class RenderDataSolicitudLoguinInfra {
     blockDataUser.querySelector("#loguin-cargo").innerHTML =
       `<i class="fa fa-briefcase me-1"></i>${usuario.cargo}` || "N/A";
     blockDataUser.querySelector("#loguin-ticket").href =
-      `http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id=${usuario.ticket_id}` ||
-      "N/A";
+      glpiTicketUrl(usuario.ticket_id) || "N/A";
     blockDataUser
       .querySelector("#loguin-ticket")
       .setAttribute("target", "_blank");

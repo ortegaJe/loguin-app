@@ -55,9 +55,13 @@
                         @foreach ($data as $loguin)
                             <tr data-usuario-id="{{ $loguin->usuario_id }}">
                                 <td class="text-center d-none d-md-table-cell">{{ $contador++ }}</td>
-                                <td class="text-center"><a class="fw-semibold"
-                                        href="http://mesadeservicios.viva1a.com.co/glpi/front/ticket.form.php?id={{ $loguin->ticket_id }}"
-                                        target="_blank">{{ $loguin->ticket }}</a></td>
+                                <td class="text-center">
+                                    <a class="fw-semibold"
+                                        href="{{ trim(config('glpi.url') . 
+                                        '/front/ticket.form.php?id=' . $loguin->ticket_id) }}"
+                                        target="_blank">{{ $loguin->ticket }}
+                                    </a>
+                                </td>
                                 <td class="d-none d-sm-table-cell">
                                     <span class="badge bg-{{ $loguin->status_color }} w-100">
                                         <i class="{{ $loguin->status_icon }} me-1"></i>

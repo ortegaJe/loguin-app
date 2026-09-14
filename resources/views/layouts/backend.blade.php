@@ -47,6 +47,13 @@
             });
         });
     </script>
+    <script>
+        window.appConfig = {
+            glpi: {
+                url: @json(config('glpi.url')),
+            }
+        };
+    </script>
     @yield('js')
 </head>
 
