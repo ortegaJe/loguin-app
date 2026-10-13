@@ -183,6 +183,13 @@ class pageTablesDatatables {
           }
       });
 
+      // 3. Filtrar y modificar las tablas (<table>) para un texto pequeño sin estilos
+      tempDiv.querySelectorAll('table').forEach(table => {
+          table.removeAttribute('class');
+          table.removeAttribute('style');
+          table.style.fontSize = '12px';
+      });
+
       // ----------------------------------------------------
       // Resultado Final: Obtener el HTML limpio (o texto)
       // ----------------------------------------------------

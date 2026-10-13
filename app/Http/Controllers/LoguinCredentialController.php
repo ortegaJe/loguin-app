@@ -47,7 +47,7 @@ class LoguinCredentialController extends Controller
         ], 200);
     }
 
-    private function getUsuario($solicitudId)
+    private function getUsuario(int $solicitudId)
     {
         return DB::table('loguin_solicitud as a')
             ->join('loguin_usuarios as b', 'b.id', 'a.usuario_id')
@@ -76,7 +76,7 @@ class LoguinCredentialController extends Controller
                             WHEN c.status = 2 AND d.items_id IS NULL THEN 'success'
                             WHEN c.status = 2 AND c.id = d.items_id THEN 'secondary'
                             WHEN c.status >= 5 THEN 'info'
-                            ELSE 0
+                            ELSE 'danger'
                         END 
                     FROM glpi_tickets c
                     LEFT JOIN glpi_itilfollowups d ON d.items_id = c.id
@@ -89,13 +89,26 @@ class LoguinCredentialController extends Controller
                             WHEN c.status = 2 AND d.items_id IS NULL THEN 'far fa-circle'
                             WHEN c.status = 2 AND c.id = d.items_id THEN 'far fa-comment'
                             WHEN c.status >= 5 THEN 'fa fa-check'
-                            ELSE 0
+                            ELSE 'far fa-circle-xmark'
                         END 
                     FROM glpi_tickets c
                     LEFT JOIN glpi_itilfollowups d ON d.items_id = c.id
                     WHERE c.id = a.ticket_id
                     LIMIT 1
-                ) AS status_icon")
+                ) AS status_icon"),
+                DB::raw("(
+                    SELECT 
+                        CASE 
+                            WHEN c.status = 2 AND d.items_id IS NULL THEN 'en curso'
+                            WHEN c.status = 2 AND c.id = d.items_id THEN 'respuesta'
+                            WHEN c.status >= 5 THEN 'solucionado'
+                            ELSE 'desconocido'
+                        END
+                    FROM glpi_tickets c
+                    LEFT JOIN glpi_itilfollowups d ON d.items_id = c.id
+                    WHERE c.id = a.ticket_id
+                    LIMIT 1
+                ) AS status_title")
             ])->get();
     }
     
@@ -145,68 +158,24 @@ class LoguinCredentialController extends Controller
             return $sedes;
     }
 
-    public function storeLoguin(Request $request)
+    public function getLoguins($solicitudId)
     {
-        // Iniciar una transacción para asegurar la consistencia de los datos
-        DB::beginTransaction();
-    
-        try {
-            $validatedData = $request->validate([
-                'solicitud' => 'integer',
-                'aplicaciones_loguin' => 'required|array',
-            ]);
-    
-            // Datos enviados desde el frontend
-            $solicitud = $validatedData['solicitud'];
-            $aplicacionesLoguin = $validatedData['aplicaciones_loguin'];
-
-            $this->registerLoguinApplications($aplicacionesLoguin, $solicitud);
-
-            // Confirmar la transacción si todo salió bien
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Datos guardados exitosamente',
-                'solicitud' => $solicitud,
-            ], 200);
-    
-        } catch (\Exception $e) {
-            // Manejar errores y hacer rollback si es necesario
-            DB::rollBack();
-    
-            return response()->json([
-                'message' => 'Error al guardar los datos '.$e->getMessage(), 
-                'error' => $e->getFile(), 'line '.$e->getLine(),
-            ], 500);
-        }
-    }
-
-    private function registerLoguinApplications($aplicacionesLoguin, $solicitud)
-    {
-        $currentUser = Auth::guard('glpi')->id();
-
-        foreach ($aplicacionesLoguin as $loguin) {
-            DB::table('loguin_solicitud_detalle')
-            ->where('solicitud_id', $solicitud)
-            ->where('aplicacion_id', $loguin['app_id'])
-            ->where('perfil_id', $loguin['perfil_id'])
-            ->update([
-                'users_id_recipient' => $currentUser,
-                'usuario_loguin' => $loguin['usuario_loguin'],
-                'password_loguin' => $loguin['password_loguin'],
-                'mipres' => $loguin['mipres'],
-                'ruaf' => $loguin['ruaf'],
-                'agendas_ocultas' => $loguin['agendas_ocultas'],
-                'fecha_creacion_loguin' => now('America/Bogota'),
-            ]);
-        }
-
-        DB::table('loguin_solicitud')
-            ->where('id', $solicitud)
-            ->update([
-                'estado' => 0, // Estado actualizado a "Cerrado"
-                'fecha_cerrado' => $aplicacionesLoguin[0]['fecha_creacion_loguin'] ?? now('America/Bogota'),
-            ]);
+        return DB::table('loguin_solicitud as a')
+        ->join('loguin_solicitud_detalle as b', 'b.solicitud_id', 'a.id')
+        ->join('loguin_aplicaciones as c', 'c.id', 'b.aplicacion_id')
+        ->join('loguin_perfil as d', 'd.id', 'b.perfil_id')
+        ->where('b.solicitud_id', $solicitudId)
+        ->select([
+            'a.id as solicitud_id',
+            'b.aplicacion_id',
+            'b.perfil_id',
+            DB::raw("UPPER(CONCAT(c.name,' ',d.name)) as aplicacion_perfil"),
+            'b.usuario_loguin',
+            'b.password_loguin',
+            'b.mipres',
+            'b.ruaf',
+            'b.agendas_ocultas',
+        ])->get();
     }
 
     private function hasLoguins($solicitudId)
@@ -226,26 +195,6 @@ class LoguinCredentialController extends Controller
             'b.mipres',
             'b.ruaf',
             'b.agendas_ocultas'
-        ])->get();
-    }
-
-    public function getLoguins($solicitudId)
-    {
-        return DB::table('loguin_solicitud as a')
-        ->join('loguin_solicitud_detalle as b', 'b.solicitud_id', 'a.id')
-        ->join('loguin_aplicaciones as c', 'c.id', 'b.aplicacion_id')
-        ->join('loguin_perfil as d', 'd.id', 'b.perfil_id')
-        ->where('b.solicitud_id', $solicitudId)
-        ->select([
-            'a.id as solicitud_id',
-            'b.aplicacion_id',
-            'b.perfil_id',
-            DB::raw("UPPER(CONCAT(c.name,' ',d.name)) as aplicacion_perfil"),
-            'b.usuario_loguin',
-            'b.password_loguin',
-            'b.mipres',
-            'b.ruaf',
-            'b.agendas_ocultas',
         ])->get();
     }
 
@@ -308,4 +257,211 @@ class LoguinCredentialController extends Controller
             //'countByTicketCloseUser' => $countByTicketCloseUser,
         ]);
     }
+
+    public function storeLoguin(Request $request)
+    {
+        // Iniciar una transacción para asegurar la consistencia de los datos
+        DB::beginTransaction();
+    
+        try {
+            $validatedData = $request->validate([
+                'solicitud' => 'integer',
+                'aplicaciones_loguin' => 'required|array',
+            ]);
+    
+            // Datos enviados desde el frontend
+            $solicitud = $validatedData['solicitud'];
+            $aplicacionesLoguin = $validatedData['aplicaciones_loguin'];
+
+            $this->registerLoguinApplications($aplicacionesLoguin, $solicitud);
+            $this->closeGlpiTicket($solicitud);
+
+            // Confirmar la transacción si todo salió bien
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Credenciales Login registradas correctamente.',
+                'solicitud' => $solicitud,
+                'ticket_status' => $this->getUsuario($solicitud) ?? null,
+            ], 200);
+    
+        } catch (\Exception $e) {
+            // Manejar errores y hacer rollback si es necesario
+            DB::rollBack();
+    
+            return response()->json([
+                'message' => 'Error al guardar los datos '.$e->getMessage(), 
+                'error' => $e->getFile(), 'line '.$e->getLine(),
+            ], 500);
+        }
+    }
+
+    private function registerLoguinApplications($aplicacionesLoguin, $solicitud)
+    {
+        $currentUser = Auth::guard('glpi')->id();
+
+        foreach ($aplicacionesLoguin as $loguin) {
+            DB::table('loguin_solicitud_detalle')
+            ->where('solicitud_id', $solicitud)
+            ->where('aplicacion_id', $loguin['app_id'])
+            ->where('perfil_id', $loguin['perfil_id'])
+            ->update([
+                'users_id_recipient' => $currentUser,
+                'usuario_loguin' => $loguin['usuario_loguin'],
+                'password_loguin' => $loguin['password_loguin'],
+                'mipres' => $loguin['mipres'],
+                'ruaf' => $loguin['ruaf'],
+                'agendas_ocultas' => $loguin['agendas_ocultas'],
+                'fecha_creacion_loguin' => now('America/Bogota'),
+            ]);
+        }
+
+        DB::table('loguin_solicitud')
+            ->where('id', $solicitud)
+            ->update([
+                'estado' => 0, // Estado actualizado a "Cerrado"
+                'fecha_cerrado' => $aplicacionesLoguin[0]['fecha_creacion_loguin'] ?? now('America/Bogota'),
+            ]);
+    }
+
+    private function closeGlpiTicket(int $solicitud)
+    {
+        $currentUser = Auth::guard('glpi')->id();
+
+        $ticketId = DB::table('loguin_solicitud')
+            ->where('id', $solicitud)
+            ->value('ticket_id');
+
+        if ($ticketId) {
+
+            $encodedTable = $this->buildEncodedTable($this->getLoguins($solicitud));
+
+            DB::table('glpi_itilsolutions')->insert([
+                'itemtype' => 'Ticket',
+                'items_id' => $ticketId,
+                'solutiontypes_id' => 0,
+                'solutiontype_name' => NULL,
+                'content' => $encodedTable,
+                'date_creation' => now('America/Bogota'),
+                'date_mod' => now('America/Bogota'),
+                'date_approval' => NULL,
+                'users_id' => $currentUser,
+                'user_name' => NULL,
+                'users_id_editor' => 0,
+                'users_id_approval' => 0,
+                'user_name_approval' => NULL,
+                'status' => 2,
+                'itilfollowups_id' => NULL
+            ]);
+
+            DB::table('glpi_tickets')
+                ->where('id', $ticketId)
+                ->update([
+                    'status' => 5, // Estado actualizado a "Cerrado"
+                    'date_mod' => now('America/Bogota'),
+                    'solvedate' => now('America/Bogota'),
+                    'closedate' => now('America/Bogota'),
+                    'users_id_lastupdater' => $currentUser,
+                ]);
+        }
+    }
+
+    private function buildEncodedTable($dataAplicacionesLoguin)
+    {
+
+        $encodedTable = '<div tabindex="0">
+            <p>¡Buen día!</p>
+            <p>Solicitud de creación login realizada:</p>';
+
+        foreach ($dataAplicacionesLoguin as $appPerfil) {
+
+            $aplicacionId = (int) $appPerfil->aplicacion_id;
+
+            /*
+            * MIPRES y RUAF
+            * Se muestran como una tabla independiente:
+            * APLICACION | SÍ/NO
+            */
+            if ($aplicacionId === 7) {
+
+                $valorMipres = (int) $appPerfil->mipres === 1 ? 'SÍ' : 'NO';
+
+                $encodedTable .= '
+                    <table style="width: 100%; border-collapse: collapse; border: 1px solid #27363b; margin-bottom: 16px;">
+                        <tbody>
+                            <tr>
+                                <th>
+                                    ' . e($appPerfil->aplicacion_perfil) . '
+                                </th>
+                                <td>
+                                    ' . $valorMipres . '
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>';
+            }
+
+            elseif ($aplicacionId === 8) {
+
+                $valorRuaf = (int) $appPerfil->ruaf === 1 ? 'SÍ' : 'NO';
+
+                $encodedTable .= '
+                    <table style="width: 100%; border-collapse: collapse; border: 1px solid #27363b; margin-bottom: 16px;">
+                        <tbody>
+                            <tr>
+                                <th>
+                                    ' . e($appPerfil->aplicacion_perfil) . '
+                                </th>
+                                <td>
+                                    ' . $valorRuaf . '
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>';
+            }
+
+            /*
+            * Aplicaciones normales
+            * Se muestran con usuario y contraseña.
+            */
+            else {
+
+                $encodedTable .= '
+                    <table style="width: 100%; border-collapse: collapse; border: 1px solid #27363b; margin-bottom: 16px;">
+                        <thead>
+                            <tr>
+                                <th colspan="2">
+                                    ' . e($appPerfil->aplicacion_perfil) . '
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <th>
+                                    USUARIO
+                                </th>
+                                <td>
+                                    ' . e($appPerfil->usuario_loguin ?? '') . '
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>
+                                    CONTRASEÑA
+                                </th>
+                                <td>
+                                    ' . e($appPerfil->password_loguin ?? '') . '
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>';
+            }
+        }
+
+        $encodedTable .= '</div><br>';
+
+        return $encodedTable;
+    }
+
 }

@@ -89,7 +89,7 @@
                 @endif
                 <div class="py-4 px-1 text-center mb-4">
                     <a class="link-fx fw-bold" href="index.html">
-                        <i class="fa fa-users-cog"></i>
+                        <i class="fa fa-users-cog fa-2x"></i>
                         <span class="fs-4 text-body-color">Log</span><span class="fs-4">in</span>
                     </a>
                     <h1 class="h3 fw-bold mt-5 mb-2">Bienvenido</h1>

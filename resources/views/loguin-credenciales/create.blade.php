@@ -128,7 +128,19 @@
             <span class="breadcrumb-item active">Ticket #LOG.{{ $solicitud->ticket_id }}</span>
         </nav>
         <div class="row">
-            <div class="col-sm-6 d-flex flex-column" id="block-datos-personales">
+            <div class="col-md-6 col-xl-6 animated fadeIn">
+                <a class="block block-rounded block-link-shadow" id="ticket-card">
+                    <div class="block-content block-content-full">
+                        <div class="py-3 text-center">
+                            <div class="mb-3" id="ticket-icon"></div>
+                            <div class="fs-sm fw-semibold text-uppercase text-muted" id="ticket-status-title"></div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-xl-6 d-flex flex-column" id="block-datos-personales">
                 <div class="block block-themed block-rounded flex-grow-1">
                     <div class="block-header block-header-default">
                         <h3 class="block-title">Datos Personales</i></h3>
@@ -168,7 +180,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 d-flex flex-column" id="block-datos-solicitud">
+            <div class="col-md-6 col-xl-6 d-flex flex-column" id="block-datos-solicitud">
                 <div class="block block-themed block-rounded flex-grow-1">
                     <div class="block-header block-header-default">
                         <h3 class="block-title">Solicitud</h3>
@@ -178,16 +190,12 @@
                             <span id="loguin-zonal"></span><br>
                             <span id="loguin-sede"></span><br>
                             <span id="loguin-cargo"></span><br>
-                            <span id="loguin-especialidad" hidden></span><br>
-                            <a type="button" class="fw-bold mb-2" id="loguin-ticket" href="javascript:void(0)"
-                                data-bs-toggle="tooltip" data-bs-placement="right" title="Ticket Mesa de Servicio">
-                                <span id="modal-ticket-numero"></span>
-                            </a>
+                            <span id="loguin-especialidad" hidden></span>
                         </address>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4 d-flex flex-column" id="block-sedes-adicionales">
+            <div class="col-md-12 col-xl-12 d-flex flex-column" id="block-sedes-adicionales">
                 <div class="block block-themed block-rounded flex-grow-1">
                     <div class="block-header block-header-default">
                         <h3 class="block-title">Sedes Adicionales</h3>
@@ -197,7 +205,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 d-flex flex-column" id="block-observaciones">
+            <div class="col-md-3 col-xl-6 d-flex flex-column" id="block-observaciones">
                 <div class="block block-themed block-rounded flex-grow-1">
                     <div class="block-header block-header-default">
                         <h3 class="block-title">Observaciones</h3>

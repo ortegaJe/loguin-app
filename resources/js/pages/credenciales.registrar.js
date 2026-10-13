@@ -1,9 +1,16 @@
 import { glpiTicketUrl } from "../helpers/glpi";
 
 class RenderDataSolicitudLoguin {
+
   static initFormElements() {
+
     this.formLoguin = document.getElementById("form-loguin");
     this.solicitudLoguin = document.getElementById("solicitud");
+    this.ticketElement = document.getElementById("ticket-card");
+    this.ticketNumero = document.getElementById("ticket-numero");
+    this.ticketIcon = document.getElementById("ticket-icon");
+    this.ticketStatusTitle = document.getElementById("ticket-status-title");
+
     this.toast = Swal.mixin({
       buttonsStyling: false,
       target: "#page-container",
@@ -13,6 +20,7 @@ class RenderDataSolicitudLoguin {
         input: "form-control",
       },
     });
+
     jQuery("#form-loguin").validate({
       ignore: [],
       rules: {
@@ -174,6 +182,13 @@ class RenderDataSolicitudLoguin {
         throw new Error("Datos incompletos recibidos del servidor");
       }
 
+      this.getTicketStatus(
+        data.usuario[0].ticket_id,
+        data.usuario[0].status_title,
+        data.usuario[0].status_color, 
+        data.usuario[0].status_icon,
+      );
+
       this.showDataUserBlock(
         data.usuario[0],
         data.especialidad_usuario,
@@ -186,6 +201,32 @@ class RenderDataSolicitudLoguin {
       console.error("Fetch error:", error);
       Codebase.loader("hide");
     }
+  }
+
+  static getTicketStatus(ticketId, statusTitle, statusColor, statusIcon) {
+    const ticketElement = this.ticketElement;
+    const ticketIconElement = this.ticketIcon;
+    const ticketStatusTitleElement = this.ticketStatusTitle;
+
+    if (!ticketElement || !ticketIconElement || !ticketStatusTitleElement) {
+        return;
+    }
+
+  const idTicket = ticketId.ticket_id ?? ticketId ?? null;
+
+    if (!idTicket) {
+        return;
+    }
+
+    ticketElement.href = glpiTicketUrl(idTicket);
+
+    ticketElement.setAttribute("target", "_blank");
+
+    ticketIconElement.innerHTML = `
+      <i class="${statusIcon} fa-4x text-${statusColor}"></i>
+    `;
+
+    ticketStatusTitleElement.innerHTML = `${statusTitle}`;
   }
 
   static async showDataUserBlock(
@@ -258,15 +299,6 @@ class RenderDataSolicitudLoguin {
       .classList.add("mb-4");
     containerDatosSolicitud.querySelector("#loguin-cargo").innerHTML =
       `<i class="fa fa-briefcase me-1"></i> ${usuario.cargo}` || "N/A";
-
-    containerDatosSolicitud.querySelector("#loguin-ticket").href =
-      glpiTicketUrl(usuario.ticket_id) || "N/A";
-    containerDatosSolicitud
-      .querySelector("#loguin-ticket")
-      .setAttribute("target", "_blank");
-    containerDatosSolicitud.querySelector("#modal-ticket-numero").innerHTML =
-      `<span class="badge bg-${usuario.status_color}"></i><i class="${usuario.status_icon} me-1"></i>${usuario.ticket_id}</span>` ||
-      "N/A";
 
     containerObservacion.querySelector("#observacion-loguin").innerHTML =
       `<i class="fa fa-circle-info me-2"></i>
@@ -943,10 +975,16 @@ class RenderDataSolicitudLoguin {
 
             const result = await response.json();
             //console.log('datos desde la db',result);
-            this.showToast("Loguin creado!", `${result.message}`, "success");
+            this.showToast("Login creado!", `${result.message}`, "success");
             this.formLoguin.hidden = true;
             this.clearLoguinInputs();
             await this.fetchAndRenderLoguins(result.solicitud);
+            this.getTicketStatus(
+              result.ticket_status[0].ticket_id,
+              result.ticket_status[0].status_title, 
+              result.ticket_status[0].status_color, 
+              result.ticket_status[0].status_icon
+            );
             this.copyTableFeature();
           } catch (error) {
             console.error("Error al guardar las credenciales:", error);

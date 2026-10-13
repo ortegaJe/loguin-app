@@ -448,6 +448,14 @@ class LoguinTicketStoreController extends Controller
             'ola_tto_begin_date' => null
         ]);
 
+        // Asignar el ticket al usuario que envía la solicitud
+         DB::table('glpi_tickets_users')->insert([
+            'tickets_id' => $ticketId,
+            'users_id' => $currentUser,
+            'type' => 1,
+            'use_notification' => 1
+        ]);
+
         // Asignar el ticket al grupo "Loguin"
         DB::table('glpi_groups_tickets')->insert([
             'tickets_id' => $ticketId,
@@ -609,6 +617,14 @@ class LoguinTicketStoreController extends Controller
             'is_deleted' => 0, 
             'validation_percent' => 0, 
             'ola_tto_begin_date' => null
+        ]);
+
+        // Asignar el ticket al usuario que envía la solicitud
+         DB::table('glpi_tickets_users')->insert([
+            'tickets_id' => $ticketInfra,
+            'users_id' => $currentUser,
+            'type' => 1,
+            'use_notification' => 1
         ]);
     
         // Asociar ticket con el grupo
