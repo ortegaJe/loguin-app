@@ -410,7 +410,7 @@ class LoguinTicketStoreController extends Controller
             'date_creation' => now('America/Bogota'),
             'date' => now('America/Bogota'), // Fecha de creación del ticket
             'time_to_own' => now('America/Bogota')->addHour(2), // Tiempo para asignar el ticket
-            'time_to_resolve' => now('America/Bogota')->addHour(48), // Tiempo para resolver el ticket
+            'time_to_resolve' => now('America/Bogota')->addHour(168), // Tiempo para resolver el ticket 7 dias en horas
             'date_mod' => now('America/Bogota'),
             'users_id_lastupdater' => $currentUser, // ID del usuario que envía la solicitud
             'itilcategories_id' => 3809, // Categoría del ticket
@@ -581,7 +581,7 @@ class LoguinTicketStoreController extends Controller
             'date_creation' => now('America/Bogota'),
             'date' => now('America/Bogota'),
             'time_to_own' => now('America/Bogota')->addHour(2),
-            'time_to_resolve' => now('America/Bogota')->addHour(48),
+            'time_to_resolve' => now('America/Bogota')->addHour(168),
             'date_mod' => now('America/Bogota'),
             'users_id_lastupdater' => $currentUser,
             'itilcategories_id' => 3829, // Categoría del ticket

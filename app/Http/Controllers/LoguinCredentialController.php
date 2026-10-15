@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserProfiles;
+use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -360,9 +361,66 @@ class LoguinCredentialController extends Controller
                     'status' => 5, // Estado actualizado a "Cerrado"
                     'date_mod' => now('America/Bogota'),
                     'solvedate' => now('America/Bogota'),
-                    'closedate' => now('America/Bogota'),
+                    'begin_waiting_date' => now('America/Bogota'),
+                    'solve_delay_stat' => $this->getSolveDelayStat($ticketId),
+                    'takeintoaccount_delay_stat' => $this->getTakeIntoAccountDelayStat($ticketId),
                     'users_id_lastupdater' => $currentUser,
                 ]);
+        }
+    }
+
+    // Calcula el tiempo de resolución del ticket en segundos, diferencia entre la fecha de creación y la fecha de solución
+    private function getSolveDelayStat(int $ticketId)
+    {
+        $date = Carbon::now('America/Bogota');
+
+        $solveDate = $date->toDateTimeString();
+
+        $getDate = DB::table('glpi_tickets')
+            ->where('id', $ticketId)
+            ->value('date');
+
+        $dateCreation = new Carbon($getDate, 'America/Bogota');
+
+        $solveDelayStat =  $dateCreation->diffInSeconds(CarbonImmutable::parse($solveDate, 'America/Bogota'));
+
+        return $solveDelayStat;
+    }
+
+    // Calcula el tiempo de atención del ticket en segundos, diferencia entre la fecha de creación y la fecha de toma en cuenta
+    // Si el ticket no tiene fecha de toma en cuenta y el tiempo de atención es 0, se actualiza la fecha de toma en cuenta con la fecha actual y se calcula el tiempo de atención
+    private function getTakeIntoAccountDelayStat(int $ticketId)
+    {
+        $ticket = DB::table('glpi_tickets')
+            ->where('id', $ticketId)
+            ->first(['takeintoaccountdate', 'takeintoaccount_delay_stat']);
+
+        $getTakeIntoAccountDate = $ticket?->takeintoaccountdate;
+        $getTakeIntoAccountDelayStat = $ticket?->takeintoaccount_delay_stat;
+
+        if ($getTakeIntoAccountDate === null && $getTakeIntoAccountDelayStat === 0) 
+        {
+            DB::table('glpi_tickets')
+                ->where('id', $ticketId)
+                ->update(['takeintoaccountdate' => now('America/Bogota')]);
+
+            $getDate = DB::table('glpi_tickets')
+                ->where('id', $ticketId)
+                ->value('date');
+
+            $dateCreation = new Carbon($getDate, 'America/Bogota');
+
+            $getTakeIntoAccountDate = DB::table('glpi_tickets')
+                ->where('id', $ticketId)
+                ->value('takeintoaccountdate');
+
+            $takeIntoAccountDelayStat = $dateCreation->diffInSeconds(CarbonImmutable::parse($getTakeIntoAccountDate, 'America/Bogota'));
+
+             return $takeIntoAccountDelayStat;
+
+        } else
+        {
+            return $getTakeIntoAccountDelayStat;
         }
     }
 
