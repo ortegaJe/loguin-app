@@ -328,20 +328,32 @@
                                         </div>
                                     </div>
                                     <div class="row mb-4">
+                                        <div class="col-3">
+                                            <div class="form-floating">
+                                                <select class="form-select" id="gender"
+                                                    for="gender" name="gender"
+                                                    style="width: 100%;">
+                                                    <option selected disabled>Seleccione genero..</option>
+                                                    <!-- Required for data-placeholder attribute to work with Select2 plugin -->
+                                                        <option value="F">F</option>
+                                                        <option value="M">M</option>
+                                                </select>
+                                                <label class="form-label" for="gender">Genero</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="form-floating">
+                                                <input type="text"
+                                                    class="js-masked-date-dash form-control form-control-lg"
+                                                    id="fecha_nacimiento" name="fecha_nacimiento" placeholder="dd-mm-yyyy">
+                                                <label class="form-label" for="fecha_nacimiento">Fecha de Nacimiento</label>
+                                            </div>
+                                        </div>
                                         <div class="col-6">
                                             <div class="form-floating">
                                                 <input type="email" class="form-control" id="email" name="email"
                                                     for="email" placeholder="email">
                                                 <label class="form-label" for="email">Correo</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="form-floating">
-                                                <input type="text"
-                                                    class="js-masked-date-dash form-control form-control-lg"
-                                                    id="fecha_nacimiento" name="fecha_nacimiento"
-                                                    placeholder="dd-mm-yyyy">
-                                                <label class="form-label" for="fecha_nacimiento">Fecha de Nacimiento</label>
                                             </div>
                                         </div>
                                     </div>

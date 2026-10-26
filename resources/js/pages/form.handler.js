@@ -6,7 +6,13 @@ class ApplicationFormManager {
 
     static initFormElements() {
         this.mainForm = document.getElementById('main-form');
+        this.typeIdentityNumber = document.getElementById('type_identity_number');
+        this.identityNumber = document.getElementById('identity_number');
+        this.firstName = document.getElementById('first_name');
+        this.lastName = document.getElementById('last_name');
+        this.email = document.getElementById('email');
         this.fechaNacimiento = document.getElementById('fecha_nacimiento');
+        this.genero = document.getElementById('gender');
         this.zonalDropdown = document.getElementById('zonal-dropdown');
         this.sedeDropdown = document.getElementById('sede-dropdown');
         this.tipoCargoDropdown = document.getElementById('tipo-cargo-dropdown');
@@ -69,6 +75,9 @@ class ApplicationFormManager {
             'fecha_nacimiento': {
             required: true,
             },
+            'gender': {
+            required: true,
+            },
             'zonal-dropdown': {
             required: true,
             },
@@ -108,6 +117,9 @@ class ApplicationFormManager {
             'email': {
                 required: "Este campo es obligatorio",
                 emailWithDot: "Debe ser un correo válido"
+            },
+            'gender': {
+                required: "Este campo es obligatorio",
             },
             'fecha_nacimiento': {
                 required: "Este campo es obligatorio",
@@ -272,6 +284,7 @@ class ApplicationFormManager {
                     jQuery('#identity_number').val(data.identificacion);
                     jQuery('#first_name').val(data.nombres);
                     jQuery('#last_name').val(data.apellidos);
+                    JQuery('#gender').val(data.genero);
                     jQuery('#email').val(data.email);
                     jQuery('#fecha_nacimiento').val(data.fecha_nacimiento);
                 })
@@ -631,6 +644,7 @@ class ApplicationFormManager {
         document.getElementById('last_name').value = '';
         document.getElementById('email').value = '';
         this.fechaNacimiento.value = '';
+        this.genero.value = '';
         this.zonalDropdown.value = '';
         this.sedeDropdown.value = '';
         this.tipoCargoDropdown.value = '';
@@ -706,11 +720,12 @@ class ApplicationFormManager {
         //console.log(selectedData);
 
         const formData = {
-            tipo_identificacion: document.getElementById('type_identity_number').value,
-            identificacion: document.getElementById('identity_number').value,
-            nombre: document.getElementById('first_name').value,
-            apellido: document.getElementById('last_name').value,
-            email: document.getElementById('email').value,
+            tipo_identificacion: this.typeIdentityNumber.value,
+            identificacion: this.identityNumber.value,
+            nombre: this.firstName.value,
+            apellido: this.lastName.value,
+            email: this.email.value,
+            genero: this.genero.value,
             fecha_nacimiento: this.fechaNacimiento.value,
             zonal_id: this.zonalDropdown.value,
             sede_id: this.sedeDropdown.value,

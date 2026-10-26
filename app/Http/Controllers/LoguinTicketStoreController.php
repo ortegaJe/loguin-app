@@ -22,8 +22,9 @@ class LoguinTicketStoreController extends Controller
                 'identificacion' => 'required|string|max:255',
                 'nombre' => 'required|string|max:255',
                 'apellido' => 'required|string|max:255',
-                'email' => 'required|email|max:255',
                 'fecha_nacimiento' => 'required|date_format:d-m-Y',
+                'genero' => 'required|in:M,F|string|max:1',
+                'email' => 'required|email|max:255',
                 'zonal_id' => 'required|integer',
                 'sede_id' => 'required|integer',
                 'aplicaciones' => 'nullable|array',
@@ -41,6 +42,7 @@ class LoguinTicketStoreController extends Controller
             $apellido = $validatedData['apellido'];
             $email = $validatedData['email'];
             $fechaNacimiento = $validatedData['fecha_nacimiento'];
+            $genero = $validatedData['genero'];
             $zonal_id = $validatedData['zonal_id'];
             $sede_id = $validatedData['sede_id'];
             $aplicaciones = $validatedData['aplicaciones'] ?? [];
@@ -51,7 +53,7 @@ class LoguinTicketStoreController extends Controller
             $sedes_adicionales = $validatedData['sedes_adicionales'] ?? '';
     
             // Crear usuario en la tabla loguin_usuarios
-            $appUserId = $this->createUser($tipo_identificacion_id, $identificacion, $nombre, $apellido, $email, $fechaNacimiento);
+            $appUserId = $this->createUser($tipo_identificacion_id, $identificacion, $nombre, $apellido, $email, $fechaNacimiento, $genero);
             //error_log(__LINE__ . __METHOD__ . ' ID usuario creado --->' .var_export($appUserId, true));
 
             // Lógica para decidir y crear los tickets
@@ -79,13 +81,14 @@ class LoguinTicketStoreController extends Controller
     }
     
     // Función para crear un usuario
-    private function createUser($tipo_identificacion_id, $identificacion, $nombre, $apellido, $email, $fechaNacimiento)
+    private function createUser($tipo_identificacion_id, $identificacion, $nombre, $apellido, $email, $fechaNacimiento, $genero)
     {
         $nombreStr = Str::title($nombre);
         $apellidoStr = Str::title($apellido);
         $emailStr = Str::lower($email);
         $fechaNacimientoFormat = Carbon::createFromFormat('d-m-Y', $fechaNacimiento)->format('Y-m-d');
-        
+        $genero = strtoupper($genero);
+
         // Intentar encontrar el usuario existente
         $user = DB::table('loguin_usuarios')
             ->where('tipoidentificacion_id', $tipo_identificacion_id)
@@ -99,8 +102,9 @@ class LoguinTicketStoreController extends Controller
                 ->update([
                     'nombres' => $nombreStr,
                     'apellidos' => $apellidoStr,
-                    'email' => $emailStr,
+                    'genero' => $genero,
                     'fecha_nacimiento' => $fechaNacimientoFormat,
+                    'email' => $emailStr,
                 ]);
 
             // Usar el ID del usuario existente
@@ -113,6 +117,7 @@ class LoguinTicketStoreController extends Controller
                 'nombres' => $nombreStr,
                 'apellidos' => $apellidoStr,
                 'email' => $emailStr,
+                'genero' => $genero,
                 'fecha_nacimiento' => $fechaNacimientoFormat,
                 'fecha_creacion' => now('America/Bogota'),
             ]);
