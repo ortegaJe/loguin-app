@@ -138,6 +138,16 @@
                     </div>
                 </a>
             </div>
+            <div class="col-md-6 col-xl-6 animated fadeIn">
+                <a class="block block-rounded block-link-shadow" id="seguimiento-card" href="javascript:void(0)">
+                    <div class="block-content block-content-full">
+                        <div class="py-3 text-center">
+                            <div class="mb-3"><i class="fa fa-timeline fa-4x text-secondary"></i></div>
+                            <div class="fs-sm fw-semibold text-uppercase text-muted">Seguimiento</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
         </div>
         <div class="row">
             <div class="col-md-6 col-xl-6 d-flex flex-column" id="block-datos-personales">

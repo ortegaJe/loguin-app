@@ -34,6 +34,7 @@ class LoguinCredentialController extends Controller
         $especialidadUsuario = $this->getEspecialidadUsuario($solicitudId);
         $hasLoguin = $this->hasLoguins($solicitudId);
         $sedesAdicionales = $this->getSedesAdicionales($solicitudId);
+        $timeline = $this->getAllFollowUpAndSolutions($usuario[0]->ticket_id ?? null);
 
         if ($usuario->isEmpty() && $loguinSolicitud->isEmpty() && $especialidadUsuario->isEmpty()) {
             return response()->json(['message' => 'No se encontró información'], 404);
@@ -45,6 +46,7 @@ class LoguinCredentialController extends Controller
             'especialidad_usuario' => $especialidadUsuario ?? null,
             'sedes_adicionales' => $sedesAdicionales ?? null,
             'has_loguin' => $hasLoguin ?? null,
+            'timeline' => $timeline ?? null,
         ], 200);
     }
 
@@ -520,6 +522,34 @@ class LoguinCredentialController extends Controller
         $encodedTable .= '</div><br>';
 
         return $encodedTable;
+    }
+
+    private function getAllFollowUpAndSolutions(int $ticketId)
+    {
+        $query = DB::table('glpi_itilfollowups as a')
+            ->join('glpi_users as b', 'b.id', 'a.users_id')
+            ->select(
+                'a.items_id as ticket_id',
+                'a.content as contenido',
+                'a.date as fecha',
+                DB::raw("CONCAT(b.firstname, ' ', b.realname) as usuario"),
+                DB::raw("'respuesta' as tipo")
+            )
+            ->where('a.items_id', $ticketId);
+
+        return DB::table('glpi_itilsolutions as a')
+            ->join('glpi_users as b', 'b.id', 'a.users_id')
+            ->select(
+                'a.items_id as ticket_id',
+                'a.content as contenido',
+                'a.date_creation as fecha',
+                DB::raw("CONCAT(b.firstname, ' ', b.realname) as usuario"),
+                DB::raw("'solucion' as tipo")
+            )
+            ->where('a.items_id', $ticketId)
+            ->unionAll($query)
+            ->orderByDesc('fecha')
+            ->get();
     }
 
 }
